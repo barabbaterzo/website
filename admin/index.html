@@ -897,7 +897,7 @@
                 headers: { Authorization: `Bearer ${c.mgmtToken}`,
                   'Content-Type': 'application/vnd.contentful.management.v1+json',
                   'X-Contentful-Version': e.sys.version },
-                body: JSON.stringify({ ...e, fields: { ...e.fields, heroBanner: { 'en-US': url } } })
+                body: JSON.stringify({ fields: { ...e.fields, heroBanner: { 'en-US': url } } })
               }
             );
             const updated = await bannerR.json();
@@ -1058,7 +1058,7 @@
               headers: { Authorization: `Bearer ${c.mgmtToken}`,
                 'Content-Type': 'application/vnd.contentful.management.v1+json',
                 'X-Contentful-Version': e.sys.version },
-              body: JSON.stringify({ ...e, fields: Object.fromEntries(Object.entries(fields).map(([k,v]) => [k, {'en-US': v}])) })
+              body: JSON.stringify({ fields: Object.fromEntries(Object.entries(fields).map(([k,v]) => [k, {'en-US': v}])) })
             }
           );
           const upd = await updR.json();

@@ -171,7 +171,6 @@ const CF = (() => {
           'X-Contentful-Version': existing.sys.version
         },
         body: JSON.stringify({
-          ...existing,
           fields: Object.fromEntries(
             Object.entries(fields).map(([k, v]) => [k, { 'en-US': v }])
           )
