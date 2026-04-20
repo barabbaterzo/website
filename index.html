@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tomaso Pignocchi</title>
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=New+Computer+Modern:ital,wght@0,400;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Cormorant+Garant:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Source+Sans+3:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet" />
+  <style>
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --page-bg:   #f5f2ec;
+      --page-ink:  #1a1814;
+      --page-ink2: #3e3b36;
+      --page-ink3: #8a8480;
+      --page-rule: #d0ccc4;
+      --font-primary:    'Cormorant Garant', serif;
+      --font-secondary:  'Inter', sans-serif;
+      --wt-primary:   300;
+      --wt-secondary: 300;
+      --fs-primary:   normal;
+      --fs-secondary: normal;
+      --sz-banner-title: 1;
+      --sz-banner-sub:   1;
+      --sz-bio:          1;
+      --sz-pubs:         1;
+      --sz-talks:        1;
+      --sz-photo:        1;
+      --sz-labels:       1;
+      --sz-footer:       1;
+      --lh-bio:          1.75;
+      --hero-pos:        center 38%;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { background: var(--page-bg); color: var(--page-ink); }
+
+    /* ── NAV ── */
+    .site-nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--page-bg);
+      border-bottom: 0.5px solid var(--page-rule);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2.4rem; height: 54px;
+    }
+    .nav-logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-logo .logo-mark { height: 20px; width: auto; display: block; }
+    .nav-links { display: flex; gap: 2.2rem; list-style: none; }
+    .nav-links a {
+      font-family: var(--font-secondary); font-weight: 300;
+      font-size: 0.6rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--page-ink3); text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--page-ink); }
+    @media (max-width: 600px) {
+      .site-nav { padding: 0 1.2rem; }
+      .nav-links { gap: 1rem; }
+      .nav-links a { font-size: 0.5rem; letter-spacing: 0.12em; }
+    }
+
+    /* ── INTRO ── */
+    .intro {
+      display: grid; grid-template-columns: 1fr 1fr;
+      border-bottom: 0.5px solid var(--page-rule);
+    }
+    .intro-left {
+      padding: 3.6rem 2.8rem;
+      border-right: 0.5px solid var(--page-rule);
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .intro-left h1 {
+      font-family: var(--font-primary);
+      font-weight: var(--wt-primary); font-style: var(--fs-primary);
+      font-size: calc(clamp(2.6rem, 5.5vw, 4.8rem) * var(--sz-banner-title, 1));
+      line-height: 1.0; letter-spacing: -0.01em; color: var(--page-ink);
+    }
+    .intro-left .role {
+      font-family: var(--font-secondary);
+      font-weight: var(--wt-secondary); font-style: var(--fs-secondary);
+      font-size: calc(0.56rem * var(--sz-banner-sub, 1));
+      letter-spacing: 0.26em; text-transform: uppercase;
+      color: var(--page-ink3); margin-top: 1.6rem;
+    }
+    .intro-right { display: flex; flex-direction: column; }
+    .intro-photo {
+      flex: 1; position: relative; overflow: hidden;
+      border-bottom: 0.5px solid var(--page-rule); min-height: 220px;
+    }
+    .intro-photo img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: var(--hero-pos, center 38%);
+      filter: grayscale(15%) brightness(0.88) contrast(1.04);
+      pointer-events: none; user-select: none; -webkit-user-drag: none;
+    }
+    .intro-photo-placeholder {
+      position: absolute; inset: 0; background: var(--page-rule);
+    }
+    .intro-bio { padding: 2rem 2.4rem; }
+    .intro-bio p {
+      font-family: var(--font-primary);
+      font-weight: var(--wt-primary); font-style: var(--fs-primary);
+      font-size: calc(clamp(0.95rem, 1.5vw, 1.08rem) * var(--sz-bio, 1));
+      line-height: var(--lh-bio, 1.75); color: var(--page-ink2);
+    }
+    @media (max-width: 700px) {
+      .intro { grid-template-columns: 1fr; }
+      .intro-left { border-right: none; border-bottom: 0.5px solid var(--page-rule); padding: 2.4rem 1.6rem; }
+      .intro-photo { height: 220px; }
+    }
+
+    /* ── CONTENT SECTIONS ── */
+    .content-section { padding: 3rem 2.4rem; border-bottom: 0.5px solid var(--page-rule); max-width: 920px; }
+    .section-header {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: 1.8rem; padding-bottom: 0.7rem;
+      border-bottom: 0.5px solid var(--page-rule);
+    }
+    .section-label {
+      font-family: var(--font-secondary); font-weight: var(--wt-secondary); font-style: var(--fs-secondary);
+      font-size: calc(0.52rem * var(--sz-labels, 1)); letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--page-ink3);
+    }
+    .see-more {
+      font-family: var(--font-secondary); font-size: 0.52rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--page-ink3); text-decoration: none;
+      border-bottom: 0.5px solid var(--page-rule); transition: color 0.2s, border-color 0.2s;
+    }
+    .see-more:hover { color: var(--page-ink); border-color: var(--page-ink); }
+
+    /* ── PUBLICATIONS ── */
+    .pub-group-label {
+      font-family: var(--font-secondary); font-size: 0.5rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--page-ink3); margin: 1.6rem 0 0.8rem;
+    }
+    .pub-group-label:first-of-type { margin-top: 0; }
+    .pub-list { list-style: none; }
+    .pub-list li {
+      display: grid; grid-template-columns: 2.6rem 1fr;
+      gap: 0 1rem; padding: 0.85rem 0;
+      border-top: 0.5px solid var(--page-rule); align-items: baseline;
+    }
+    .pub-list li:last-child { border-bottom: 0.5px solid var(--page-rule); }
+    .pub-year {
+      font-family: var(--font-secondary); font-size: 0.58rem;
+      font-weight: 300; color: var(--page-ink3); letter-spacing: 0.06em;
+    }
+    .pub-title {
+      font-family: var(--font-primary); font-weight: var(--wt-primary); font-style: var(--fs-primary);
+      font-size: calc(0.95rem * var(--sz-pubs, 1)); line-height: 1.45; color: var(--page-ink);
+    }
+    .pub-title a {
+      color: inherit; text-decoration: none;
+      border-bottom: 0.5px solid var(--page-rule); transition: border-color 0.2s;
+    }
+    .pub-title a:hover { border-color: var(--page-ink); }
+    .pub-venue {
+      display: block; font-family: var(--font-secondary); font-size: 0.63rem;
+      font-weight: 300; color: var(--page-ink3); margin-top: 0.2rem;
+    }
+    .pub-tag {
+      display: inline-block; font-family: var(--font-secondary); font-size: 0.44rem;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--page-ink3);
+      border: 0.5px solid var(--page-rule); padding: 1px 5px;
+      margin-left: 6px; vertical-align: middle;
+    }
+
+    /* ── TALKS ── */
+    .talk-list { list-style: none; }
+    .talk-list li {
+      display: grid; grid-template-columns: 2.6rem 1fr;
+      gap: 0 1rem; padding: 0.85rem 0;
+      border-top: 0.5px solid var(--page-rule); align-items: baseline;
+    }
+    .talk-list li:last-child { border-bottom: 0.5px solid var(--page-rule); }
+    .talk-year { font-family: var(--font-secondary); font-size: 0.58rem; font-weight: 300; color: var(--page-ink3); }
+    .talk-venue { display: block; font-family: var(--font-secondary); font-size: 0.63rem; font-weight: 300; color: var(--page-ink3); margin-top: 0.2rem; }
+    .talk-list li > span:not(.talk-year) {
+      font-family: var(--font-primary); font-weight: var(--wt-primary); font-style: var(--fs-primary);
+      font-size: calc(0.95rem * var(--sz-talks, 1)); line-height: 1.45; color: var(--page-ink);
+    }
+
+    /* ── PHOTOGRAPHY ── */
+    .photo-intro {
+      font-family: var(--font-primary); font-weight: var(--wt-primary); font-style: italic;
+      font-size: calc(1rem * var(--sz-photo, 1)); line-height: 1.8;
+      color: var(--page-ink2); margin-bottom: 1.6rem;
+    }
+    .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 4px; }
+    .photo-grid img {
+      width: 100%; aspect-ratio: 3/2; object-fit: cover; display: block;
+      filter: grayscale(10%); transition: filter 0.3s; cursor: pointer;
+      -webkit-user-drag: none; user-select: none;
+    }
+    .photo-grid img:hover { filter: grayscale(0%); }
+    .photo-grid a { display: block; overflow: hidden; }
+
+    /* ── CONTACT ── */
+    .contact-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 2.4rem; align-items: start; }
+    @media (max-width: 580px) { .contact-wrap { grid-template-columns: 1fr; } }
+    .contact-info { font-family: var(--font-secondary); font-size: 0.72rem; font-weight: 300; line-height: 2; color: var(--page-ink3); }
+    .contact-form { display: flex; flex-direction: column; gap: 0.9rem; }
+    .contact-form .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+    .contact-form label { font-family: var(--font-secondary); font-size: 0.5rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--page-ink3); }
+    .contact-form input, .contact-form textarea {
+      border: 0.5px solid var(--page-rule); background: transparent;
+      padding: 0.6rem 0.75rem; font-family: var(--font-primary);
+      font-size: 1rem; color: var(--page-ink); outline: none; width: 100%; transition: border-color 0.2s;
+    }
+    .contact-form input:focus, .contact-form textarea:focus { border-color: var(--page-ink); }
+    .contact-form textarea { min-height: 120px; resize: vertical; }
+    .contact-form button {
+      align-self: flex-start; font-family: var(--font-secondary); font-size: 0.52rem;
+      font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase;
+      background: var(--page-ink); color: var(--page-bg); border: none;
+      padding: 0.65rem 1.4rem; cursor: pointer; transition: opacity 0.2s;
+    }
+    .contact-form button:hover { opacity: 0.7; }
+    .form-success { display: none; font-family: var(--font-primary); font-style: italic; font-size: 1rem; color: var(--page-ink2); padding: 0.8rem 0; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 1.4rem 2.4rem; display: flex;
+      justify-content: space-between; align-items: center;
+    }
+    footer p {
+      font-family: var(--font-secondary); font-weight: var(--wt-secondary); font-style: var(--fs-secondary);
+      font-size: calc(0.5rem * var(--sz-footer, 1)); letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--page-ink3);
+    }
+
+    /* ── PHOTO PROTECTION ── */
+    body { -webkit-user-select: none; user-select: none; }
+    p, h1, h2, h3, li { -webkit-user-select: text; user-select: text; }
+  </style>
+</head>
+<body id="top">
+
+  <header class="site-nav">
+    <a class="nav-logo" href="#top"><img class="logo-mark" src="data:image/png;base64,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" alt="" /></a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#publications">Publications</a></li>
+      <li><a href="#talks">Talks</a></li>
+      <li><a href="#photography">Photography</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </header>
+
+  <section class="intro" id="about">
+    <div class="intro-left">
+      <h1>Tomaso<br>Pignocchi</h1>
+      <p class="role" id="nameplateSubtitle">Philosophy · Paris · Kyoto</p>
+    </div>
+    <div class="intro-right">
+      <div class="intro-photo"><div class="intro-photo-placeholder" id="bannerPlaceholder"></div><img id="heroBannerImg" src="" alt="" style="display:none" /></div>
+      <div class="intro-bio"><p id="bioText">I am a Ph.D. candidate in philosophy at the Institut Catholique de Paris and Università degli Studi La Sapienza, Roma. My research investigates the intersection of Wittgenstein's later philosophy and Madhyamaka Buddhism.</p></div>
+    </div>
+  </section>
+
+  <section class="content-section" id="publications">
+    <div class="section-header"><span class="section-label">Publications</span><a class="see-more" href="https://icp.academia.edu/TomasoPignocchi" target="_blank">Full list on Academia.edu →</a></div>
+<p class="pub-group-label">Peer-Reviewed Articles</p>
+      <ul class="pub-list" id="pubListArticles">
+
+        <li>
+          <span class="pub-year">2026</span>
+          <span class="pub-title">
+            «No Room for Play»: Anatomy of a Defensive Fantasy
+            <span class="pub-tag">forthcoming</span>
+            <span class="pub-venue">Pòlemos. Materiali di filosofia e critica sociale, 2/25</span>
+          </span>
+        </li>
+
+        <li>
+          <span class="pub-year">2026</span>
+          <span class="pub-title">
+            Question de perspectives. Images, raisons et méthodes philosophiques entre Wittgenstein et Nietzsche
+            <span class="pub-tag">forthcoming</span>
+            <span class="pub-venue">Transversalités, 179</span>
+          </span>
+        </li>
+
+        <li>
+          <span class="pub-year">2026</span>
+          <span class="pub-title">
+            <a href="https://link.springer.com/article/10.1007/s11245-026-10398-2" target="_blank">
+              When Rivers are Just Rivers: A Buddhist-Wittgensteinian Framework for a Non-Foundational Epistemology
+            </a>
+            <span class="pub-venue">Topoi, 45/2</span>
+          </span>
+        </li>
+
+        <li>
+          <span class="pub-year">2025</span>
+          <span class="pub-title">
+            «Il serpentesco inganno»: Linguaggio, illusione e conoscenza in Hamann e Wittgenstein
+            <span class="pub-venue">Annuario filosofico, 40, pp. 78–107</span>
+          </span>
+        </li>
+
+        <li>
+          <span class="pub-year">2025</span>
+          <span class="pub-title">
+            <a href="https://link.springer.com/epdf/10.1007/s11229-024-04857-9?sharing_token=eWPcmhCATbF0bETTNvtLqfe4RwlQNchNByi7wbcMAY4u8QU-fGvgMQcyub6FGk_b71uQTswrL5BDaND01PIlWsqX2l1bdDHN7kGH1Wi1gxerC7FchvXAb-sIqROEfatNg7ZEZWv6GKek6RnxZ_rqDGzgd1fivCEPFaZCH9B-d0Q%3D" target="_blank">
+              Beyond Belief: Deep Disagreement and Conversion in Wittgenstein's Philosophy
+            </a>
+            <span class="pub-venue">Synthese, 205, art. 39, pp. 1–25</span>
+          </span>
+        </li>
+
+        <li>
+          <span class="pub-year">2024</span>
+          <span class="pub-title">
+            <a href="https://synthesisonline.net/wp-content/uploads/2024/12/5.-tomaso-pignocchi-2.pdf" target="_blank">
+              The Buddhist Quest for Valid Experience from Dignāga to Candrakīrti
+            </a>
+            <span class="pub-venue">Synthesis — Journal for Philosophy, 4, pp. 115–148</span>
+          </span>
+        </li>
+
+        <li>
+          <span class="pub-year">2024</span>
+          <span class="pub-title">
+            <a href="https://www.cittadellaeditrice.com/munera/tutti-gli-articoli/munera-1-2024-tomaso-pignocchi-la-profondita-del-quotidiano-etica-e-senso-nella-poesia-haiku/" target="_blank">
+              La profondità del quotidiano. Etica e senso nella poesia haiku
+            </a>
+            <span class="pub-venue">Munera. Rivista europea di cultura, 1, pp. 115–123</span>
+          </span>
+        </li>
+
+        <li>
+          <span class="pub-year">2023</span>
+          <span class="pub-title">
+            <a href="http://www.rifl.unical.it/index.php/rifl/article/view/747/725" target="_blank">
+              Sull'uso della similitudine e del paradosso nel Tractatus di Wittgenstein e nel buddhismo
+            </a>
+            <span class="pub-venue">Rivista Italiana di Filosofia del Linguaggio, 17/1, pp. 96–108</span>
+          </span>
+        </li>
+
+        <li>
+          <span class="pub-year">2023</span>
+          <span class="pub-title">
+            <a href="https://philpapers.org/archive/PIGOAA.pdf" target="_blank">
+              Ordinary Aesthetics and Ethics in the Haiku Poetry of Matsuo Bashō: A Wittgensteinian Perspective
+            </a>
+            <span class="pub-venue">Open Philosophy, 6/1, pp. 1–16</span>
+          </span>
+        </li>
+
+      </ul>
+
+      <div id="pubChaptersSection"><p class="pub-group-label" style="margin-top:1.8rem;">Book Chapters</p>
+      <ul class="pub-list" id="pubListChapters">
+        <li>
+          <span class="pub-year">2026</span>
+          <span class="pub-title">
+            Language and Emptiness. Toward a Non-Foundational Soteriological Epistemology
+            <span class="pub-venue">Studium — Contemporary Humanism Open Access Annals 2025, pp. 149–156</span>
+          </span>
+        </li>
+        <li>
+          <span class="pub-year">2025</span>
+          <span class="pub-title">
+            Language and Soteriology: Desire, Illusion and Liberation in Wittgenstein's and Buddhist Philosophies
+            <span class="pub-venue">Studium — Contemporary Humanism Open Access Annals 2024, pp. 260–267</span>
+          </span>
+        </li>
+      </ul></div>
+
+      
+    </div>
+  </section>
+
+  <section class="content-section" id="talks">
+    <div class="section-header"><span class="section-label">Talks</span></div>
+<ul class="talk-list" id="talkList">
+
+        <li>
+          <span class="talk-year">2026</span>
+          <span>
+            From <em>Thauma</em> to <em>Trauma</em>: On the Genesis of Philosophy between Wonder and Wound
+            <span class="pub-tag">upcoming</span>
+            <span class="talk-venue">Person and Common Good — Université Catholique de Lyon</span>
+          </span>
+        </li>
+
+        <li>
+          <span class="talk-year">2026</span>
+          <span>
+            On the Existential Genealogy of Metaphysical Thinking
+            <span class="pub-tag">upcoming · invited</span>
+            <span class="talk-venue">Hokkaido University, Department of Philosophy and Religious Studies</span>
+          </span>
+        </li>
+
+        <li>
+          <span class="talk-year">2026</span>
+          <span>
+            Healing through Loss. Between Buddhist Thought and the Western Crisis of Finitude
+            <span class="pub-tag">upcoming · opening</span>
+            <span class="talk-venue">58th Annual Conference of the Society for Asian and Comparative Philosophy — MAHE, India</span>
+          </span>
+        </li>
+
+        <li>
+          <span class="talk-year">2026</span>
+          <span>
+            Becoming as Mourning
+            <span class="pub-tag">upcoming · invited</span>
+            <span class="talk-venue">Kyoto University</span>
+          </span>
+        </li>
+
+        <li>
+          <span class="talk-year">2025</span>
+          <span>
+            The Depth of the Surface: A Cross-Reading of Wittgenstein and Candrakīrti
+            <span class="talk-venue">57th Annual Conference of the Society for Asian and Comparative Philosophy — Leiden University</span>
+          </span>
+        </li>
+
+        <li>
+          <span class="talk-year">2025</span>
+          <span>
+            Deconstructing the Self: A Cross-cultural Inquiry into Consciousness and Personal Identity
+            <span class="talk-venue">Consciousness Research Network (CoRN) 2025 — Chulalongkorn University, Bangkok</span>
+          </span>
+        </li>
+
+        <li>
+          <span class="talk-year">2025</span>
+          <span>
+            A Matter of Perspectives: Pictures and Reasons in a Wittgensteinian Framework
+            <span class="talk-venue">Forms of Life and Relativism — Institut Catholique de Paris</span>
+          </span>
+        </li>
+
+        <li>
+          <span class="talk-year">2025</span>
+          <span>
+            Consciousness without Self: Perspectives on Subjective Experience from the Buddha to Neuroscience
+            <span class="talk-venue">ECAI Research Network Talk Series — Institut Catholique de Paris</span>
+          </span>
+        </li>
+
+        <li>
+          <span class="talk-year">2024</span>
+          <span>
+            Language and Soteriology: Liberation in Wittgenstein and Buddhist Philosophies
+            <span class="talk-venue">Human Freedom at the Test of AI and Neurosciences — Lumsa / University of Notre Dame, Rome</span>
+          </span>
+        </li>
+
+        <li>
+          <span class="talk-year">2024</span>
+          <span>
+            Toward a Non-Foundational Soteriological Epistemology
+            <span class="talk-venue">Contemporary Humanism Annual Conference — University of Rome–Lumsa</span>
+          </span>
+        </li>
+
+      </ul>
+
+      <div class="award-box">
+        Recipient of the <em>SACP Graduate Student Essay Award</em> (2026),
+        Society for Asian and Comparative Philosophy, for the essay
+        "Healing through Loss: Between Buddhist Thought and the Western Crisis of Finitude."
+      </div>
+  </section>
+
+  <section class="content-section" id="photography">
+    <div class="section-header"><span class="section-label">Photography</span></div>
+<p class="photo-intro" id="photoIntro">
+        Street photography, shot on film and digital between Rome and Kyoto.
+      </p>
+      <div class="photo-grid">
+        <a href="https://www.tomasopignocchi.com/works/" target="_blank">
+          <img src="https://www.tomasopignocchi.com/wp-content/uploads/2021/12/banner_bike_r_L.jpg" alt="" />
+        </a>
+        <a href="https://www.tomasopignocchi.com/works/" target="_blank">
+          <img src="https://www.tomasopignocchi.com/wp-content/uploads/2022/03/banner_together.jpg" alt="" />
+        </a>
+        <a href="https://www.tomasopignocchi.com/works/" target="_blank">
+          <img src="https://www.tomasopignocchi.com/wp-content/uploads/2022/01/banner_colosseo2.jpg" alt="" />
+        </a>
+      </div>
+      <a class="see-more" href="https://www.tomasopignocchi.com/works/" target="_blank">See all work →</a>
+  </section>
+
+  <section class="content-section" id="contact">
+    <div class="section-header"><span class="section-label">Contact</span></div>
+<div class="contact-wrap">
+
+        <!-- LEFT: affiliations only, no email -->
+        <div class="contact-info" id="contactInfo">
+          Institut Catholique de Paris<br>
+          Università degli Studi La Sapienza, Roma<br>
+          Università degli Studi Roma–Lumsa<br>
+          Kyoto University<br>
+          <em style="font-size:0.82rem">(Guest Research Associate, 2026)</em>
+        </div>
+
+        <!-- RIGHT: contact form -->
+        <div>
+          <form
+            class="contact-form"
+            name="contact"
+            method="POST"
+            data-netlify="true"
+            netlify-honeypot="bot-field"
+            id="contactForm"
+          >
+            <!-- honeypot anti-spam nascosto -->
+            <input type="hidden" name="form-name" value="contact" />
+            <p style="display:none"><input name="bot-field" /></p>
+
+            <div class="form-group">
+              <label for="cf-name">Name</label>
+              <input type="text" id="cf-name" name="name" required placeholder="Your name" />
+            </div>
+
+            <div class="form-group">
+              <label for="cf-email">Email</label>
+              <input type="email" id="cf-email" name="email" required placeholder="your@email.com" />
+            </div>
+
+            <div class="form-group">
+              <label for="cf-message">Message</label>
+              <textarea id="cf-message" name="message" required placeholder="Write your message…"></textarea>
+            </div>
+
+            <button type="submit" id="cfSubmit">Send →</button>
+          </form>
+
+          <p class="form-success" id="formSuccess">
+            Thank you — I'll get back to you soon.
+          </p>
+  </section>
+
+  <footer><p>© 2026 Tomaso Pignocchi</p><p>Paris · Rome · Kyoto</p></footer>
+
+  <script src="js/contentful.js"></script>
+  <script>
+
+    /* ── Contact form ── */
+    const form = document.getElementById('contactForm');
+    if (form) {
+      form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const btn = document.getElementById('cfSubmit');
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+        try {
+          await fetch('/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(new FormData(form)).toString()
+          });
+          form.style.display = 'none';
+          document.getElementById('formSuccess').style.display = 'block';
+        } catch {
+          btn.disabled = false;
+          btn.textContent = 'Send →';
+          alert('Something went wrong — please try again.');
+        }
+      });
+    }
+
+    /* ── Tab switching ── */
+    const buttons = document.querySelectorAll('.tab-btn');
+    const panels  = document.querySelectorAll('.tab-panel');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.tab;
+        buttons.forEach(b => b.classList.remove('active'));
+        panels.forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + target).classList.add('active');
+      });
+    });
+
+
+    /* ── Apply typography settings ── */
+    function applyTypography(settings) {
+      const root = document.documentElement;
+      const FONT_CSS = {
+        'EB Garamond':        "'EB Garamond', serif",
+        'New Computer Modern':"'New Computer Modern', serif",
+        'Libre Baskerville':  "'Libre Baskerville', serif",
+        'Playfair Display':   "'Playfair Display', serif",
+        'Cormorant Garant':   "'Cormorant Garant', serif",
+        'Spectral':           "'Spectral', serif",
+        'Lato':               "'Lato', sans-serif",
+        'Inter':              "'Inter', sans-serif",
+        'Source Sans Pro':    "'Source Sans 3', sans-serif",
+        'DM Mono':            "'DM Mono', monospace",
+      };
+      if (settings.fontPrimary)        root.style.setProperty('--font-primary',   FONT_CSS[settings.fontPrimary]   || settings.fontPrimary);
+      if (settings.fontSecondary)      root.style.setProperty('--font-secondary',  FONT_CSS[settings.fontSecondary] || settings.fontSecondary);
+      if (settings.fontPrimaryWeight)  root.style.setProperty('--wt-primary',      settings.fontPrimaryWeight);
+      if (settings.fontSecondaryWeight)root.style.setProperty('--wt-secondary',    settings.fontSecondaryWeight);
+      root.style.setProperty('--fs-primary',   settings.fontPrimaryItalic   ? 'italic' : 'normal');
+      root.style.setProperty('--fs-secondary', settings.fontSecondaryItalic ? 'italic' : 'normal');
+      if (settings.sizeBannerTitle)    root.style.setProperty('--sz-banner-title', settings.sizeBannerTitle / 100);
+      if (settings.sizeBannerSubtitle) root.style.setProperty('--sz-banner-sub',   settings.sizeBannerSubtitle / 100);
+      if (settings.sizeBio)            root.style.setProperty('--sz-bio',           settings.sizeBio / 100);
+      if (settings.sizePubs)           root.style.setProperty('--sz-pubs',          settings.sizePubs / 100);
+      if (settings.sizeTalks)          root.style.setProperty('--sz-talks',         settings.sizeTalks / 100);
+      if (settings.sizePhotoIntro)     root.style.setProperty('--sz-photo',         settings.sizePhotoIntro / 100);
+      if (settings.sizeLabels)         root.style.setProperty('--sz-labels',        settings.sizeLabels / 100);
+      if (settings.sizeFooter)         root.style.setProperty('--sz-footer',        settings.sizeFooter / 100);
+      if (settings.bioLineHeight)      root.style.setProperty('--lh-bio',           settings.bioLineHeight / 100);
+    }
+
+    /* ── Apply hero style ── */
+    function applyHeroStyle(style) {
+      ['hero-a','hero-b','hero-c','hero-d','hero-e'].forEach(c => document.body.classList.remove(c));
+      if (style) document.body.classList.add('hero-' + style.toLowerCase());
+      /* sync style-d photo */
+      const dp = document.getElementById('dPhoto');
+      const dn = document.getElementById('dName');
+      const ds = document.getElementById('dSub');
+      const bannerUrl = localStorage.getItem('tp_banner_url') || ''; if (dp) dp.style.display='none';
+      if (dp) dp.src = bannerUrl;
+      const subtitleEl = document.getElementById('nameplateSubtitle');
+      if (dn) dn.textContent = 'Tomaso Pignocchi';
+      if (ds && subtitleEl) ds.textContent = subtitleEl.textContent;
+    }
+
+    /* ── Load typography + hero style from localStorage (instant) ── */
+    (function() {
+      const saved = localStorage.getItem('tp_typography');
+      if (saved) { try { applyTypography(JSON.parse(saved)); } catch(e) {} }
+      const savedStyle = localStorage.getItem('tp_hero_style') || 'e';
+      applyHeroStyle(savedStyle);
+      const savedPos = localStorage.getItem('tp_hero_pos');
+      if (savedPos) document.documentElement.style.setProperty('--hero-pos', savedPos);
+    })();
+
+    /* ── Load hero position ── */
+    (async () => {
+      const saved = localStorage.getItem('tp_hero_pos');
+      if (saved) document.documentElement.style.setProperty('--hero-pos', saved);
+    })();
+
+    /* ── Load all site content from Contentful ── */
+    (async () => {
+      if (!CF.isConnected()) return;
+      try {
+        /* ── Site text content ── */
+        const contents = await CF.get('siteContent');
+        const sc = contents && contents.length ? contents[0] : null;
+        if (sc) {
+          if (sc.nameplateSubtitle)
+            document.getElementById('nameplateSubtitle').textContent = sc.nameplateSubtitle;
+          if (sc.bioText)
+            document.getElementById('bioText').innerHTML = sc.bioText.replace(/\n/g, '<br>');
+          if (sc.photoIntro)
+            document.getElementById('photoIntro').textContent = sc.photoIntro;
+          if (sc.contactInfo)
+            document.getElementById('contactInfo').innerHTML = sc.contactInfo.replace(/\n/g, '<br>');
+          if (sc.heroPosX !== undefined && sc.heroPosY !== undefined) {
+            const pos = `${sc.heroPosX}% ${sc.heroPosY}%`;
+            document.documentElement.style.setProperty('--hero-pos', pos);
+            localStorage.setItem('tp_hero_pos', pos);
+          }
+          /* apply typography */
+          applyTypography(sc);
+          if (sc.bgColor || sc.textColor) applyColors(sc.bgColor || '#f5f2ec', sc.textColor || '#1a1814', sc.logoVariant || 'light');
+          localStorage.setItem('tp_typography', JSON.stringify(sc));
+          /* apply hero style */
+          if (sc.heroStyle) {
+            applyHeroStyle(sc.heroStyle);
+            localStorage.setItem('tp_hero_style', sc.heroStyle);
+          }
+        }
+
+        /* ── Publications ── */
+        const pubs = await CF.get('publication', { order: '-fields.year,-fields.order' });
+        if (pubs && pubs.length) {
+          const articles = pubs.filter(p => p.pubType === 'article' || !p.pubType);
+          const chapters = pubs.filter(p => p.pubType === 'chapter');
+          renderPubList('pubListArticles', articles);
+          renderPubList('pubListChapters', chapters);
+          if (!chapters.length) document.getElementById('pubChaptersSection').style.display = 'none';
+        }
+
+        /* ── Talks ── */
+        const talks = await CF.get('talk', { order: '-fields.year,-fields.order' });
+        if (talks && talks.length) renderTalkList('talkList', talks);
+
+      } catch(e) { console.warn('Content load error', e); }
+    })();
+
+    function renderPubList(id, pubs) {
+      if (!pubs.length) return;
+      const ul = document.getElementById(id);
+      if (!ul) return;
+      ul.innerHTML = '';
+      pubs.forEach(p => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span class="pub-year">${p.year || ''}</span>
+          <span class="pub-title">
+            ${p.link ? `<a href="${p.link}" target="_blank">${p.title}</a>` : p.title}
+            ${p.forthcoming ? '<span class="pub-tag">forthcoming</span>' : ''}
+            ${p.venue ? `<span class="pub-venue">${p.venue}</span>` : ''}
+          </span>`;
+        ul.appendChild(li);
+      });
+    }
+
+    function renderTalkList(id, talks) {
+      const ul = document.getElementById(id);
+      if (!ul) return;
+      ul.innerHTML = '';
+      talks.forEach(t => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span class="talk-year">${t.year || ''}</span>
+          <span>
+            ${t.title}
+            ${t.upcoming ? '<span class="pub-tag">upcoming</span>' : ''}
+            ${t.talkType && t.talkType !== 'regular' ? `<span class="pub-tag">${t.talkType}</span>` : ''}
+            ${t.venue ? `<span class="talk-venue">${t.venue}</span>` : ''}
+          </span>`;
+        ul.appendChild(li);
+      });
+    }
+
+    /* ── Netlify Identity — gestisce il token di invito ── */
+    netlifyIdentity.on('init', user => {});
+    netlifyIdentity.on('login', () => {
+      netlifyIdentity.close();
+      /* dopo il login da invito, rimanda all'admin */
+      if (window.location.hash.includes('invite_token') ||
+          window.location.hash.includes('confirmation_token') ||
+          window.location.hash.includes('recovery_token')) {
+        location.href = '/admin/login.html';
+      }
+    });
+
+    /* ── Photo protection ── */
+    document.addEventListener('contextmenu', e => {
+      if (e.target.tagName === 'IMG') e.preventDefault();
+    });
+    document.addEventListener('dragstart', e => {
+      if (e.target.tagName === 'IMG') e.preventDefault();
+    });
+
+    /* ── Load hero banner ── */
+    (async () => {
+      /* 1. Check localStorage first (instant) */
+      const local = localStorage.getItem('tp_banner_url');
+      if (local) document.getElementById('heroBanner').src = local;
+
+      /* 2. Then check Contentful for authoritative value */
+      if (CF.isConnected()) {
+        try {
+          const settings = await CF.get('siteSettings');
+          if (settings && settings.length && settings[0].heroBanner) {
+            const url = settings[0].heroBanner;
+            document.getElementById('heroBanner').src = url;
+            localStorage.setItem('tp_banner_url', url);
+          }
+        } catch (e) { /* silent — keep local/default */ }
+      }
+    })();
+  
+
+    /* ── Apply colors ── */
+    function applyColors(bgColor, textColor, logoVariant) {
+      var root = document.documentElement;
+      if (bgColor) {
+        root.style.setProperty('--page-bg', bgColor);
+        document.body.style.background = bgColor;
+        localStorage.setItem('tp_bg_color', bgColor);
+      }
+      if (textColor) {
+        root.style.setProperty('--page-ink', textColor);
+        localStorage.setItem('tp_text_color', textColor);
+        var hex = textColor.replace('#','');
+        var r = parseInt(hex.slice(0,2),16), g = parseInt(hex.slice(2,4),16), b = parseInt(hex.slice(4,6),16);
+        var bghex = (bgColor||'#f5f2ec').replace('#','');
+        var br = parseInt(bghex.slice(0,2),16)||245, bg2 = parseInt(bghex.slice(2,4),16)||242, bb = parseInt(bghex.slice(4,6),16)||236;
+        function mix(v,t,a) { return Math.round(v*a+t*(1-a)); }
+        root.style.setProperty('--page-ink2','rgb('+mix(r,br,0.7)+','+mix(g,bg2,0.7)+','+mix(b,bb,0.7)+')');
+        root.style.setProperty('--page-ink3','rgb('+mix(r,br,0.45)+','+mix(g,bg2,0.45)+','+mix(b,bb,0.45)+')');
+        root.style.setProperty('--page-rule','rgb('+mix(r,br,0.18)+','+mix(g,bg2,0.18)+','+mix(b,bb,0.18)+')');
+      }
+      if (logoVariant !== undefined) {
+        localStorage.setItem('tp_logo_variant', logoVariant);
+        document.querySelectorAll('.logo-mark').forEach(function(img) {
+          img.style.filter = logoVariant === 'dark' ? 'invert(1) brightness(0)' : 'none';
+        });
+      }
+    }
+
+    /* ── Load saved colors instantly ── */
+    (function() {
+      var bg = localStorage.getItem('tp_bg_color');
+      var tc = localStorage.getItem('tp_text_color');
+      var lv = localStorage.getItem('tp_logo_variant');
+      if (bg || tc) applyColors(bg || '#f5f2ec', tc || '#1a1814', lv || 'light');
+    })();
+
+    /* ── Load banner image ── */
+    (function() {
+      var url = localStorage.getItem('tp_banner_url') || '';
+      var img = document.getElementById('heroBannerImg');
+      var ph  = document.getElementById('bannerPlaceholder');
+      if (url && img) {
+        img.src = url; img.style.display = 'block';
+        if (ph) ph.style.display = 'none';
+      }
+    })();
+
+    /* ── Contact form ── */
+    var cf_form = document.getElementById('contactForm');
+    if (cf_form) {
+      cf_form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var btn = document.getElementById('cfSubmit');
+        btn.disabled = true; btn.textContent = 'Sending…';
+        fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(new FormData(cf_form)).toString()
+        }).then(function() {
+          cf_form.style.display = 'none';
+          document.getElementById('formSuccess').style.display = 'block';
+        }).catch(function() {
+          btn.disabled = false; btn.textContent = 'Send →';
+          alert('Something went wrong — please try again.');
+        });
+      });
+    }
+
+    /* ── Netlify Identity ── */
+    netlifyIdentity.on('init', function(user) {});
+    netlifyIdentity.on('login', function() {
+      netlifyIdentity.close();
+      if (window.location.hash.includes('invite_token') ||
+          window.location.hash.includes('confirmation_token') ||
+          window.location.hash.includes('recovery_token')) {
+        location.href = '/admin/login.html';
+      }
+    });
+
+    /* ── Block right click on photos ── */
+    document.addEventListener('contextmenu', function(e) {
+      if (e.target.tagName === 'IMG') e.preventDefault();
+    });
+
+  </script>
+</body>
+</html>
