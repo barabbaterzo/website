@@ -324,35 +324,78 @@
 
 
       <div style="height:1px;background:var(--rule);margin:1.6rem 0"></div>
-      <p class="section-title" style="margin-bottom:1rem">Layout homepage</p>
+      <p class="section-title" style="margin-bottom:0.8rem">Layout homepage</p>
 
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.4rem">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:1.4rem">
         <button class="layout-opt" data-layout="a" onclick="setLayout('a')"
-          style="padding:8px 6px;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
-          <div style="display:grid;grid-template-columns:1fr 1fr;height:40px;margin-bottom:4px;gap:2px">
-            <div style="background:#888;border-radius:2px"></div>
-            <div style="background:#ddd;border-radius:2px"></div>
-          </div>
-          A — Split
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="display:grid;grid-template-columns:1fr 1fr #888;height:40px;margin-bottom:3px;gap:2px"><div style="background:#888;border-radius:2px"></div><div style="background:#ddd;border-radius:2px"></div></div>
+          A — Split 50/50
         </button>
         <button class="layout-opt" data-layout="b" onclick="setLayout('b')"
-          style="padding:8px 6px;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
-          <div style="height:40px;margin-bottom:4px">
-            <div style="background:#ddd;height:14px;border-radius:2px;margin-bottom:2px"></div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;height:22px;gap:2px">
-              <div style="background:#888;border-radius:2px"></div>
-              <div style="background:#ddd;border-radius:2px"></div>
-            </div>
-          </div>
-          B — Griglia
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;margin-bottom:3px"><div style="background:#ddd;height:12px;border-radius:1px;margin-bottom:2px"></div><div style="display:grid;grid-template-columns:1fr 1fr;height:24px;gap:2px"><div style="background:#888;border-radius:1px"></div><div style="background:#ddd;border-radius:1px"></div></div></div>
+          B — Nome + Foto + Bio
         </button>
         <button class="layout-opt" data-layout="c" onclick="setLayout('c')"
-          style="padding:8px 6px;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
-          <div style="display:grid;grid-template-columns:2fr 3fr;height:40px;margin-bottom:4px;gap:2px">
-            <div style="background:#888;border-radius:2px"></div>
-            <div style="background:#ddd;border-radius:2px"></div>
-          </div>
-          C — Foto fissa
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="display:grid;grid-template-columns:38% 1fr #888;height:40px;margin-bottom:3px;gap:2px"><div style="background:#888;border-radius:2px"></div><div style="background:#ddd;border-radius:2px"></div></div>
+          C — Foto 38% + testo
+        </button>
+        <button class="layout-opt" data-layout="e" onclick="setLayout('e')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;background:#666;border-radius:2px;margin-bottom:3px;display:flex;align-items:flex-end;padding:4px"><div style="font-size:5px;color:rgba(255,255,255,0.8);letter-spacing:0.1em">T.PIGNOCCHI</div></div>
+          E — Full photo overlay
+        </button>
+        <button class="layout-opt" data-layout="f" onclick="setLayout('f')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;margin-bottom:3px"><div style="background:#ddd;height:12px;border-radius:1px;margin-bottom:2px"></div><div style="display:grid;grid-template-columns:1fr 2fr;height:24px;gap:2px"><div style="background:#888;border-radius:1px"></div><div style="background:#ddd;border-radius:1px"></div></div></div>
+          F — Editoriale
+        </button>
+        <button class="layout-opt" data-layout="g" onclick="setLayout('g')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;margin-bottom:3px"><div style="background:#888;height:28px;border-radius:1px;margin-bottom:2px"></div><div style="background:#ddd;height:8px;border-radius:1px"></div></div>
+          G — Panorama + barra
+        </button>
+        <button class="layout-opt" data-layout="h" onclick="setLayout('h')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="display:grid;grid-template-columns:1fr 2fr #ddd;height:40px;margin-bottom:3px;gap:2px"><div style="background:#888;border-radius:2px"></div><div style="background:#ddd;border-radius:2px"></div></div>
+          H — Asimm. 1/3 · 2/3
+        </button>
+        <button class="layout-opt" data-layout="i" onclick="setLayout('i')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;margin-bottom:3px"><div style="display:grid;grid-template-columns:24px 1fr;gap:2px;margin-bottom:2px"><div style="background:#ddd;border-radius:1px"></div><div style="background:#888;border-radius:1px"></div></div><div style="display:grid;grid-template-columns:24px 1fr;gap:2px;margin-bottom:2px"><div style="background:#ddd;border-radius:1px"></div><div style="background:#ddd;border-radius:1px"></div></div><div style="display:grid;grid-template-columns:24px 1fr;gap:2px;margin-bottom:2px"><div style="background:#ddd;border-radius:1px"></div><div style="background:#ddd;border-radius:1px"></div></div></div>
+          I — Archivio / righe
+        </button>
+        <button class="layout-opt" data-layout="j" onclick="setLayout('j')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;margin-bottom:3px"><div style="background:#888;height:20px;border-radius:1px;margin-bottom:2px"></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;height:16px;gap:2px"><div style="background:#ddd;border-radius:1px"></div><div style="background:#ddd;border-radius:1px"></div><div style="background:#ddd;border-radius:1px"></div></div></div>
+          J — Foto + 3 col
+        </button>
+        <button class="layout-opt" data-layout="k" onclick="setLayout('k')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;margin-bottom:3px"><div style="background:#ddd;height:12px;border-radius:1px;margin-bottom:2px;overflow:hidden"><div style="font-family:serif;font-size:9px;color:#888;padding:0 2px;white-space:nowrap">Tomaso Pignocchi</div></div><div style="display:grid;grid-template-columns:1fr 1fr;height:24px;gap:2px"><div style="background:#ddd;border-radius:1px"></div><div style="background:#888;border-radius:1px"></div></div></div>
+          K — Magazine
+        </button>
+        <button class="layout-opt" data-layout="l" onclick="setLayout('l')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;background:#555;border-radius:2px;margin-bottom:3px;display:flex;align-items:center;justify-content:center"><div style="font-size:5px;color:rgba(255,255,255,0.8);letter-spacing:0.1em;text-align:center">T.PIGNOCCHI<br><span style="opacity:0.5">PHILOSOPHY</span></div></div>
+          L — Centrato overlay
+        </button>
+        <button class="layout-opt" data-layout="m" onclick="setLayout('m')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;display:grid;grid-template-columns:6px 1fr;gap:2px;margin-bottom:3px"><div style="background:#333;border-radius:1px"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:2px"><div style="background:#ddd;border-radius:1px"></div><div style="background:#888;border-radius:1px"></div></div></div>
+          M — Sidebar verticale
+        </button>
+        <button class="layout-opt" data-layout="n" onclick="setLayout('n')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="display:grid;grid-template-columns:65% 35% #ddd;height:40px;margin-bottom:3px;gap:2px"><div style="background:#888;border-radius:2px"></div><div style="background:#ddd;border-radius:2px"></div></div>
+          N — Testo + foto stretta
+        </button>
+        <button class="layout-opt" data-layout="o" onclick="setLayout('o')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;margin-bottom:3px"><div style="background:#888;height:30px;border-radius:1px;margin-bottom:2px"></div><div style="background:#ddd;height:6px;border-radius:1px"></div></div>
+          O — Full bleed + barra
         </button>
       </div>
 
@@ -1279,8 +1322,10 @@
     function setLayout(s) {
       currentLayout = s;
       document.querySelectorAll('.layout-opt').forEach(b => {
-        b.style.borderColor = b.dataset.layout === s ? 'var(--ink)' : 'var(--rule)';
-        b.style.background  = b.dataset.layout === s ? 'white' : 'var(--paper)';
+        const active = b.dataset.layout === s;
+        b.style.borderColor = active ? 'var(--ink)' : 'var(--rule)';
+        b.style.background  = active ? 'white' : 'var(--paper)';
+        b.style.fontWeight  = active ? '500' : '300';
       });
     }
     setLayout('a');
