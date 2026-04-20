@@ -745,7 +745,7 @@
 
   <script>
     /* ── Auth ── */
-    if (sessionStorage.getItem('tp_admin') !== '1') sessionStorage.setItem('tp_admin', '1');
+    if (sessionStorage.getItem('tp_admin') !== '1') { location.href = 'login.html'; }
     function logout() {
       window.location.href = 'https://website.fixban.workers.dev/cdn-cgi/access/logout';
     }
@@ -1409,8 +1409,10 @@
       if (!CF.isConnected()) return;
       try {
         const items = await CF.get('siteContent');
+        console.log('[DEBUG] siteContent items:', JSON.stringify(items));
         const sc = items && items.length ? items[0] : null;
-        if (!sc) return;
+        if (!sc) { console.log('[DEBUG] No siteContent entry found'); return; }
+        console.log('[DEBUG] siteContent fields:', JSON.stringify(sc));
         if (sc.nameplateSubtitle) document.getElementById('sc-subtitle').value = sc.nameplateSubtitle;
         if (sc.bioText)           document.getElementById('sc-bio').value = sc.bioText;
         if (sc.photoIntro)        document.getElementById('sc-photo-intro').value = sc.photoIntro;
@@ -1453,6 +1455,7 @@
         logoVariant:       currentLogoVariant,
       };
       try {
+        console.log('[DEBUG] Saving fields:', JSON.stringify(fields));
         const c = CF.cfg();
         const existing = await CF.get('siteContent');
         if (existing && existing.length) {
