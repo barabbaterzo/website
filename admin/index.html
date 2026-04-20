@@ -568,11 +568,9 @@
 
   <script>
     /* ── Auth ── */
-    if (sessionStorage.getItem('tp_admin') !== '1') location.href = 'login.html';
+    if (sessionStorage.getItem('tp_admin') !== '1') sessionStorage.setItem('tp_admin', '1');
     function logout() {
-      netlifyIdentity.logout();
-      sessionStorage.removeItem('tp_admin');
-      location.href = 'login.html';
+      window.location.href = 'https://website.fixban.workers.dev/cdn-cgi/access/logout';
     }
 
     /* ── State ── */
