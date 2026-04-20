@@ -1,6 +1,0 @@
-name = "pignocchi-admin-api"
-main = "admin-worker.js"
-compatibility_date = "2026-04-21"
-
-# Example route (adjust to your domain):
-# routes = [{ pattern = "your-domain.com/api/admin/*", zone_name = "your-domain.com" }]
