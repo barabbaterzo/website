@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Tomaso Pignocchi</title>
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300&family=EB+Garamond&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --ink: #1a1814; --paper: #f5f2ec; --rule: #d8d4cc; }
+    body { background: var(--paper); font-family: 'DM Mono', monospace; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; }
+    .box { width: 340px; text-align: center; }
+    h1 { font-family: 'EB Garamond', serif; font-weight: 400; font-size: 1.4rem;
+      letter-spacing: 0.02em; color: var(--ink); margin-bottom: 0.3rem; }
+    .sub { font-size: 0.55rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: #999; margin-bottom: 2rem; }
+    button { width: 100%; border: 1px solid var(--ink); background: var(--ink);
+      color: var(--paper); padding: 0.7rem; font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase;
+      cursor: pointer; border-radius: 2px; transition: opacity 0.2s; }
+    button:hover { opacity: 0.8; }
+    .back { display: block; margin-top: 1.6rem; font-size: 0.5rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: #999; text-decoration: none; }
+    .back:hover { color: var(--ink); }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Admin Panel</h1>
+    <p class="sub">Tomaso Pignocchi · Photography</p>
+    <button onclick="netlifyIdentity.open()">Login →</button>
+    <a class="back" href="../index.html">← Back to site</a>
+  </div>
+  <script>
+    netlifyIdentity.on('login', user => {
+      sessionStorage.setItem('tp_admin', '1');
+      netlifyIdentity.close();
+      location.href = 'index.html';
+    });
+
+    netlifyIdentity.on('init', user => {
+      if (user) {
+        sessionStorage.setItem('tp_admin', '1');
+        location.href = 'index.html';
+      }
+    });
+  </script>
+</body>
+</html>
