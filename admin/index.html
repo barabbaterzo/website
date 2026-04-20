@@ -352,17 +352,23 @@
         <div class="form-group">
           <label>Colore sfondo</label>
           <div style="display:flex;gap:6px;align-items:center">
-            <div id="bg-swatch" style="width:28px;height:28px;border:1px solid var(--rule);border-radius:2px;flex-shrink:0;background:#f5f2ec"></div>
+            <input type="color" id="cp-bg-picker" value="#f5f2ec"
+              oninput="document.getElementById('cp-bg').value=this.value;updateSwatch('bg')"
+              style="width:36px;height:36px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" />
             <input type="text" id="cp-bg" value="#f5f2ec" placeholder="#f5f2ec" maxlength="7"
-              oninput="updateSwatch('bg')" style="font-family:'DM Mono',monospace;font-size:0.75rem" />
+              oninput="updateSwatch('bg');var p=document.getElementById('cp-bg-picker');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value"
+              style="font-family:'DM Mono',monospace;font-size:0.75rem" />
           </div>
         </div>
         <div class="form-group">
           <label>Colore testo</label>
           <div style="display:flex;gap:6px;align-items:center">
-            <div id="ink-swatch" style="width:28px;height:28px;border:1px solid var(--rule);border-radius:2px;flex-shrink:0;background:#1a1814"></div>
+            <input type="color" id="cp-ink-picker" value="#1a1814"
+              oninput="document.getElementById('cp-ink').value=this.value;updateSwatch('ink')"
+              style="width:36px;height:36px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" />
             <input type="text" id="cp-ink" value="#1a1814" placeholder="#1a1814" maxlength="7"
-              oninput="updateSwatch('ink')" style="font-family:'DM Mono',monospace;font-size:0.75rem" />
+              oninput="updateSwatch('ink');var p=document.getElementById('cp-ink-picker');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value"
+              style="font-family:'DM Mono',monospace;font-size:0.75rem" />
           </div>
         </div>
       </div>
@@ -1356,9 +1362,8 @@
 
     function updateSwatch(which) {
       const input = document.getElementById('cp-' + (which === 'bg' ? 'bg' : 'ink'));
-      const swatch = document.getElementById((which === 'bg' ? 'bg' : 'ink') + '-swatch');
       const val = input.value.trim();
-      if (/^#[0-9a-fA-F]{6}$/.test(val)) swatch.style.background = val;
+      /* swatch removed — picker is the visual indicator */
     }
 
     function setLogoVariant(v) {
@@ -1373,8 +1378,8 @@
 
     function loadColorsToAdmin(sc) {
       if (!sc) return;
-      if (sc.bgColor)   { document.getElementById('cp-bg').value  = sc.bgColor;  updateSwatch('bg'); }
-      if (sc.textColor) { document.getElementById('cp-ink').value = sc.textColor; updateSwatch('ink'); }
+      if (sc.bgColor)   { document.getElementById('cp-bg').value  = sc.bgColor;  updateSwatch('bg');  var bp=document.getElementById('cp-bg-picker');  if(bp) bp.value=sc.bgColor; }
+      if (sc.textColor) { document.getElementById('cp-ink').value = sc.textColor; updateSwatch('ink'); var ip=document.getElementById('cp-ink-picker'); if(ip) ip.value=sc.textColor; }
       if (sc.logoVariant) setLogoVariant(sc.logoVariant);
     }
 
