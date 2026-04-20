@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin — Photos</title>
+  <script src="../js/site-config.js"></script>
   <script src="../js/contentful.js"></script>
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=New+Computer+Modern:ital,wght@0,400;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Cormorant+Garant:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Source+Sans+3:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -689,16 +689,15 @@
 
   <!-- ═══ SETTINGS PANEL ═══ -->
   <div class="admin-panel" id="panel-settings">
-    <p class="section-title">Contentful connection</p>
+    <p class="section-title">Cloudflare + Contentful</p>
     <div class="cf-status" id="cfStatus2" style="margin-bottom:1.8rem">
       <span id="cfStatusText2">Checking…</span>
-      <button onclick="openSetup()">Configure</button>
+      <button onclick="openSetup()">Deployment notes</button>
     </div>
     <p style="font-size:0.6rem;color:var(--ink3);line-height:1.8">
-      Contentful stores all your content — photos, publications, talks, bio text —
-      so it persists across devices and sessions. Without it, changes are lost on refresh.<br><br>
-      Once connected, all sections of this admin panel save directly to Contentful
-      and appear live on the site immediately.
+      The public website reads from Contentful using <code>js/site-config.js</code>.<br><br>
+      The admin panel writes through <strong>Cloudflare Zero Trust + Worker API</strong>, so no management token is ever stored in the browser.<br><br>
+      Protect both <code>/admin/*</code> and <code>/api/admin/*</code> with Cloudflare Access, then run the setup once to create the required content types.
     </p>
   </div>
 
@@ -707,36 +706,22 @@
   <!-- CONTENTFUL SETUP MODAL -->
   <div class="modal-bg" id="setupModal">
     <div class="modal">
-      <h2>Connect Contentful</h2>
-      <p class="modal-sub">One-time setup · Free tier is enough</p>
+      <h2>Deployment notes</h2>
+      <p class="modal-sub">No browser-stored credentials · Admin protected by Cloudflare Access</p>
 
       <div class="guide">
         <ol>
-          <li>Go to <a href="https://contentful.com" target="_blank">contentful.com</a> and create a free account</li>
-          <li>Create a new Space (any name, e.g. "pignocchi-photo")</li>
-          <li>In Settings → API keys → "Add API key" — copy the <strong>Space ID</strong> and <strong>Content Delivery API token</strong></li>
-          <li>In Settings → API keys → "Content management tokens" — generate a <strong>Management token</strong></li>
-          <li>Paste all three below and click Setup</li>
+          <li>Fill <strong>js/site-config.js</strong> with your <strong>Space ID</strong> and <strong>Content Delivery token</strong>.</li>
+          <li>Deploy the Worker in <strong>cloudflare/admin-worker.js</strong>.</li>
+          <li>Add the Worker secrets for <strong>CONTENTFUL_SPACE_ID</strong>, <strong>CONTENTFUL_ENVIRONMENT</strong>, <strong>CONTENTFUL_LOCALE</strong>, <strong>CONTENTFUL_MANAGEMENT_TOKEN</strong>, <strong>ACCESS_TEAM_DOMAIN</strong> and <strong>ACCESS_AUD</strong>.</li>
+          <li>Protect <strong>/admin/*</strong> and <strong>/api/admin/*</strong> with Cloudflare Access.</li>
+          <li>Click the button below once to create or publish the content types used by the site.</li>
         </ol>
       </div>
 
-      <div class="form-group" style="margin-bottom:0.8rem">
-        <label>Space ID</label>
-        <input type="text" id="cfSpaceId" placeholder="xxxxxxxxxxxxxx" />
-      </div>
-      <div class="form-group" style="margin-bottom:0.8rem">
-        <label>Delivery Token (public read)</label>
-        <input type="text" id="cfDelivery" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
-      </div>
-      <div class="form-group">
-        <label>Management Token (admin write)</label>
-        <input type="text" id="cfMgmt" placeholder="CFPAT-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
-      </div>
-
       <div class="modal-actions">
-        <button class="btn primary" onclick="runSetup()">Setup Contentful →</button>
-        <button class="btn ghost" onclick="closeSetup()">Cancel</button>
-        <button class="btn danger" onclick="disconnectCF()">Disconnect</button>
+        <button class="btn primary" onclick="runSetup()">Create content types →</button>
+        <button class="btn ghost" onclick="closeSetup()">Close</button>
       </div>
 
       <div class="log" id="setupLog"></div>
@@ -745,9 +730,8 @@
 
   <script>
     /* ── Auth ── */
-    if (sessionStorage.getItem('tp_admin') !== '1') { location.href = 'login.html'; }
     function logout() {
-      window.location.href = 'https://website.fixban.workers.dev/cdn-cgi/access/logout';
+      window.location.href = CF.cfg().accessLogoutUrl || '/cdn-cgi/access/logout';
     }
 
     /* ── State ── */
@@ -755,6 +739,8 @@
     let pendingUrl   = null; /* object URL for preview */
     let photos       = [];   /* loaded from Contentful */
     let seriesNames  = new Set();
+    let currentBannerUrl = '';
+    let currentBannerAssetId = null;
 
     /* ── Contentful status ── */
     function updateCFStatus() {
@@ -764,21 +750,17 @@
       const btn  = document.getElementById('cfSetupBtn');
       if (connected) {
         bar.className = 'cf-status connected';
-        text.textContent = '✓ Connected to Contentful — photos are saved to the cloud';
-        btn.textContent = 'Settings';
+        text.textContent = '✓ Public Contentful read is configured. Admin writes go through Cloudflare Access + Worker API.';
+        btn.textContent = 'Deployment notes';
       } else {
         bar.className = 'cf-status disconnected';
-        text.textContent = '⚠ Contentful not connected — photos will be lost on refresh. Configure to save permanently.';
-        btn.textContent = 'Configure Contentful';
+        text.textContent = '⚠ Fill js/site-config.js first — the site cannot read Contentful yet.';
+        btn.textContent = 'Deployment notes';
       }
     }
 
     /* ── Setup modal ── */
     function openSetup() {
-      const c = CF.cfg();
-      document.getElementById('cfSpaceId').value  = c.spaceId  || '';
-      document.getElementById('cfDelivery').value = c.deliveryToken || '';
-      document.getElementById('cfMgmt').value     = c.mgmtToken || '';
       document.getElementById('setupLog').className = 'log';
       document.getElementById('setupLog').textContent = '';
       document.getElementById('setupModal').classList.add('open');
@@ -793,37 +775,32 @@
     }
 
     async function runSetup() {
-      const spaceId = document.getElementById('cfSpaceId').value.trim();
-      const delivery = document.getElementById('cfDelivery').value.trim();
-      const mgmt = document.getElementById('cfMgmt').value.trim();
-
-      if (!spaceId || !delivery || !mgmt) {
-        log('Please fill all three fields.', '#f88'); return;
-      }
-
-      CF.saveCfg({ spaceId, deliveryToken: delivery, mgmtToken: mgmt });
-      log('Credentials saved. Creating content types…');
-
+      log('Creating or publishing required content types…');
       try {
         const results = await CF.createContentTypes();
         results.forEach(r => {
-          log(`  ${r.id}: ${r.status}${r.message ? ' — ' + r.message : ''}`,
+          log(`${r.id}: ${r.status}${r.message ? ' — ' + r.message : ''}`,
             r.status === 'error' ? '#f88' : '#8f8');
         });
-        log('✓ Setup complete! Close this panel and start uploading photos.');
+        log('Setup complete. You can close this panel and use the admin.', '#8f8');
         updateCFStatus();
-        loadPhotos();
+        updateCFStatus2();
+        await Promise.all([loadPhotos(), loadBanner(), loadContent(), loadPubs(), loadTalks()]);
       } catch (e) {
         log('Error: ' + e.message, '#f88');
       }
     }
 
-    function disconnectCF() {
-      if (confirm('Remove Contentful connection? Uploaded photos stay on Contentful.')) {
-        localStorage.removeItem('pignocchi_cf');
-        updateCFStatus();
-        closeSetup();
+
+    async function upsertSingletonEntry(contentType, fields) {
+      const key = CF.cfg().settingsKey || 'main';
+      const existing = await CF.get(contentType, { 'fields.key': key, limit: 1 });
+      const payload = { key, ...fields };
+      if (existing && existing.length) {
+        await CF.updateEntry(existing[0]._id, payload);
+        return existing[0]._id;
       }
+      return CF.createEntry(contentType, payload);
     }
 
     /* ── Upload zone ── */
@@ -910,39 +887,7 @@
             featured
           };
 
-          /* POST with content type header */
-          const c = CF.cfg();
-          const r = await fetch(
-            `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries`,
-            {
-              method: 'POST',
-              headers: {
-                Authorization: `Bearer ${c.mgmtToken}`,
-                'Content-Type': 'application/vnd.contentful.management.v1+json',
-                'X-Contentful-Content-Type': 'photo'
-              },
-              body: JSON.stringify({
-                fields: Object.fromEntries(
-                  Object.entries(fields).map(([k, v]) => [k, { 'en-US': v }])
-                )
-              })
-            }
-          );
-          const entry = await r.json();
-          if (!r.ok) throw new Error(entry.message || 'Failed to create entry');
-
-          /* publish */
-          await fetch(
-            `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entry.sys.id}/published`,
-            {
-              method: 'PUT',
-              headers: {
-                Authorization: `Bearer ${c.mgmtToken}`,
-                'Content-Type': 'application/vnd.contentful.management.v1+json',
-                'X-Contentful-Version': entry.sys.version
-              }
-            }
-          );
+          await CF.createEntry('photo', fields);
 
           if (series) seriesNames.add(series);
           await loadPhotos();
@@ -1031,14 +976,23 @@
 
     /* ── Banner management ── */
     async function loadBanner() {
-      let url = localStorage.getItem('tp_banner_url') || '';
+      let url = '';
+      let assetId = null;
 
-      if (!url && CF.isConnected()) {
+      if (CF.isConnected()) {
         try {
-          const s = await CF.get('siteSettings');
-          if (s && s.length && s[0].heroBanner) url = s[0].heroBanner;
-        } catch {}
+          const settings = await CF.get('siteSettings', { 'fields.key': CF.cfg().settingsKey || 'main', limit: 1 });
+          if (settings && settings.length) {
+            url = settings[0].heroBanner || '';
+            assetId = settings[0].heroBannerAssetId || null;
+          }
+        } catch (e) {
+          console.warn('Could not load banner from Contentful:', e);
+        }
       }
+
+      currentBannerUrl = url || '';
+      currentBannerAssetId = assetId;
 
       const preview = document.getElementById('bannerPreview');
       const label   = document.getElementById('bannerLabel');
@@ -1049,77 +1003,27 @@
         preview.src = 'https://www.tomasopignocchi.com/wp-content/uploads/2021/12/banner_bike_r_L.jpg';
         label.textContent = 'Using default banner — upload or pick a photo to customise';
       }
+
+      const cropImg = document.getElementById('cropPreview');
+      if (cropImg && preview) cropImg.src = preview.src;
     }
 
-    async function setBanner(url) {
-      localStorage.setItem('tp_banner_url', url);
-      document.getElementById('bannerPreview').src = url;
+    async function setBanner(url, assetId) {
+      currentBannerUrl = url || '';
+      currentBannerAssetId = assetId || null;
+      document.getElementById('bannerPreview').src = currentBannerUrl;
       document.getElementById('bannerLabel').textContent = 'Banner updated ✓';
-      /* update crop preview too */
       const cropImg = document.getElementById('cropPreview');
-      if (cropImg) cropImg.src = url;
+      if (cropImg) cropImg.src = currentBannerUrl;
 
-      /* save to Contentful if connected */
-      if (CF.isConnected()) {
-        try {
-          const c = CF.cfg();
-          /* check if siteSettings entry exists */
-          const existing = await CF.get('siteSettings');
-          const assetId = url.match(/contentful\.com/) ? null : null; /* URL already resolved */
+      if (!CF.isConnected() || !currentBannerAssetId) return;
 
-          if (existing && existing.length) {
-            /* update */
-            const entryId = existing[0]._id;
-            const e = await CF.mgmt('GET', `/entries/${entryId}`);
-            const bannerR = await fetch(
-              `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entryId}`,
-              { method: 'PUT',
-                headers: { Authorization: `Bearer ${c.mgmtToken}`,
-                  'Content-Type': 'application/vnd.contentful.management.v1+json',
-                  'X-Contentful-Version': e.sys.version },
-                body: JSON.stringify({ fields: { ...e.fields, heroBanner: { 'en-US': url } } })
-              }
-            );
-            const updated = await bannerR.json();
-            if (!bannerR.ok) throw new Error(updated.message || 'Update failed');
-            await CF.publishEntry(entryId, updated.sys.version);
-          } else {
-            /* create */
-            const r = await fetch(
-              `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries`,
-              {
-                method: 'POST',
-                headers: {
-                  Authorization: `Bearer ${c.mgmtToken}`,
-                  'Content-Type': 'application/vnd.contentful.management.v1+json',
-                  'X-Contentful-Content-Type': 'siteSettings'
-                },
-                body: JSON.stringify({
-                  fields: {
-                    key: { 'en-US': 'main' },
-                    heroBanner: { 'en-US': url }
-                  }
-                })
-              }
-            );
-            const entry = await r.json();
-            if (r.ok) {
-              await fetch(
-                `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entry.sys.id}/published`,
-                {
-                  method: 'PUT',
-                  headers: {
-                    Authorization: `Bearer ${c.mgmtToken}`,
-                    'Content-Type': 'application/vnd.contentful.management.v1+json',
-                    'X-Contentful-Version': entry.sys.version
-                  }
-                }
-              );
-            }
-          }
-        } catch (e) {
-          console.warn('Could not save banner to Contentful:', e);
-        }
+      try {
+        await upsertSingletonEntry('siteSettings', {
+          heroBanner: { sys: { type: 'Link', linkType: 'Asset', id: currentBannerAssetId } },
+        });
+      } catch (e) {
+        console.warn('Could not save banner to Contentful:', e);
       }
     }
 
@@ -1139,11 +1043,11 @@
           /* fetch resolved URL */
           const asset = await CF.mgmt('GET', `/assets/${assetId}`);
           const url = 'https:' + asset.fields.file['en-US'].url;
-          await setBanner(url);
+          await setBanner(url, assetId);
         } else {
           /* fallback: object URL (session only) */
           const url = URL.createObjectURL(file);
-          await setBanner(url);
+          await setBanner(url, null);
         }
       } catch (e) {
         alert('Could not upload banner: ' + e.message);
@@ -1168,7 +1072,7 @@
           card.innerHTML = `<img src="${photo.image}" alt="${photo.title||''}" loading="lazy" />
             <div class="card-info"><p>${photo.title||''}</p></div>`;
           card.addEventListener('click', async () => {
-            await setBanner(photo.image);
+            await setBanner(photo.image, photo.imageAssetId || null);
             document.getElementById('pickerModal').classList.remove('open');
           });
           grid.appendChild(card);
@@ -1196,8 +1100,6 @@
       const cross = document.getElementById('cropCross');
       if (preview) preview.style.objectPosition = `${cropX}% ${cropY}%`;
       if (cross) { cross.style.left = cropX + '%'; cross.style.top = cropY + '%'; }
-      /* live update homepage if open in another tab */
-      localStorage.setItem('tp_hero_pos', `${cropX}% ${cropY}%`);
     }
 
     /* slider input handler */
@@ -1231,14 +1133,9 @@
     }
 
     function initCropPreview() {
-      const banner = localStorage.getItem('tp_banner_url') || '';
       const preview = document.getElementById('cropPreview');
-      if (preview && banner) preview.src = banner;
-      const saved = localStorage.getItem('tp_hero_pos');
-      if (saved) {
-        const parts = saved.match(/(\d+)%\s+(\d+)%/);
-        if (parts) { cropX = parseInt(parts[1]); cropY = parseInt(parts[2]); updateCrop(); }
-      } else { updateCrop(); }
+      if (preview && currentBannerUrl) preview.src = currentBannerUrl;
+      updateCrop();
     }
 
 
@@ -1374,8 +1271,10 @@
 
     function loadColorsToAdmin(sc) {
       if (!sc) return;
-      if (sc.bgColor)   { document.getElementById('cp-bg').value  = sc.bgColor;  updateSwatch('bg'); }
-      if (sc.textColor) { document.getElementById('cp-ink').value = sc.textColor; updateSwatch('ink'); }
+      const backgroundColor = sc.backgroundColor || sc.bgColor;
+      const textColor = sc.textColor;
+      if (backgroundColor) { document.getElementById('cp-bg').value  = backgroundColor; updateSwatch('bg'); }
+      if (textColor) { document.getElementById('cp-ink').value = textColor; updateSwatch('ink'); }
       if (sc.logoVariant) setLogoVariant(sc.logoVariant);
     }
 
@@ -1397,10 +1296,10 @@
       if (!bar) return;
       if (connected) {
         bar.className = 'cf-status connected';
-        text.textContent = '✓ Connected to Contentful';
+        text.textContent = '✓ Public read configured. Admin routes must be protected by Cloudflare Access.';
       } else {
         bar.className = 'cf-status disconnected';
-        text.textContent = '⚠ Not connected';
+        text.textContent = '⚠ Missing public Contentful config in js/site-config.js';
       }
     }
 
@@ -1408,92 +1307,91 @@
     async function loadContent() {
       if (!CF.isConnected()) return;
       try {
-        const items = await CF.get('siteContent');
-        console.log('[DEBUG] siteContent items:', JSON.stringify(items));
-        const sc = items && items.length ? items[0] : null;
-        if (!sc) { console.log('[DEBUG] No siteContent entry found'); return; }
-        console.log('[DEBUG] siteContent fields:', JSON.stringify(sc));
-        if (sc.nameplateSubtitle) document.getElementById('sc-subtitle').value = sc.nameplateSubtitle;
-        if (sc.bioText)           document.getElementById('sc-bio').value = sc.bioText;
-        if (sc.photoIntro)        document.getElementById('sc-photo-intro').value = sc.photoIntro;
-        if (sc.contactInfo)       document.getElementById('sc-contact').value = sc.contactInfo;
-        if (sc.heroPosX !== undefined) { cropX = sc.heroPosX; cropY = sc.heroPosY || 38; updateCrop(); }
-        loadTypographyToAdmin(sc);
-        loadColorsToAdmin(sc);
-      } catch(e) { console.warn('loadContent error', e); }
+        const key = CF.cfg().settingsKey || 'main';
+        const [contentItems, settingsItems] = await Promise.all([
+          CF.get('siteContent', { 'fields.key': key, limit: 1 }),
+          CF.get('siteSettings', { 'fields.key': key, limit: 1 }),
+        ]);
+
+        const sc = contentItems && contentItems.length ? contentItems[0] : null;
+        const ss = settingsItems && settingsItems.length ? settingsItems[0] : null;
+        const merged = {
+          ...(sc || {}),
+          ...(ss || {}),
+          bgColor: ss?.backgroundColor || sc?.bgColor,
+          textColor: ss?.textColor || sc?.textColor,
+          fontPrimary: ss?.fontPrimary || sc?.fontPrimary,
+          sizeBio: ss?.fontSizeBio ?? sc?.sizeBio,
+          sizePubs: ss?.fontSizePubs ?? sc?.sizePubs,
+        };
+
+        if (sc?.nameplateSubtitle) document.getElementById('sc-subtitle').value = sc.nameplateSubtitle;
+        if (sc?.bioText) document.getElementById('sc-bio').value = sc.bioText;
+        if (sc?.photoIntro) document.getElementById('sc-photo-intro').value = sc.photoIntro;
+        if (sc?.contactInfo) document.getElementById('sc-contact').value = sc.contactInfo;
+        if (sc?.heroPosX !== undefined) {
+          cropX = sc.heroPosX;
+          cropY = sc.heroPosY || 38;
+          updateCrop();
+        }
+
+        loadTypographyToAdmin(merged);
+        loadColorsToAdmin(merged);
+      } catch (e) {
+        console.warn('loadContent error', e);
+      }
       initCropPreview();
     }
 
     async function saveContent() {
-      if (!CF.isConnected()) { alert('Connect Contentful first (Settings tab)'); return; }
-      const fields = {
-        key: 'main',
+      if (!CF.isConnected()) { alert('Fill js/site-config.js first.'); return; }
+
+      const contentFields = {
         nameplateSubtitle: document.getElementById('sc-subtitle').value.trim(),
-        bioText:           document.getElementById('sc-bio').value.trim(),
-        photoIntro:        document.getElementById('sc-photo-intro').value.trim(),
-        contactInfo:       document.getElementById('sc-contact').value.trim(),
-        heroPosX:          cropX,
-        heroPosY:          cropY,
-        heroStyle:         currentHeroStyle,
-        fontPrimary:       document.getElementById('tp-font-primary')?.value || 'EB Garamond',
-        fontSecondary:     document.getElementById('tp-font-secondary')?.value || 'DM Mono',
-        fontPrimaryWeight:   parseInt(document.getElementById('tp-wt-primary')?.value || 400),
-        fontSecondaryWeight: parseInt(document.getElementById('tp-wt-secondary')?.value || 300),
-        fontPrimaryItalic:   document.getElementById('tp-it-primary')?.checked || false,
+        bioText: document.getElementById('sc-bio').value.trim(),
+        photoIntro: document.getElementById('sc-photo-intro').value.trim(),
+        contactInfo: document.getElementById('sc-contact').value.trim(),
+        heroPosX: cropX,
+        heroPosY: cropY,
+        heroStyle: currentHeroStyle,
+        fontSecondary: document.getElementById('tp-font-secondary')?.value || 'DM Mono',
+        fontPrimaryWeight: parseInt(document.getElementById('tp-wt-primary')?.value || 400, 10),
+        fontSecondaryWeight: parseInt(document.getElementById('tp-wt-secondary')?.value || 300, 10),
+        fontPrimaryItalic: document.getElementById('tp-it-primary')?.checked || false,
         fontSecondaryItalic: document.getElementById('tp-it-secondary')?.checked || false,
-        sizeBannerTitle:   parseInt(document.getElementById('sz-banner-title')?.value || 100),
-        sizeBannerSubtitle:parseInt(document.getElementById('sz-banner-sub')?.value || 100),
-        sizeBio:           parseInt(document.getElementById('sz-bio')?.value || 100),
-        sizePubs:          parseInt(document.getElementById('sz-pubs')?.value || 100),
-        sizeTalks:         parseInt(document.getElementById('sz-talks')?.value || 100),
-        sizePhotoIntro:    parseInt(document.getElementById('sz-photo')?.value || 100),
-        sizeLabels:        parseInt(document.getElementById('sz-labels')?.value || 100),
-        sizeFooter:        parseInt(document.getElementById('sz-footer')?.value || 100),
-        bioLineHeight:     parseInt(document.getElementById('sz-lh-bio')?.value || 188),
-        bgColor:           document.getElementById('cp-bg')?.value?.trim() || '#f5f2ec',
-        textColor:         document.getElementById('cp-ink')?.value?.trim() || '#1a1814',
-        logoVariant:       currentLogoVariant,
+        sizeBannerTitle: parseInt(document.getElementById('sz-banner-title')?.value || 100, 10),
+        sizeBannerSubtitle: parseInt(document.getElementById('sz-banner-sub')?.value || 100, 10),
+        sizeTalks: parseInt(document.getElementById('sz-talks')?.value || 100, 10),
+        sizePhotoIntro: parseInt(document.getElementById('sz-photo')?.value || 100, 10),
+        sizeLabels: parseInt(document.getElementById('sz-labels')?.value || 100, 10),
+        sizeFooter: parseInt(document.getElementById('sz-footer')?.value || 100, 10),
+        bioLineHeight: parseInt(document.getElementById('sz-lh-bio')?.value || 188, 10),
+        logoVariant: currentLogoVariant,
       };
+
+      const settingsFields = {
+        backgroundColor: document.getElementById('cp-bg')?.value?.trim() || '#f5f2ec',
+        textColor: document.getElementById('cp-ink')?.value?.trim() || '#1a1814',
+        fontPrimary: document.getElementById('tp-font-primary')?.value || 'EB Garamond',
+        fontSizeBio: parseInt(document.getElementById('sz-bio')?.value || 100, 10),
+        fontSizePubs: parseInt(document.getElementById('sz-pubs')?.value || 100, 10),
+      };
+
+      if (currentBannerAssetId) {
+        settingsFields.heroBanner = { sys: { type: 'Link', linkType: 'Asset', id: currentBannerAssetId } };
+      }
+
       try {
-        console.log('[DEBUG] Saving fields:', JSON.stringify(fields));
-        const c = CF.cfg();
-        const existing = await CF.get('siteContent');
-        if (existing && existing.length) {
-          const id = existing[0]._id;
-          const e = await CF.mgmt('GET', `/entries/${id}`);
-          const updR = await fetch(
-            `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${id}`,
-            { method: 'PUT',
-              headers: { Authorization: `Bearer ${c.mgmtToken}`,
-                'Content-Type': 'application/vnd.contentful.management.v1+json',
-                'X-Contentful-Version': e.sys.version },
-              body: JSON.stringify({ fields: Object.fromEntries(Object.entries(fields).map(([k,v]) => [k, {'en-US': v}])) })
-            }
-          );
-          const upd = await updR.json();
-          if (!updR.ok) throw new Error(upd.message || 'Update failed');
-          await CF.publishEntry(id, upd.sys.version);
-        } else {
-          const r = await fetch(
-            `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries`,
-            { method: 'POST',
-              headers: { Authorization: `Bearer ${c.mgmtToken}`,
-                'Content-Type': 'application/vnd.contentful.management.v1+json',
-                'X-Contentful-Content-Type': 'siteContent' },
-              body: JSON.stringify({ fields: Object.fromEntries(Object.entries(fields).map(([k,v]) => [k, {'en-US': v}])) })
-            }
-          );
-          const entry = await r.json();
-          if (!r.ok) throw new Error(entry.message);
-          await fetch(`https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entry.sys.id}/published`,
-            { method: 'PUT', headers: { Authorization: `Bearer ${c.mgmtToken}`,
-              'Content-Type': 'application/vnd.contentful.management.v1+json',
-              'X-Contentful-Version': entry.sys.version }});
-        }
+        await Promise.all([
+          upsertSingletonEntry('siteContent', contentFields),
+          upsertSingletonEntry('siteSettings', settingsFields),
+        ]);
         const msg = document.getElementById('contentSaveMsg');
         msg.style.display = 'block';
         setTimeout(() => msg.style.display = 'none', 2500);
-      } catch(e) { alert('Save error: ' + e.message); }
+      } catch (e) {
+        alert('Save error: ' + e.message);
+      }
     }
 
     /* ── Publications ── */
@@ -1537,22 +1435,7 @@
         forthcoming: document.getElementById('pub-forthcoming').value === 'true',
       };
       try {
-        const c = CF.cfg();
-        const r = await fetch(
-          `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries`,
-          { method: 'POST',
-            headers: { Authorization: `Bearer ${c.mgmtToken}`,
-              'Content-Type': 'application/vnd.contentful.management.v1+json',
-              'X-Contentful-Content-Type': 'publication' },
-            body: JSON.stringify({ fields: Object.fromEntries(Object.entries(fields).filter(([,v]) => v !== '' && v !== null).map(([k,v]) => [k, {'en-US': v}])) })
-          }
-        );
-        const entry = await r.json();
-        if (!r.ok) throw new Error(entry.message);
-        await fetch(`https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entry.sys.id}/published`,
-          { method: 'PUT', headers: { Authorization: `Bearer ${c.mgmtToken}`,
-            'Content-Type': 'application/vnd.contentful.management.v1+json',
-            'X-Contentful-Version': entry.sys.version }});
+        await CF.createEntry('publication', Object.fromEntries(Object.entries(fields).filter(([,v]) => v !== '' && v !== null)));
         // clear form
         ['pub-title','pub-venue','pub-year','pub-link'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('pub-forthcoming').value = 'false';
@@ -1606,22 +1489,7 @@
         upcoming: document.getElementById('talk-upcoming').value === 'true',
       };
       try {
-        const c = CF.cfg();
-        const r = await fetch(
-          `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries`,
-          { method: 'POST',
-            headers: { Authorization: `Bearer ${c.mgmtToken}`,
-              'Content-Type': 'application/vnd.contentful.management.v1+json',
-              'X-Contentful-Content-Type': 'talk' },
-            body: JSON.stringify({ fields: Object.fromEntries(Object.entries(fields).filter(([,v]) => v !== '').map(([k,v]) => [k, {'en-US': v}])) })
-          }
-        );
-        const entry = await r.json();
-        if (!r.ok) throw new Error(entry.message);
-        await fetch(`https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entry.sys.id}/published`,
-          { method: 'PUT', headers: { Authorization: `Bearer ${c.mgmtToken}`,
-            'Content-Type': 'application/vnd.contentful.management.v1+json',
-            'X-Contentful-Version': entry.sys.version }});
+        await CF.createEntry('talk', Object.fromEntries(Object.entries(fields).filter(([,v]) => v !== '')));
         ['talk-title','talk-venue','talk-year'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('talk-upcoming').value = 'false';
         await loadTalks();

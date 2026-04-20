@@ -7,60 +7,75 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300&family=Cormorant+Garant:wght@300&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #f5f2ec; font-family: 'DM Mono', monospace; min-height: 100vh;
-      display: flex; align-items: center; justify-content: center; }
-    .box { width: 320px; }
-    h1 { font-family: 'Cormorant Garant', serif; font-weight: 300; font-size: 1.4rem;
-      letter-spacing: 0.02em; color: #1a1814; margin-bottom: 0.25rem; }
-    .sub { font-size: 0.52rem; letter-spacing: 0.18em; text-transform: uppercase;
-      color: #8a8480; margin-bottom: 2rem; }
-    label { display: block; font-size: 0.5rem; letter-spacing: 0.16em;
-      text-transform: uppercase; color: #8a8480; margin-bottom: 0.4rem; }
-    input { width: 100%; border: 0.5px solid #d0ccc4; background: white;
-      padding: 0.65rem 0.8rem; font-family: 'DM Mono', monospace; font-size: 0.82rem;
-      color: #1a1814; outline: none; margin-bottom: 1.2rem; }
-    input:focus { border-color: #1a1814; }
-    button { width: 100%; border: none; background: #1a1814; color: #f5f2ec;
-      padding: 0.7rem; font-family: 'DM Mono', monospace; font-size: 0.56rem;
-      letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
-    button:hover { opacity: 0.8; }
-    .error { font-size: 0.58rem; color: #8b2020; margin-top: 0.8rem; display: none; letter-spacing: 0.06em; }
-    .back { display: block; margin-top: 1.6rem; font-size: 0.5rem; letter-spacing: 0.14em;
-      text-transform: uppercase; color: #8a8480; text-decoration: none; }
+    body {
+      background: #f5f2ec;
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1a1814;
+    }
+    .box { width: min(420px, calc(100vw - 3rem)); }
+    h1 {
+      font-family: 'Cormorant Garant', serif;
+      font-weight: 300;
+      font-size: 1.55rem;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.35rem;
+    }
+    .sub {
+      font-size: 0.52rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #8a8480;
+      margin-bottom: 1.6rem;
+    }
+    p {
+      font-size: 0.7rem;
+      line-height: 1.9;
+      color: #3e3b36;
+      margin-bottom: 1.35rem;
+    }
+    .btn {
+      display: inline-block;
+      border: none;
+      background: #1a1814;
+      color: #f5f2ec;
+      padding: 0.8rem 1rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.56rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.82; }
+    .back {
+      display: block;
+      margin-top: 1.4rem;
+      font-size: 0.5rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #8a8480;
+      text-decoration: none;
+    }
     .back:hover { color: #1a1814; }
   </style>
 </head>
 <body>
   <div class="box">
     <h1>Admin Panel</h1>
-    <p class="sub">Tomaso Pignocchi</p>
-    <label for="pw">Password</label>
-    <input type="password" id="pw" placeholder="••••••••" autofocus />
-    <button onclick="login()">Enter &#x2192;</button>
-    <div class="error" id="err">Incorrect password.</div>
-    <a class="back" href="../index.html">&#x2190; Back to site</a>
+    <p class="sub">Cloudflare Zero Trust</p>
+    <p>
+      This admin area is protected by Cloudflare Access. There is no password stored in the browser anymore.
+    </p>
+    <p>
+      If your Access policy is configured, continue below and Cloudflare will handle authentication before loading the admin panel.
+    </p>
+    <a class="btn" href="index.html">Enter admin →</a>
+    <a class="back" href="../index.html">← Back to site</a>
   </div>
-  <script>
-    /* SHA-256 hash of the password — change this when you change the password */
-    /* Current password hash — update with: https://emn178.github.io/online-tools/sha256.html */
-    const HASH = 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3';
-
-    async function login() {
-      const pw = document.getElementById('pw').value;
-      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
-      const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-      if (hash === HASH) {
-        sessionStorage.setItem('tp_admin', '1');
-        location.href = 'index.html';
-      } else {
-        const err = document.getElementById('err');
-        err.style.display = 'block';
-        document.getElementById('pw').value = '';
-        document.getElementById('pw').focus();
-      }
-    }
-    document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
-    if (sessionStorage.getItem('tp_admin') === '1') location.href = 'index.html';
-  </script>
 </body>
 </html>
