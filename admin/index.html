@@ -394,7 +394,8 @@
       </div>
 
       <div style="background:#f8f7f4;border:1px solid var(--rule);border-radius:3px;padding:0.8rem 1rem;margin-bottom:1.2rem;font-size:0.72rem;color:var(--ink3)">
-        Anteprima: <span id="tp-preview" style="font-size:1.1rem;color:var(--ink)">Tomaso Pignocchi — Philosophy as Therapy</span>
+        Anteprima titolo: <span id="tp-preview" style="font-size:1.1rem;color:var(--ink)">Tomaso Pignocchi — Philosophy as Therapy</span><br><br>
+        Anteprima bio: <span id="tp-bio-preview" style="font-size:0.95rem;color:#3e3b36;line-height:1.88;display:block;margin-top:4px">I am a Ph.D. candidate in philosophy at the Institut Catholique de Paris and Università degli Studi La Sapienza. My research focuses on the intersection of Wittgenstein's later philosophy and Madhyamaka Buddhism.</span>
       </div>
 
       <div style="height:1px;background:var(--rule);margin:1.2rem 0"></div>
@@ -1259,6 +1260,11 @@
       const slider = document.getElementById('sz-' + key);
       const label  = document.getElementById('v-' + key);
       if (slider && label) label.textContent = slider.value;
+      /* live preview for line-height */
+      if (key === 'lh-bio') {
+        const prev = document.getElementById('tp-bio-preview');
+        if (prev && slider) prev.style.lineHeight = slider.value / 100;
+      }
     }
 
     function loadTypographyToAdmin(sc) {

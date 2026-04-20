@@ -975,6 +975,7 @@
       if (settings.sizePhotoIntro)     root.style.setProperty('--sz-photo',         settings.sizePhotoIntro / 100);
       if (settings.sizeLabels)         root.style.setProperty('--sz-labels',        settings.sizeLabels / 100);
       if (settings.sizeFooter)         root.style.setProperty('--sz-footer',        settings.sizeFooter / 100);
+      if (settings.bioLineHeight)      root.style.setProperty('--lh-bio',           settings.bioLineHeight / 100);
     }
 
     /* ── Apply hero style ── */
@@ -996,8 +997,6 @@
     (function() {
       const saved = localStorage.getItem('tp_typography');
       if (saved) { try { applyTypography(JSON.parse(saved)); } catch(e) {} }
-      const savedLh = localStorage.getItem('tp_lh_bio');
-      if (savedLh) document.documentElement.style.setProperty('--lh-bio', savedLh);
       const savedStyle = localStorage.getItem('tp_hero_style') || 'e';
       applyHeroStyle(savedStyle);
       const savedPos = localStorage.getItem('tp_hero_pos');
