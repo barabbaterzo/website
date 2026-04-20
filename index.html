@@ -35,6 +35,7 @@
       --sz-photo:        1;
       --sz-labels:       1;
       --sz-footer:       1;
+      --lh-bio:          1.88;
     }
 
 
@@ -98,8 +99,8 @@
       margin-top: 0.5rem;
     }
     .style-d-header .d-photo {
-      width: 220px;
-      height: 160px;
+      width: clamp(180px, 25vw, 320px);
+      height: clamp(130px, 18vw, 240px);
       object-fit: cover;
       border-radius: 3px;
       flex-shrink: 0;
@@ -218,7 +219,7 @@
       font-weight: var(--wt-primary);
       font-style: var(--fs-primary);
       font-size: calc(clamp(1rem, 1.85vw, 1.16rem) * var(--sz-bio, 1));
-      line-height: 1.88;
+      line-height: var(--lh-bio, 1.88);
       color: var(--ink2);
       text-align: justify;
       hyphens: auto;
@@ -995,6 +996,8 @@
     (function() {
       const saved = localStorage.getItem('tp_typography');
       if (saved) { try { applyTypography(JSON.parse(saved)); } catch(e) {} }
+      const savedLh = localStorage.getItem('tp_lh_bio');
+      if (savedLh) document.documentElement.style.setProperty('--lh-bio', savedLh);
       const savedStyle = localStorage.getItem('tp_hero_style') || 'e';
       applyHeroStyle(savedStyle);
       const savedPos = localStorage.getItem('tp_hero_pos');

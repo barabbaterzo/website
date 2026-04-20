@@ -414,6 +414,10 @@
           <input type="range" min="60" max="180" value="100" step="1" id="sz-bio" oninput="syncSize('bio')" style="width:100%" />
         </div>
         <div>
+          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Interlinea bio <span id="v-lh-bio">188</span>%</label>
+          <input type="range" min="100" max="300" value="188" step="1" id="sz-lh-bio" oninput="syncSize('lh-bio')" style="width:100%" />
+        </div>
+        <div>
           <label style="display:flex;justify-content:space-between;margin-bottom:3px">Pubblicazioni <span id="v-pubs">100</span>%</label>
           <input type="range" min="60" max="180" value="100" step="1" id="sz-pubs" oninput="syncSize('pubs')" style="width:100%" />
         </div>
@@ -1371,6 +1375,7 @@
         sizePhotoIntro:    parseInt(document.getElementById('sz-photo')?.value || 100),
         sizeLabels:        parseInt(document.getElementById('sz-labels')?.value || 100),
         sizeFooter:        parseInt(document.getElementById('sz-footer')?.value || 100),
+        bioLineHeight:     parseInt(document.getElementById('sz-lh-bio')?.value || 188),
       };
       try {
         const c = CF.cfg();
