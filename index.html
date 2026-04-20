@@ -405,14 +405,38 @@
 
     /* ── Fetch from Contentful Delivery API ── */
     async function cfGet(contentType, params) {
-      const qs = new URLSearchParams({ content_type: contentType, limit: 200, ...(params||{}) });
+      const qs = new URLSearchParams({ content_type: contentType, limit: 200, include: 2, ...(params||{}) });
       const r = await fetch(
         'https://cdn.contentful.com/spaces/' + CF_SPACE + '/environments/master/entries?' + qs,
         { headers: { Authorization: 'Bearer ' + CF_DELIVERY } }
       );
       if (!r.ok) throw new Error('Contentful ' + r.status);
       const data = await r.json();
-      return (data.items || []).map(item => ({ _id: item.sys.id, ...item.fields }));
+
+      /* Build asset lookup map from includes */
+      const assetMap = {};
+      if (data.includes && data.includes.Asset) {
+        data.includes.Asset.forEach(a => {
+          if (a.fields && a.fields.file) {
+            assetMap[a.sys.id] = 'https:' + a.fields.file.url;
+          }
+        });
+      }
+
+      /* Resolve linked assets in fields */
+      function resolveField(val) {
+        if (!val) return val;
+        if (typeof val === 'object' && val.sys && val.sys.type === 'Link' && val.sys.linkType === 'Asset') {
+          return assetMap[val.sys.id] || null;
+        }
+        return val;
+      }
+
+      return (data.items || []).map(item => {
+        const fields = {};
+        Object.entries(item.fields || {}).forEach(([k, v]) => { fields[k] = resolveField(v); });
+        return { _id: item.sys.id, ...fields };
+      });
     }
 
     /* ── Font map ── */
