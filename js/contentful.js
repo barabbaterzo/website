@@ -160,12 +160,29 @@ const CF = (() => {
 
   async function updateEntry(id, fields) {
     const existing = await mgmt('GET', `/entries/${id}`);
-    const updated = await mgmt('PUT', `/entries/${id}`, {
-      ...existing,
-      fields: Object.fromEntries(
-        Object.entries(fields).map(([k, v]) => [k, { 'en-US': v }])
-      )
-    });
+    const c = cfg();
+    const r = await fetch(
+      `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${id}`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${c.mgmtToken}`,
+          'Content-Type': 'application/vnd.contentful.management.v1+json',
+          'X-Contentful-Version': existing.sys.version
+        },
+        body: JSON.stringify({
+          ...existing,
+          fields: Object.fromEntries(
+            Object.entries(fields).map(([k, v]) => [k, { 'en-US': v }])
+          )
+        })
+      }
+    );
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      throw new Error(err.message || 'Update failed');
+    }
+    const updated = await r.json();
     await publishEntry(id, updated.sys.version);
     return updated;
   }

@@ -891,13 +891,17 @@
             /* update */
             const entryId = existing[0]._id;
             const e = await CF.mgmt('GET', `/entries/${entryId}`);
-            const updated = await CF.mgmt('PUT', `/entries/${entryId}`, {
-              ...e,
-              fields: {
-                ...e.fields,
-                heroBanner: { 'en-US': url } /* store resolved URL directly */
+            const bannerR = await fetch(
+              `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entryId}`,
+              { method: 'PUT',
+                headers: { Authorization: `Bearer ${c.mgmtToken}`,
+                  'Content-Type': 'application/vnd.contentful.management.v1+json',
+                  'X-Contentful-Version': e.sys.version },
+                body: JSON.stringify({ ...e, fields: { ...e.fields, heroBanner: { 'en-US': url } } })
               }
-            });
+            );
+            const updated = await bannerR.json();
+            if (!bannerR.ok) throw new Error(updated.message || 'Update failed');
             await CF.publishEntry(entryId, updated.sys.version);
           } else {
             /* create */
@@ -1048,10 +1052,17 @@
         if (existing && existing.length) {
           const id = existing[0]._id;
           const e = await CF.mgmt('GET', `/entries/${id}`);
-          const upd = await CF.mgmt('PUT', `/entries/${id}`, {
-            ...e,
-            fields: Object.fromEntries(Object.entries(fields).map(([k,v]) => [k, {'en-US': v}]))
-          });
+          const updR = await fetch(
+            `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${id}`,
+            { method: 'PUT',
+              headers: { Authorization: `Bearer ${c.mgmtToken}`,
+                'Content-Type': 'application/vnd.contentful.management.v1+json',
+                'X-Contentful-Version': e.sys.version },
+              body: JSON.stringify({ ...e, fields: Object.fromEntries(Object.entries(fields).map(([k,v]) => [k, {'en-US': v}])) })
+            }
+          );
+          const upd = await updR.json();
+          if (!updR.ok) throw new Error(upd.message || 'Update failed');
           await CF.publishEntry(id, upd.sys.version);
         } else {
           const r = await fetch(
