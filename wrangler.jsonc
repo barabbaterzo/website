@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pignocchi-site",
+  "compatibility_date": "2026-04-20",
+  "send_email": [
+    {
+      "name": "CONTACT_EMAIL",
+      "destination_address": "YOUR_VERIFIED_DESTINATION_EMAIL"
+    }
+  ],
+  "vars": {
+    "CONTACT_DESTINATION": "YOUR_VERIFIED_DESTINATION_EMAIL",
+    "CONTACT_SENDER": "contact@YOUR_DOMAIN"
+  }
+}
