@@ -898,7 +898,7 @@
                 heroBanner: { 'en-US': url } /* store resolved URL directly */
               }
             });
-            await CF.mgmt('PUT', `/entries/${entryId}/published`, updated);
+            await CF.publishEntry(entryId, updated.sys.version);
           } else {
             /* create */
             const r = await fetch(
@@ -1052,7 +1052,7 @@
             ...e,
             fields: Object.fromEntries(Object.entries(fields).map(([k,v]) => [k, {'en-US': v}]))
           });
-          await CF.mgmt('PUT', `/entries/${id}/published`, upd);
+          await CF.publishEntry(id, upd.sys.version);
         } else {
           const r = await fetch(
             `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries`,

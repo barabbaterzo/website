@@ -138,7 +138,27 @@ const CF = (() => {
     return entry.sys.id;
   }
 
-  async function updateEntry(id, fields, version) {
+  async function publishEntry(id, version) {
+    const c = cfg();
+    const r = await fetch(
+      `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${id}/published`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${c.mgmtToken}`,
+          'X-Contentful-Version': version,
+          'Content-Type': 'application/vnd.contentful.management.v1+json'
+        }
+      }
+    );
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      throw new Error(err.message || 'Publish failed');
+    }
+    return r.json();
+  }
+
+  async function updateEntry(id, fields) {
     const existing = await mgmt('GET', `/entries/${id}`);
     const updated = await mgmt('PUT', `/entries/${id}`, {
       ...existing,
@@ -146,7 +166,7 @@ const CF = (() => {
         Object.entries(fields).map(([k, v]) => [k, { 'en-US': v }])
       )
     });
-    await mgmt('PUT', `/entries/${id}/published`, updated);
+    await publishEntry(id, updated.sys.version);
     return updated;
   }
 
@@ -293,5 +313,5 @@ const CF = (() => {
     return results;
   }
 
-  return { cfg, saveCfg, isConnected, get, mgmt, uploadAsset, createEntry, updateEntry, deleteEntry, createContentTypes };
+  return { cfg, saveCfg, isConnected, get, mgmt, publishEntry, uploadAsset, createEntry, updateEntry, deleteEntry, createContentTypes };
 })();
