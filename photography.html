@@ -25,6 +25,25 @@
       font-family: 'EB Garamond', serif;
     }
 
+
+    /* ── Photo bio intro ── */
+    .photo-bio-section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2.4rem 2rem 1.6rem;
+      border-bottom: 0.5px solid var(--rule);
+    }
+    .photo-bio-section p {
+      font-family: 'EB Garamond', serif;
+      font-size: clamp(1rem, 1.5vw, 1.12rem);
+      line-height: 1.78;
+      color: var(--text);
+      opacity: 0.75;
+      column-count: 2;
+      column-gap: 2.4rem;
+    }
+    @media (max-width: 600px) { .photo-bio-section p { column-count: 1; } }
+
     /* ── HEADER ── */
     header {
       display: flex;
@@ -299,6 +318,9 @@
 
   <main>
     <div class="grid-wrap">
+            <div class="photo-bio-section">
+        <p id="photoBioText"></p>
+      </div>
       <div class="photo-grid" id="photoGrid">
         <!-- photos loaded dynamically -->
       </div>
@@ -472,6 +494,25 @@
     });
 
     init();
+  </script>
+
+  <script>
+    /* ── Load photo bio from Contentful ── */
+    (async function() {
+      try {
+        const qs = new URLSearchParams({ content_type: 'siteContent', limit: 1 });
+        const r = await fetch(
+          'https://cdn.contentful.com/spaces/fejt7dmbrv9e/environments/master/entries?' + qs,
+          { headers: { Authorization: 'Bearer tOHgPb2AaW4raBzCEnxzs5QhFMnNdyOGJDF3sTKGAgc' } }
+        );
+        const data = await r.json();
+        if (data.items && data.items[0]) {
+          const sc = data.items[0].fields;
+          const el = document.getElementById('photoBioText');
+          if (el && sc.photoIntro) el.textContent = sc.photoIntro;
+        }
+      } catch(e) { console.warn('Bio load error', e); }
+    })();
   </script>
 </body>
 </html>
