@@ -324,26 +324,37 @@
 
 
       <div style="height:1px;background:var(--rule);margin:1.6rem 0"></div>
-      <p class="section-title" style="margin-bottom:1rem">Hero style</p>
+      <p class="section-title" style="margin-bottom:1rem">Layout homepage</p>
 
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:1.4rem">
-        <button class="hero-opt" data-style="a" onclick="setHeroStyle('a')" style="padding:6px 4px;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer">
-          <div style="height:36px;background:#222;border-radius:2px;margin-bottom:4px;border-top:2px solid #fff"></div>A — Netto
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.4rem">
+        <button class="layout-opt" data-layout="a" onclick="setLayout('a')"
+          style="padding:8px 6px;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="display:grid;grid-template-columns:1fr 1fr;height:40px;margin-bottom:4px;gap:2px">
+            <div style="background:#888;border-radius:2px"></div>
+            <div style="background:#ddd;border-radius:2px"></div>
+          </div>
+          A — Split
         </button>
-        <button class="hero-opt" data-style="b" onclick="setHeroStyle('b')" style="padding:6px 4px;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer">
-          <div style="height:36px;background:linear-gradient(to right,#111 0%,#444 60%,#222 100%);border-radius:2px;margin-bottom:4px"></div>B — Laterale
+        <button class="layout-opt" data-layout="b" onclick="setLayout('b')"
+          style="padding:8px 6px;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;margin-bottom:4px">
+            <div style="background:#ddd;height:14px;border-radius:2px;margin-bottom:2px"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;height:22px;gap:2px">
+              <div style="background:#888;border-radius:2px"></div>
+              <div style="background:#ddd;border-radius:2px"></div>
+            </div>
+          </div>
+          B — Griglia
         </button>
-        <button class="hero-opt" data-style="c" onclick="setHeroStyle('c')" style="padding:6px 4px;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer">
-          <div style="height:36px;background:var(--paper);border-radius:2px;margin-bottom:4px;padding:3px"><div style="height:100%;background:#222;border-radius:2px"></div></div>C — Cornice
-        </button>
-        <button class="hero-opt" data-style="d" onclick="setHeroStyle('d')" style="padding:6px 4px;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer">
-          <div style="height:36px;background:var(--paper);border-radius:2px;margin-bottom:4px;display:flex;align-items:center;gap:3px;padding:4px"><div style="flex:1;height:100%;background:#ddd;border-radius:1px"></div><div style="width:18px;height:100%;background:#888;border-radius:1px"></div></div>D — Testo
-        </button>
-        <button class="hero-opt" data-style="e" onclick="setHeroStyle('e')" style="padding:6px 4px;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer">
-          <div style="height:36px;background:linear-gradient(to bottom,#222 0%,#444 50%,#f5f2ec 100%);border-radius:2px;margin-bottom:4px"></div>E — Sfumatura
+        <button class="layout-opt" data-layout="c" onclick="setLayout('c')"
+          style="padding:8px 6px;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="display:grid;grid-template-columns:2fr 3fr;height:40px;margin-bottom:4px;gap:2px">
+            <div style="background:#888;border-radius:2px"></div>
+            <div style="background:#ddd;border-radius:2px"></div>
+          </div>
+          C — Foto fissa
         </button>
       </div>
-
 
       <div style="height:1px;background:var(--rule);margin:1.6rem 0"></div>
       <p class="section-title" style="margin-bottom:1rem">Colori & Logo</p>
@@ -1264,13 +1275,15 @@
 
     let currentHeroStyle = 'e';
 
-    function setHeroStyle(s) {
-      currentHeroStyle = s;
-      document.querySelectorAll('.hero-opt').forEach(b => {
-        b.style.borderColor = b.dataset.style === s ? 'var(--ink)' : 'var(--rule)';
-        b.style.background  = b.dataset.style === s ? 'white' : 'var(--paper)';
+    let currentLayout = 'a';
+    function setLayout(s) {
+      currentLayout = s;
+      document.querySelectorAll('.layout-opt').forEach(b => {
+        b.style.borderColor = b.dataset.layout === s ? 'var(--ink)' : 'var(--rule)';
+        b.style.background  = b.dataset.layout === s ? 'white' : 'var(--paper)';
       });
     }
+    setLayout('a');
 
     function updateFontWeights(which) {
       const sel = document.getElementById('tp-font-' + which);
@@ -1302,11 +1315,11 @@
       const slider = document.getElementById('sz-' + key);
       const label  = document.getElementById('v-' + key);
       if (slider && label) label.textContent = slider.value;
-      /* live preview for line-height */
-      if (key === 'lh-bio') {
-        const prev = document.getElementById('tp-bio-preview');
-        if (prev && slider) prev.style.lineHeight = slider.value / 100;
-      }
+      const prev = document.getElementById('tp-bio-preview');
+      if (!prev || !slider) return;
+      const val = parseInt(slider.value) / 100;
+      if (key === 'lh-bio') prev.style.lineHeight = val;
+      if (key === 'bio')    prev.style.fontSize = (0.95 * val) + 'rem';
     }
 
     function loadTypographyToAdmin(sc) {
@@ -1341,7 +1354,7 @@
         if (slider) slider.value = v;
         if (label)  label.textContent = v;
       });
-      if (sc.heroStyle) setHeroStyle(sc.heroStyle);
+      if (sc.heroStyle) setLayout(sc.heroStyle);
       updateTypoPreview();
     }
 
@@ -1438,7 +1451,7 @@
         contactInfo:       document.getElementById('sc-contact').value.trim(),
         heroPosX:          cropX,
         heroPosY:          cropY,
-        heroStyle:         currentHeroStyle,
+        heroStyle:         currentLayout,
         fontPrimary:       document.getElementById('tp-font-primary')?.value || 'EB Garamond',
         fontSecondary:     document.getElementById('tp-font-secondary')?.value || 'DM Mono',
         fontPrimaryWeight:   parseInt(document.getElementById('tp-wt-primary')?.value || 400),
