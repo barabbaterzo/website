@@ -6,7 +6,7 @@
   <title>Admin — Photos</title>
   <script src="../js/contentful.js"></script>
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300&family=EB+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=New+Computer+Modern:ital,wght@0,400;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Cormorant+Garant:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Source+Sans+3:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -323,6 +323,119 @@
         </div>
       </div>
 
+
+      <div style="height:1px;background:var(--rule);margin:1.6rem 0"></div>
+      <p class="section-title" style="margin-bottom:1rem">Hero style</p>
+
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:1.4rem">
+        <button class="hero-opt" data-style="a" onclick="setHeroStyle('a')" style="padding:6px 4px;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer">
+          <div style="height:36px;background:#222;border-radius:2px;margin-bottom:4px;border-top:2px solid #fff"></div>A — Netto
+        </button>
+        <button class="hero-opt" data-style="b" onclick="setHeroStyle('b')" style="padding:6px 4px;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer">
+          <div style="height:36px;background:linear-gradient(to right,#111 0%,#444 60%,#222 100%);border-radius:2px;margin-bottom:4px"></div>B — Laterale
+        </button>
+        <button class="hero-opt" data-style="c" onclick="setHeroStyle('c')" style="padding:6px 4px;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer">
+          <div style="height:36px;background:var(--paper);border-radius:2px;margin-bottom:4px;padding:3px"><div style="height:100%;background:#222;border-radius:2px"></div></div>C — Cornice
+        </button>
+        <button class="hero-opt" data-style="d" onclick="setHeroStyle('d')" style="padding:6px 4px;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer">
+          <div style="height:36px;background:var(--paper);border-radius:2px;margin-bottom:4px;display:flex;align-items:center;gap:3px;padding:4px"><div style="flex:1;height:100%;background:#ddd;border-radius:1px"></div><div style="width:18px;height:100%;background:#888;border-radius:1px"></div></div>D — Testo
+        </button>
+        <button class="hero-opt" data-style="e" onclick="setHeroStyle('e')" style="padding:6px 4px;font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer">
+          <div style="height:36px;background:linear-gradient(to bottom,#222 0%,#444 50%,#f5f2ec 100%);border-radius:2px;margin-bottom:4px"></div>E — Sfumatura
+        </button>
+      </div>
+
+      <div style="height:1px;background:var(--rule);margin:1.6rem 0"></div>
+      <p class="section-title" style="margin-bottom:1rem">Tipografia</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem">
+        <div>
+          <label style="display:block;margin-bottom:0.3rem">Font principale</label>
+          <select id="tp-font-primary" onchange="updateFontWeights('primary')" style="width:100%">
+            <option>EB Garamond</option>
+            <option>New Computer Modern</option>
+            <option>Libre Baskerville</option>
+            <option>Playfair Display</option>
+            <option>Cormorant Garant</option>
+            <option>Spectral</option>
+            <option>Lato</option>
+            <option>Inter</option>
+            <option>Source Sans Pro</option>
+            <option>DM Mono</option>
+          </select>
+          <div style="display:flex;gap:6px;margin-top:6px">
+            <select id="tp-wt-primary" style="flex:1"></select>
+            <label style="display:flex;align-items:center;gap:4px;font-size:0.6rem;cursor:pointer">
+              <input type="checkbox" id="tp-it-primary" /> <em>Italic</em>
+            </label>
+          </div>
+        </div>
+        <div>
+          <label style="display:block;margin-bottom:0.3rem">Font secondario</label>
+          <select id="tp-font-secondary" onchange="updateFontWeights('secondary')" style="width:100%">
+            <option>DM Mono</option>
+            <option>EB Garamond</option>
+            <option>New Computer Modern</option>
+            <option>Libre Baskerville</option>
+            <option>Playfair Display</option>
+            <option>Cormorant Garant</option>
+            <option>Spectral</option>
+            <option>Lato</option>
+            <option>Inter</option>
+            <option>Source Sans Pro</option>
+          </select>
+          <div style="display:flex;gap:6px;margin-top:6px">
+            <select id="tp-wt-secondary" style="flex:1"></select>
+            <label style="display:flex;align-items:center;gap:4px;font-size:0.6rem;cursor:pointer">
+              <input type="checkbox" id="tp-it-secondary" /> <em>Italic</em>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#f8f7f4;border:1px solid var(--rule);border-radius:3px;padding:0.8rem 1rem;margin-bottom:1.2rem;font-size:0.72rem;color:var(--ink3)">
+        Anteprima: <span id="tp-preview" style="font-size:1.1rem;color:var(--ink)">Tomaso Pignocchi — Philosophy as Therapy</span>
+      </div>
+
+      <div style="height:1px;background:var(--rule);margin:1.2rem 0"></div>
+      <p class="section-title" style="margin-bottom:0.8rem">Dimensioni testo <span style="color:var(--ink3);font-weight:400;font-size:0.5rem">(% della dimensione base)</span></p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem 1.4rem">
+        <div>
+          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Titolo banner <span id="v-banner-title">100</span>%</label>
+          <input type="range" min="60" max="180" value="100" step="1" id="sz-banner-title" oninput="syncSize('banner-title')" style="width:100%" />
+        </div>
+        <div>
+          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Sottotitolo banner <span id="v-banner-sub">100</span>%</label>
+          <input type="range" min="60" max="180" value="100" step="1" id="sz-banner-sub" oninput="syncSize('banner-sub')" style="width:100%" />
+        </div>
+        <div>
+          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Bio <span id="v-bio">100</span>%</label>
+          <input type="range" min="60" max="180" value="100" step="1" id="sz-bio" oninput="syncSize('bio')" style="width:100%" />
+        </div>
+        <div>
+          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Pubblicazioni <span id="v-pubs">100</span>%</label>
+          <input type="range" min="60" max="180" value="100" step="1" id="sz-pubs" oninput="syncSize('pubs')" style="width:100%" />
+        </div>
+        <div>
+          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Talk <span id="v-talks">100</span>%</label>
+          <input type="range" min="60" max="180" value="100" step="1" id="sz-talks" oninput="syncSize('talks')" style="width:100%" />
+        </div>
+        <div>
+          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Intro fotografia <span id="v-photo">100</span>%</label>
+          <input type="range" min="60" max="180" value="100" step="1" id="sz-photo" oninput="syncSize('photo')" style="width:100%" />
+        </div>
+        <div>
+          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Label sezioni <span id="v-labels">100</span>%</label>
+          <input type="range" min="60" max="180" value="100" step="1" id="sz-labels" oninput="syncSize('labels')" style="width:100%" />
+        </div>
+        <div>
+          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Footer <span id="v-footer">100</span>%</label>
+          <input type="range" min="60" max="180" value="100" step="1" id="sz-footer" oninput="syncSize('footer')" style="width:100%" />
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--rule);margin:1.6rem 0"></div>
       <div class="form-actions">
         <button class="btn primary" onclick="saveContent()">Save content →</button>
       </div>
@@ -1086,6 +1199,111 @@
       } else { updateCrop(); }
     }
 
+
+    /* ── Font definitions ── */
+    const FONT_DATA = {
+      'EB Garamond':        { css: "'EB Garamond', serif",           weights: [400,500,600,700,800] },
+      'New Computer Modern':{ css: "'New Computer Modern', serif",   weights: [400] },
+      'Libre Baskerville':  { css: "'Libre Baskerville', serif",     weights: [400,700] },
+      'Playfair Display':   { css: "'Playfair Display', serif",      weights: [400,500,600,700,800,900] },
+      'Cormorant Garant':   { css: "'Cormorant Garant', serif",      weights: [300,400,500,600,700] },
+      'Spectral':           { css: "'Spectral', serif",              weights: [200,300,400,500,600,700,800] },
+      'Lato':               { css: "'Lato', sans-serif",             weights: [100,300,400,700,900] },
+      'Inter':              { css: "'Inter', sans-serif",            weights: [100,200,300,400,500,600,700,800,900] },
+      'Source Sans Pro':    { css: "'Source Sans 3', sans-serif",    weights: [200,300,400,500,600,700,900] },
+      'DM Mono':            { css: "'DM Mono', monospace",           weights: [300,400,500] },
+    };
+    const WEIGHT_NAMES = {100:'Thin',200:'ExtraLight',300:'Light',400:'Regular',500:'Medium',600:'SemiBold',700:'Bold',800:'ExtraBold',900:'Black'};
+
+    let currentHeroStyle = 'e';
+
+    function setHeroStyle(s) {
+      currentHeroStyle = s;
+      document.querySelectorAll('.hero-opt').forEach(b => {
+        b.style.borderColor = b.dataset.style === s ? 'var(--ink)' : 'var(--rule)';
+        b.style.background  = b.dataset.style === s ? 'white' : 'var(--paper)';
+      });
+    }
+
+    function updateFontWeights(which) {
+      const sel = document.getElementById('tp-font-' + which);
+      const wtSel = document.getElementById('tp-wt-' + which);
+      if (!sel || !wtSel) return;
+      const font = sel.value;
+      const fd = FONT_DATA[font] || { weights: [400] };
+      const curVal = parseInt(wtSel.value) || 400;
+      wtSel.innerHTML = fd.weights.map(w =>
+        `<option value="${w}" ${w === curVal || (curVal === 400 && fd.weights.includes(400)) ? 'selected' : ''}>${WEIGHT_NAMES[w] || w} (${w})</option>`
+      ).join('');
+      updateTypoPreview();
+    }
+
+    function updateTypoPreview() {
+      const pFont = document.getElementById('tp-font-primary')?.value || 'EB Garamond';
+      const pWt   = document.getElementById('tp-wt-primary')?.value   || 400;
+      const pIt   = document.getElementById('tp-it-primary')?.checked;
+      const fd = FONT_DATA[pFont] || {};
+      const prev = document.getElementById('tp-preview');
+      if (prev) {
+        prev.style.fontFamily  = fd.css || pFont;
+        prev.style.fontWeight  = pWt;
+        prev.style.fontStyle   = pIt ? 'italic' : 'normal';
+      }
+    }
+
+    function syncSize(key) {
+      const slider = document.getElementById('sz-' + key);
+      const label  = document.getElementById('v-' + key);
+      if (slider && label) label.textContent = slider.value;
+    }
+
+    function loadTypographyToAdmin(sc) {
+      if (!sc) return;
+      const fp = document.getElementById('tp-font-primary');
+      const fs = document.getElementById('tp-font-secondary');
+      if (fp && sc.fontPrimary)   { fp.value = sc.fontPrimary;   updateFontWeights('primary'); }
+      if (fs && sc.fontSecondary) { fs.value = sc.fontSecondary; updateFontWeights('secondary'); }
+      const wpEl = document.getElementById('tp-wt-primary');
+      const wsEl = document.getElementById('tp-wt-secondary');
+      if (wpEl && sc.fontPrimaryWeight)   wpEl.value = sc.fontPrimaryWeight;
+      if (wsEl && sc.fontSecondaryWeight) wsEl.value = sc.fontSecondaryWeight;
+      const ipEl = document.getElementById('tp-it-primary');
+      const isEl = document.getElementById('tp-it-secondary');
+      if (ipEl) ipEl.checked = !!sc.fontPrimaryItalic;
+      if (isEl) isEl.checked = !!sc.fontSecondaryItalic;
+      /* sizes */
+      const sizeMap = {
+        'banner-title': sc.sizeBannerTitle,
+        'banner-sub':   sc.sizeBannerSubtitle,
+        'bio':          sc.sizeBio,
+        'pubs':         sc.sizePubs,
+        'talks':        sc.sizeTalks,
+        'photo':        sc.sizePhotoIntro,
+        'labels':       sc.sizeLabels,
+        'footer':       sc.sizeFooter,
+      };
+      Object.entries(sizeMap).forEach(([k, v]) => {
+        if (!v) return;
+        const slider = document.getElementById('sz-' + k);
+        const label  = document.getElementById('v-' + k);
+        if (slider) slider.value = v;
+        if (label)  label.textContent = v;
+      });
+      if (sc.heroStyle) setHeroStyle(sc.heroStyle);
+      updateTypoPreview();
+    }
+
+    /* wire preview updates to font/weight/italic changes */
+    ['tp-font-primary','tp-font-secondary','tp-wt-primary','tp-wt-secondary','tp-it-primary','tp-it-secondary']
+      .forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', updateTypoPreview);
+      });
+
+    /* init weight dropdowns */
+    updateFontWeights('primary');
+    updateFontWeights('secondary');
+
     /* ── Admin tab switching ── */
     document.querySelectorAll('.admin-tab').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1123,6 +1341,7 @@
         if (sc.photoIntro)        document.getElementById('sc-photo-intro').value = sc.photoIntro;
         if (sc.contactInfo)       document.getElementById('sc-contact').value = sc.contactInfo;
         if (sc.heroPosX !== undefined) { cropX = sc.heroPosX; cropY = sc.heroPosY || 38; updateCrop(); }
+        loadTypographyToAdmin(sc);
       } catch(e) { console.warn('loadContent error', e); }
       initCropPreview();
     }
@@ -1137,6 +1356,21 @@
         contactInfo:       document.getElementById('sc-contact').value.trim(),
         heroPosX:          cropX,
         heroPosY:          cropY,
+        heroStyle:         currentHeroStyle,
+        fontPrimary:       document.getElementById('tp-font-primary')?.value || 'EB Garamond',
+        fontSecondary:     document.getElementById('tp-font-secondary')?.value || 'DM Mono',
+        fontPrimaryWeight:   parseInt(document.getElementById('tp-wt-primary')?.value || 400),
+        fontSecondaryWeight: parseInt(document.getElementById('tp-wt-secondary')?.value || 300),
+        fontPrimaryItalic:   document.getElementById('tp-it-primary')?.checked || false,
+        fontSecondaryItalic: document.getElementById('tp-it-secondary')?.checked || false,
+        sizeBannerTitle:   parseInt(document.getElementById('sz-banner-title')?.value || 100),
+        sizeBannerSubtitle:parseInt(document.getElementById('sz-banner-sub')?.value || 100),
+        sizeBio:           parseInt(document.getElementById('sz-bio')?.value || 100),
+        sizePubs:          parseInt(document.getElementById('sz-pubs')?.value || 100),
+        sizeTalks:         parseInt(document.getElementById('sz-talks')?.value || 100),
+        sizePhotoIntro:    parseInt(document.getElementById('sz-photo')?.value || 100),
+        sizeLabels:        parseInt(document.getElementById('sz-labels')?.value || 100),
+        sizeFooter:        parseInt(document.getElementById('sz-footer')?.value || 100),
       };
       try {
         const c = CF.cfg();
