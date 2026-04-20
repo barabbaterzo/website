@@ -744,9 +744,9 @@
 
   <script>
     /* ── Auth ── */
-    if (sessionStorage.getItem('tp_admin') !== '1') { location.href = 'login.html'; }
+    /* Auth handled by Cloudflare Zero Trust */
     function logout() {
-      window.location.href = 'https://website.fixban.workers.dev/cdn-cgi/access/logout';
+      window.location.href = 'https://tomasopignocchi.com/cdn-cgi/access/logout';
     }
 
     /* ── State ── */
