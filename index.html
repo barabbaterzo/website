@@ -62,13 +62,13 @@
     .nav-links a:hover { color: var(--page-ink); }
 
     /* ── INTRO ── */
-    .intro { border-bottom: 0.5px solid var(--page-rule); padding-top: clamp(2.8rem, 6vw, 5rem); }
-    .intro > .wrap { padding-bottom: clamp(2.4rem, 5vw, 4rem); }
+    .intro { border-bottom: 0.5px solid var(--page-rule); padding-top: clamp(1.8rem, 3vw, 2.8rem); }
+    .intro > .wrap { padding-bottom: clamp(1.4rem, 2vw, 2rem); }
 
     .intro-name {
       font-family: var(--font-primary);
       font-weight: var(--wt-primary); font-style: var(--fs-primary);
-      font-size: calc(clamp(3.2rem, 8vw, 7rem) * var(--sz-banner-title, 1));
+      font-size: calc(clamp(2rem, 4.5vw, 4.2rem) * var(--sz-banner-title, 1));
       line-height: 0.92; letter-spacing: -0.02em; color: var(--page-ink);
       margin-bottom: 1rem;
     }
@@ -77,15 +77,15 @@
       font-weight: var(--wt-secondary); font-style: var(--fs-secondary);
       font-size: calc(0.56rem * var(--sz-banner-sub, 1));
       letter-spacing: 0.26em; text-transform: uppercase;
-      color: var(--page-ink3); margin-bottom: clamp(1.8rem, 4vw, 3rem);
+      color: var(--page-ink3); margin-bottom: clamp(1rem, 2vw, 1.6rem);
     }
     .intro-photo {
       position: relative; overflow: hidden;
       background: var(--page-rule);
       margin-left: calc(-1 * var(--gutter));
       width: calc(100% + 2 * var(--gutter));
-      aspect-ratio: 21/8;
-      margin-bottom: clamp(1.8rem, 4vw, 3rem);
+      aspect-ratio: 21/7;
+      margin-bottom: clamp(1.2rem, 2vw, 1.8rem);
     }
     .intro-photo img {
       position: absolute; inset: 0; width: 100%; height: 100%;
@@ -94,13 +94,20 @@
       pointer-events: none; user-select: none; -webkit-user-drag: none;
     }
     .intro-photo img[src=""] { display: none; }
+    .intro-bio {
+      padding-top: clamp(1.2rem, 2vw, 1.8rem);
+      padding-bottom: clamp(1.4rem, 2vw, 2rem);
+      column-count: 2;
+      column-gap: clamp(2rem, 4vw, 4rem);
+    }
     .intro-bio p {
       font-family: var(--font-primary);
       font-weight: var(--wt-primary); font-style: var(--fs-primary);
-      font-size: calc(clamp(1rem, 1.5vw, 1.12rem) * var(--sz-bio, 1));
+      font-size: calc(clamp(0.95rem, 1.3vw, 1.05rem) * var(--sz-bio, 1));
       line-height: var(--lh-bio, 1.78); color: var(--page-ink2);
-      max-width: 72ch;
+      text-align: justify; hyphens: auto;
     }
+    @media (max-width: 700px) { .intro-bio { column-count: 1; } }
 
     /* ── SECTIONS ── */
     .page-section { border-bottom: 0.5px solid var(--page-rule); padding-top: clamp(2rem, 4vw, 3.2rem); }
