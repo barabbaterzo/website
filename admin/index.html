@@ -301,6 +301,28 @@
         <textarea id="sc-contact" style="min-height:90px"></textarea>
       </div>
 
+      <div class="form-group" style="margin-bottom:0.9rem">
+        <label>Banner crop position <span style="color:var(--ink3);font-size:0.48rem">(drag or use sliders to choose which part of the banner to show)</span></label>
+        <div id="cropTool" style="position:relative;width:100%;height:180px;background:#111;border-radius:3px;overflow:hidden;cursor:crosshair;border:1px solid var(--rule);margin-top:0.4rem;user-select:none">
+          <img id="cropPreview" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 38%;pointer-events:none;filter:grayscale(15%) brightness(0.8)" />
+          <div id="cropCross" style="position:absolute;transform:translate(-50%,-50%);pointer-events:none;left:50%;top:38%">
+            <div style="position:absolute;top:50%;left:-12px;width:24px;height:1px;background:rgba(255,255,255,0.9)"></div>
+            <div style="position:absolute;left:50%;top:-12px;width:1px;height:24px;background:rgba(255,255,255,0.9)"></div>
+            <div style="position:absolute;top:-5px;left:-5px;width:10px;height:10px;border:1.5px solid rgba(255,255,255,0.9);border-radius:50%"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:1.2rem;margin-top:0.7rem;align-items:center">
+          <div style="flex:1">
+            <label style="margin-bottom:0.25rem;display:block">Horizontal — <span id="posXVal">50</span>%</label>
+            <input type="range" id="posX" min="0" max="100" value="50" style="width:100%" oninput="updateCrop()" />
+          </div>
+          <div style="flex:1">
+            <label style="margin-bottom:0.25rem;display:block">Vertical — <span id="posYVal">38</span>%</label>
+            <input type="range" id="posY" min="0" max="100" value="38" style="width:100%" oninput="updateCrop()" />
+          </div>
+        </div>
+      </div>
+
       <div class="form-actions">
         <button class="btn primary" onclick="saveContent()">Save content →</button>
       </div>
@@ -878,6 +900,9 @@
       localStorage.setItem('tp_banner_url', url);
       document.getElementById('bannerPreview').src = url;
       document.getElementById('bannerLabel').textContent = 'Banner updated ✓';
+      /* update crop preview too */
+      const cropImg = document.getElementById('cropPreview');
+      if (cropImg) cropImg.src = url;
 
       /* save to Contentful if connected */
       if (CF.isConnected()) {
@@ -998,6 +1023,69 @@
       document.getElementById('pickerModal').classList.add('open');
     }
 
+    /* ── Banner crop tool ── */
+    let cropX = 50, cropY = 38;
+
+    function updateCrop(x, y) {
+      if (x !== undefined) cropX = Math.round(x);
+      if (y !== undefined) cropY = Math.round(y);
+      const sliderX = document.getElementById('posX');
+      const sliderY = document.getElementById('posY');
+      if (sliderX) sliderX.value = cropX;
+      if (sliderY) sliderY.value = cropY;
+      const valX = document.getElementById('posXVal');
+      const valY = document.getElementById('posYVal');
+      if (valX) valX.textContent = cropX;
+      if (valY) valY.textContent = cropY;
+      const preview = document.getElementById('cropPreview');
+      const cross = document.getElementById('cropCross');
+      if (preview) preview.style.objectPosition = `${cropX}% ${cropY}%`;
+      if (cross) { cross.style.left = cropX + '%'; cross.style.top = cropY + '%'; }
+      /* live update homepage if open in another tab */
+      localStorage.setItem('tp_hero_pos', `${cropX}% ${cropY}%`);
+    }
+
+    /* slider input handler */
+    document.getElementById('posX') && document.getElementById('posX').addEventListener('input', function() {
+      cropX = parseInt(this.value);
+      updateCrop();
+    });
+    document.getElementById('posY') && document.getElementById('posY').addEventListener('input', function() {
+      cropY = parseInt(this.value);
+      updateCrop();
+    });
+
+    /* drag on preview */
+    const cropTool = document.getElementById('cropTool');
+    if (cropTool) {
+      let dragging = false;
+      function getCropFromEvent(e) {
+        const rect = cropTool.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const x = Math.max(0, Math.min(100, Math.round((clientX - rect.left) / rect.width * 100)));
+        const y = Math.max(0, Math.min(100, Math.round((clientY - rect.top) / rect.height * 100)));
+        return { x, y };
+      }
+      cropTool.addEventListener('mousedown', e => { dragging = true; const p = getCropFromEvent(e); updateCrop(p.x, p.y); });
+      cropTool.addEventListener('mousemove', e => { if (dragging) { const p = getCropFromEvent(e); updateCrop(p.x, p.y); } });
+      cropTool.addEventListener('mouseup', () => dragging = false);
+      cropTool.addEventListener('mouseleave', () => dragging = false);
+      cropTool.addEventListener('touchstart', e => { e.preventDefault(); const p = getCropFromEvent(e); updateCrop(p.x, p.y); }, { passive: false });
+      cropTool.addEventListener('touchmove', e => { e.preventDefault(); const p = getCropFromEvent(e); updateCrop(p.x, p.y); }, { passive: false });
+    }
+
+    function initCropPreview() {
+      const banner = localStorage.getItem('tp_banner_url') || '';
+      const preview = document.getElementById('cropPreview');
+      if (preview && banner) preview.src = banner;
+      const saved = localStorage.getItem('tp_hero_pos');
+      if (saved) {
+        const parts = saved.match(/(\d+)%\s+(\d+)%/);
+        if (parts) { cropX = parseInt(parts[1]); cropY = parseInt(parts[2]); updateCrop(); }
+      } else { updateCrop(); }
+    }
+
     /* ── Admin tab switching ── */
     document.querySelectorAll('.admin-tab').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1034,7 +1122,9 @@
         if (sc.bioText)           document.getElementById('sc-bio').value = sc.bioText;
         if (sc.photoIntro)        document.getElementById('sc-photo-intro').value = sc.photoIntro;
         if (sc.contactInfo)       document.getElementById('sc-contact').value = sc.contactInfo;
+        if (sc.heroPosX !== undefined) { cropX = sc.heroPosX; cropY = sc.heroPosY || 38; updateCrop(); }
       } catch(e) { console.warn('loadContent error', e); }
+      initCropPreview();
     }
 
     async function saveContent() {
@@ -1045,6 +1135,8 @@
         bioText:           document.getElementById('sc-bio').value.trim(),
         photoIntro:        document.getElementById('sc-photo-intro').value.trim(),
         contactInfo:       document.getElementById('sc-contact').value.trim(),
+        heroPosX:          cropX,
+        heroPosY:          cropY,
       };
       try {
         const c = CF.cfg();
@@ -1233,6 +1325,7 @@
     loadContent();
     loadPubs();
     loadTalks();
+    initCropPreview();
   </script>
 </body>
 </html>
