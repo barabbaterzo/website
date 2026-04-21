@@ -506,7 +506,7 @@
         if (data.items && data.items[0]) {
           const sc = data.items[0].fields;
           const el = document.getElementById('photoBioText');
-          if (el && sc.photoIntro) el.textContent = sc.photoIntro;
+          if (el && sc.photoIntro) el.innerHTML = sc.photoIntro.replace(/\n/g, '<br>');
           /* Apply typography settings */
           const root = document.documentElement;
           if (sc.sizePhotoIntro != null) root.style.setProperty('--sz-photo', sc.sizePhotoIntro / 100);
