@@ -17,6 +17,17 @@
       --fs-primary:normal; --fs-secondary:normal;
       --sz-banner-title:1; --sz-banner-sub:1; --sz-bio:1;
       --sz-pubs:1; --sz-venue:1; --color-venue:var(--page-ink3); --sz-photo:1; --sz-labels:1; --sz-sublabels:1; --sz-seemore:1; --sz-footer:1;
+      /* per-section fonts/colors */
+      --font-name:inherit; --wt-name:inherit; --color-name:var(--page-ink);
+      --font-sub:inherit; --wt-sub:inherit; --color-sub:var(--page-ink3);
+      --font-bio:inherit; --wt-bio:inherit; --color-bio:var(--page-ink2); --lh-bio2:var(--lh-bio);
+      --font-pubs:inherit; --wt-pubs:inherit; --color-pubs:var(--page-ink); --lh-pubs:1.45;
+      --font-venue:inherit; --wt-venue:300;
+      --font-labels:inherit; --wt-labels:inherit; --color-labels:var(--page-ink3);
+      --font-sublabels:inherit; --wt-sublabels:inherit; --color-sublabels:var(--page-ink3);
+      --font-seemore:inherit; --color-seemore:var(--page-ink3);
+      --font-photo:inherit; --wt-photo:inherit; --color-photo:var(--page-ink2);
+      --font-footer:inherit; --color-footer:var(--page-ink3);
       --lh-bio:1.78; --hero-pos:center 38%;
       --gutter:clamp(1.5rem,4vw,3.2rem);
     }
@@ -64,22 +75,22 @@
     .i-photo img[src=""]{display:none}
 
     .i-name{
-      font-family:var(--font-primary);
-      font-weight:var(--wt-primary);font-style:var(--fs-primary);
+      font-family:var(--font-name,var(--font-primary));
+      font-weight:var(--wt-name,var(--wt-primary));font-style:var(--fs-primary);
       font-size:calc(clamp(2.2rem,4vw,4.4rem)*var(--sz-banner-title,1));
-      line-height:0.92;letter-spacing:-0.02em;color:var(--page-ink);
+      line-height:0.92;letter-spacing:-0.02em;color:var(--color-name,var(--page-ink));
     }
     .i-role{
-      font-family:var(--font-secondary);
-      font-weight:var(--wt-secondary);font-style:var(--fs-secondary);
+      font-family:var(--font-sub,var(--font-secondary));
+      font-weight:var(--wt-sub,var(--wt-secondary));font-style:var(--fs-secondary);
       font-size:calc(0.54rem*var(--sz-banner-sub,1));
-      letter-spacing:0.26em;text-transform:uppercase;color:var(--page-ink3);
+      letter-spacing:0.26em;text-transform:uppercase;color:var(--color-sub,var(--page-ink3));
     }
     .i-bio p{
-      font-family:var(--font-primary);
-      font-weight:var(--wt-primary);font-style:var(--fs-primary);
+      font-family:var(--font-bio,var(--font-primary));
+      font-weight:var(--wt-bio,var(--wt-primary));font-style:var(--fs-primary);
       font-size:calc(clamp(0.92rem,1.3vw,1.05rem)*var(--sz-bio,1));
-      line-height:var(--lh-bio,1.78);color:var(--page-ink2);
+      line-height:var(--lh-bio,1.78);color:var(--color-bio,var(--page-ink2));
       text-align:justify;hyphens:auto;
     }
 
@@ -317,21 +328,21 @@
       margin-bottom:1.8rem;padding-bottom:.7rem;border-bottom:.5px solid var(--page-rule);
     }
     .section-label{
-      font-family:var(--font-secondary);font-weight:var(--wt-secondary);
+      font-family:var(--font-labels,var(--font-secondary));font-weight:var(--wt-labels,var(--wt-secondary));
       font-size:calc(.52rem*var(--sz-labels,1));letter-spacing:.3em;
-      text-transform:uppercase;color:var(--page-ink3);
+      text-transform:uppercase;color:var(--color-labels,var(--page-ink3));
     }
     .see-more{
-      font-family:var(--font-secondary);font-size:calc(.52rem*var(--sz-seemore,1));letter-spacing:.14em;
-      text-transform:uppercase;color:var(--page-ink3);text-decoration:none;
+      font-family:var(--font-seemore,var(--font-secondary));font-size:calc(.52rem*var(--sz-seemore,1));letter-spacing:.14em;
+      text-transform:uppercase;color:var(--color-seemore,var(--page-ink3));text-decoration:none;
       border-bottom:.5px solid var(--page-rule);transition:color .2s,border-color .2s;
     }
     .see-more:hover{color:var(--page-ink);border-color:var(--page-ink)}
 
     /* PUBLICATIONS */
     .pub-group-label{
-      font-family:var(--font-secondary);font-size:calc(.5rem*var(--sz-sublabels,1));letter-spacing:.2em;
-      text-transform:uppercase;color:var(--page-ink3);margin:1.6rem 0 .8rem;
+      font-family:var(--font-sublabels,var(--font-secondary));font-size:calc(.5rem*var(--sz-sublabels,1));letter-spacing:.2em;
+      text-transform:uppercase;color:var(--color-sublabels,var(--page-ink3));margin:1.6rem 0 .8rem;
     }
     .pub-group-label:first-of-type{margin-top:0}
     .pub-list{list-style:none}
@@ -342,12 +353,12 @@
     .pub-list li:last-child{border-bottom:.5px solid var(--page-rule)}
     .pub-year{font-family:var(--font-secondary);font-size:.58rem;font-weight:300;color:var(--page-ink3)}
     .pub-title{
-      font-family:var(--font-primary);font-weight:var(--wt-primary);font-style:var(--fs-primary);
-      font-size:calc(.95rem*var(--sz-pubs,1));line-height:1.45;color:var(--page-ink);
+      font-family:var(--font-pubs,var(--font-primary));font-weight:var(--wt-pubs,var(--wt-primary));font-style:var(--fs-primary);
+      font-size:calc(.95rem*var(--sz-pubs,1));line-height:var(--lh-pubs,1.45);color:var(--color-pubs,var(--page-ink));
     }
     .pub-title a{color:inherit;text-decoration:none;border-bottom:.5px solid var(--page-rule)}
     .pub-title a:hover{border-color:var(--page-ink)}
-    .pub-venue{display:block;font-family:var(--font-secondary);font-size:calc(.63rem*var(--sz-venue,1));font-weight:300;color:var(--color-venue,var(--page-ink3));margin-top:.2rem}
+    .pub-venue{display:block;font-family:var(--font-venue,var(--font-secondary));font-size:calc(.63rem*var(--sz-venue,1));font-weight:var(--wt-venue,300);color:var(--color-venue,var(--page-ink3));margin-top:.2rem}
     .pub-tag{
       display:inline-block;font-family:var(--font-secondary);font-size:.44rem;
       letter-spacing:.14em;text-transform:uppercase;color:var(--page-ink3);
@@ -379,7 +390,7 @@
     /* FOOTER */
     footer{border-top:.5px solid var(--page-rule)}
     footer .wrap{padding-top:1.4rem;padding-bottom:1.4rem;display:flex;justify-content:space-between;align-items:center}
-    footer p{font-family:var(--font-secondary);font-weight:300;font-size:calc(.5rem*var(--sz-footer,1));letter-spacing:.14em;text-transform:uppercase;color:var(--page-ink3)}
+    footer p{font-family:var(--font-footer,var(--font-secondary));font-weight:300;font-size:calc(.5rem*var(--sz-footer,1));letter-spacing:.14em;text-transform:uppercase;color:var(--color-footer,var(--page-ink3))}
 
 
     /* ─── P: nome nella nav + sottotitolo grande + foto|bio ─── */
@@ -683,29 +694,36 @@
       });
     }
 
-    const FONT_CSS = {
-      'EB Garamond':"'EB Garamond',serif", 'New Computer Modern':"'New Computer Modern',serif",
-      'Libre Baskerville':"'Libre Baskerville',serif", 'Playfair Display':"'Playfair Display',serif",
-      'Cormorant Garant':"'Cormorant Garant',serif", 'Spectral':"'Spectral',serif",
-      'Lato':"'Lato',sans-serif", 'Inter':"'Inter',sans-serif",
-      'Source Sans Pro':"'Source Sans 3',sans-serif", 'DM Mono':"'DM Mono',monospace",
-    };
 
     function applySettings(sc) {
       if (!sc) return;
       const root = document.documentElement;
-      if (sc.fontPrimary)        root.style.setProperty('--font-primary',   FONT_CSS[sc.fontPrimary]   || sc.fontPrimary);
-      if (sc.fontSecondary)      root.style.setProperty('--font-secondary',  FONT_CSS[sc.fontSecondary] || sc.fontSecondary);
-      if (sc.fontPrimaryWeight)  root.style.setProperty('--wt-primary',      sc.fontPrimaryWeight);
-      if (sc.fontSecondaryWeight)root.style.setProperty('--wt-secondary',    sc.fontSecondaryWeight);
-      root.style.setProperty('--fs-primary',   sc.fontPrimaryItalic   ? 'italic' : 'normal');
-      root.style.setProperty('--fs-secondary', sc.fontSecondaryItalic ? 'italic' : 'normal');
+      /* Global font fields removed — using per-section fonts */
       if (sc.sizeBannerTitle  != null) root.style.setProperty('--sz-banner-title', sc.sizeBannerTitle  / 100);
       if (sc.sizeBannerSubtitle!=null) root.style.setProperty('--sz-banner-sub',   sc.sizeBannerSubtitle/100);
       if (sc.sizeBio          != null) root.style.setProperty('--sz-bio',           sc.sizeBio          / 100);
       if (sc.sizePubs         != null) root.style.setProperty('--sz-pubs',          sc.sizePubs         / 100);
       if (sc.sizeVenue        != null) root.style.setProperty('--sz-venue',         sc.sizeVenue        / 100);
       if (sc.venueColor)       root.style.setProperty('--color-venue',      sc.venueColor);
+
+      const FONT_CSS_MAP = {
+        'EB Garamond':"'EB Garamond',serif",'New Computer Modern':"'New Computer Modern',serif",
+        'Libre Baskerville':"'Libre Baskerville',serif",'Playfair Display':"'Playfair Display',serif",
+        'Cormorant Garant':"'Cormorant Garant',serif",'Spectral':"'Spectral',serif",
+        'Lato':"'Lato',sans-serif",'Inter':"'Inter',sans-serif",
+        'Source Sans Pro':"'Source Sans 3',sans-serif",'DM Mono':"'DM Mono',monospace",
+      };
+      function applySection(prefix, sc) {
+        const fontKey = prefix + 'Font';
+        const wtKey   = prefix + 'FontWeight';
+        const colorKey= prefix + 'Color';
+        const lhKey   = prefix + 'LineHeight';
+        if (sc[fontKey])  root.style.setProperty('--font-' + prefix, FONT_CSS_MAP[sc[fontKey]] || sc[fontKey]);
+        if (sc[wtKey])    root.style.setProperty('--wt-' + prefix, sc[wtKey]);
+        if (sc[colorKey]) root.style.setProperty('--color-' + prefix, sc[colorKey]);
+        if (sc[lhKey])    root.style.setProperty('--lh-' + prefix, sc[lhKey] / 100);
+      }
+      ['name','sub','bio','pubs','venue','labels','sublabels','seemore','photo','footer'].forEach(p => applySection(p, sc));
       if (sc.sizePhotoIntro   != null) root.style.setProperty('--sz-photo',         sc.sizePhotoIntro   / 100);
       if (sc.sizeLabels       != null) root.style.setProperty('--sz-labels',        sc.sizeLabels       / 100);
       if (sc.sizeSublabels    != null) root.style.setProperty('--sz-sublabels',     sc.sizeSublabels    / 100);

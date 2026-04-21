@@ -460,113 +460,370 @@
       <p class="section-title" style="margin-bottom:1rem">Tipografia</p>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem">
-        <div>
-          <label style="display:block;margin-bottom:0.3rem">Font principale</label>
-          <select id="tp-font-primary" onchange="updateFontWeights('primary')" style="width:100%">
-            <option>EB Garamond</option>
-            <option>New Computer Modern</option>
-            <option>Libre Baskerville</option>
-            <option>Playfair Display</option>
-            <option>Cormorant Garant</option>
-            <option>Spectral</option>
-            <option>Lato</option>
-            <option>Inter</option>
-            <option>Source Sans Pro</option>
-            <option>DM Mono</option>
-          </select>
-          <div style="display:flex;gap:6px;margin-top:6px">
-            <select id="tp-wt-primary" style="flex:1"></select>
-            <label style="display:flex;align-items:center;gap:4px;font-size:0.6rem;cursor:pointer">
-              <input type="checkbox" id="tp-it-primary" /> <em>Italic</em>
-            </label>
+        
+      <style>
+        .ty-section { border-bottom: 0.5px solid var(--rule); padding: 0.8rem 0; }
+        .ty-section:last-child { border-bottom: none; }
+        .ty-label { font-size: 0.48rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink3); margin-bottom: 0.5rem; font-family: 'DM Mono', monospace; }
+        .ty-controls { display: flex; flex-direction: column; gap: 0.5rem; }
+        .ty-row { display: flex; gap: 0.8rem; align-items: flex-end; }
+        .ty-field { display: flex; flex-direction: column; gap: 2px; }
+        .ty-field label { font-size: 0.48rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink3); }
+      </style>
+
+
+      <div class="ty-section">
+        <div class="ty-label">Nome (Tomaso Pignocchi)</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-name" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-name" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-color-name" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-color-name').value=this.value" />
+                <input type="text" id="hex-color-name" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-color-name');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
           </div>
-        </div>
-        <div>
-          <label style="display:block;margin-bottom:0.3rem">Font secondario</label>
-          <select id="tp-font-secondary" onchange="updateFontWeights('secondary')" style="width:100%">
-            <option>DM Mono</option>
-            <option>EB Garamond</option>
-            <option>New Computer Modern</option>
-            <option>Libre Baskerville</option>
-            <option>Playfair Display</option>
-            <option>Cormorant Garant</option>
-            <option>Spectral</option>
-            <option>Lato</option>
-            <option>Inter</option>
-            <option>Source Sans Pro</option>
-          </select>
-          <div style="display:flex;gap:6px;margin-top:6px">
-            <select id="tp-wt-secondary" style="flex:1"></select>
-            <label style="display:flex;align-items:center;gap:4px;font-size:0.6rem;cursor:pointer">
-              <input type="checkbox" id="tp-it-secondary" /> <em>Italic</em>
-            </label>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-banner-title">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-banner-title" oninput="syncSize('banner-title')" style="width:100%" />
+            </div>
           </div>
         </div>
       </div>
-
-      <div style="background:#f8f7f4;border:1px solid var(--rule);border-radius:3px;padding:0.8rem 1rem;margin-bottom:1.2rem;font-size:0.72rem;color:var(--ink3)">
-        Anteprima titolo: <span id="tp-preview" style="font-size:1.1rem;color:var(--ink)">Tomaso Pignocchi — Philosophy as Therapy</span><br><br>
-        Anteprima bio: <span id="tp-bio-preview" style="font-size:0.95rem;color:#3e3b36;line-height:1.88;display:block;margin-top:4px">I am a Ph.D. candidate in philosophy at the Institut Catholique de Paris and Università degli Studi La Sapienza. My research focuses on the intersection of Wittgenstein's later philosophy and Madhyamaka Buddhism.</span>
-      </div>
-
-      <div style="height:1px;background:var(--rule);margin:1.2rem 0"></div>
-      <p class="section-title" style="margin-bottom:0.8rem">Dimensioni testo <span style="color:var(--ink3);font-weight:400;font-size:0.5rem">(% della dimensione base)</span></p>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem 1.4rem">
-        <div>
-          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Titolo banner <span id="v-banner-title">100</span>%</label>
-          <input type="range" min="60" max="180" value="100" step="1" id="sz-banner-title" oninput="syncSize('banner-title')" style="width:100%" />
-        </div>
-        <div>
-          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Sottotitolo banner <span id="v-banner-sub">100</span>%</label>
-          <input type="range" min="60" max="180" value="100" step="1" id="sz-banner-sub" oninput="syncSize('banner-sub')" style="width:100%" />
-        </div>
-        <div>
-          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Bio <span id="v-bio">100</span>%</label>
-          <input type="range" min="60" max="180" value="100" step="1" id="sz-bio" oninput="syncSize('bio')" style="width:100%" />
-        </div>
-        <div>
-          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Interlinea bio <span id="v-lh-bio">188</span>%</label>
-          <input type="range" min="100" max="300" value="188" step="1" id="sz-lh-bio" oninput="syncSize('lh-bio')" style="width:100%" />
-        </div>
-        <div>
-          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Pubblicazioni <span id="v-pubs">100</span>%</label>
-          <input type="range" min="60" max="180" value="100" step="1" id="sz-pubs" oninput="syncSize('pubs')" style="width:100%" />
-        </div>
-        <div>
-          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Rivista/venue <span id="v-venue">100</span>%</label>
-          <input type="range" min="60" max="180" value="100" step="1" id="sz-venue" oninput="syncSize('venue')" style="width:100%" />
-          <div style="display:flex;gap:6px;align-items:center;margin-top:6px">
-            <input type="color" id="cp-venue-picker" value="#8a8480"
-              oninput="document.getElementById('cp-venue').value=this.value"
-              style="width:36px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" />
-            <input type="text" id="cp-venue" value="#8a8480" placeholder="#8a8480" maxlength="7"
-              oninput="var p=document.getElementById('cp-venue-picker');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value"
-              style="font-family:'DM Mono',monospace;font-size:0.75rem;width:90px" />
-            <span style="font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3)">Colore venue</span>
+      <div class="ty-section">
+        <div class="ty-label">Sottotitolo (Philosophy · Paris · Kyoto)</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-sub" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-sub" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-color-sub" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-color-sub').value=this.value" />
+                <input type="text" id="hex-color-sub" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-color-sub');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-banner-sub">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-banner-sub" oninput="syncSize('banner-sub')" style="width:100%" />
+            </div>
           </div>
         </div>
-
-        <div>
-          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Intro fotografia <span id="v-photo">100</span>%</label>
-          <input type="range" min="60" max="180" value="100" step="1" id="sz-photo" oninput="syncSize('photo')" style="width:100%" />
+      </div>
+      <div class="ty-section">
+        <div class="ty-label">Bio</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-bio" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-bio" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-color-bio" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-color-bio').value=this.value" />
+                <input type="text" id="hex-color-bio" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-color-bio');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-bio">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-bio" oninput="syncSize('bio')" style="width:100%" />
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Interlinea <span id="v-sz-lh-bio">178</span>%</label>
+              <input type="range" min="100" max="300" value="178" step="1" id="sz-lh-bio" oninput="syncSize('sz-bio-lh')" style="width:100%" />
+            </div>
+          </div>
         </div>
-        <div>
-          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Label sezioni (es. "Publications") <span id="v-labels">100</span>%</label>
-          <input type="range" min="60" max="180" value="100" step="1" id="sz-labels" oninput="syncSize('labels')" style="width:100%" />
+      </div>
+      <div class="ty-section">
+        <div class="ty-label">Titolo pubblicazione</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-pubs" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-pubs" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-color-pubs" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-color-pubs').value=this.value" />
+                <input type="text" id="hex-color-pubs" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-color-pubs');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-pubs">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-pubs" oninput="syncSize('pubs')" style="width:100%" />
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Interlinea <span id="v-lh-pubs">178</span>%</label>
+              <input type="range" min="100" max="300" value="178" step="1" id="lh-pubs" oninput="syncSize('pubs-lh')" style="width:100%" />
+            </div>
+          </div>
         </div>
-        <div>
-          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Sottolabel (es. "Peer-reviewed articles") <span id="v-sublabels">100</span>%</label>
-          <input type="range" min="60" max="180" value="100" step="1" id="sz-sublabels" oninput="syncSize('sublabels')" style="width:100%" />
+      </div>
+      <div class="ty-section">
+        <div class="ty-label">Rivista / venue</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-venue" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-venue" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-venue" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-venue').value=this.value" />
+                <input type="text" id="hex-venue" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-venue');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-venue">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-venue" oninput="syncSize('venue')" style="width:100%" />
+            </div>
+          </div>
         </div>
-        <div>
-          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Link sezione (es. "Full list on Academia") <span id="v-seemore">100</span>%</label>
-          <input type="range" min="60" max="180" value="100" step="1" id="sz-seemore" oninput="syncSize('seemore')" style="width:100%" />
+      </div>
+      <div class="ty-section">
+        <div class="ty-label">Label sezioni (Publications…)</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-labels" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-labels" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-color-labels" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-color-labels').value=this.value" />
+                <input type="text" id="hex-color-labels" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-color-labels');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-labels">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-labels" oninput="syncSize('labels')" style="width:100%" />
+            </div>
+          </div>
         </div>
-        <div>
-          <label style="display:flex;justify-content:space-between;margin-bottom:3px">Footer <span id="v-footer">100</span>%</label>
-          <input type="range" min="60" max="180" value="100" step="1" id="sz-footer" oninput="syncSize('footer')" style="width:100%" />
+      </div>
+      <div class="ty-section">
+        <div class="ty-label">Sottolabel (Peer-reviewed…)</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-sublabels" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-sublabels" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-color-sublabels" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-color-sublabels').value=this.value" />
+                <input type="text" id="hex-color-sublabels" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-color-sublabels');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-sublabels">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-sublabels" oninput="syncSize('sublabels')" style="width:100%" />
+            </div>
+          </div>
         </div>
+      </div>
+      <div class="ty-section">
+        <div class="ty-label">Link sezione (Full list…)</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-seemore" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-seemore" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-color-seemore" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-color-seemore').value=this.value" />
+                <input type="text" id="hex-color-seemore" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-color-seemore');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-seemore">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-seemore" oninput="syncSize('seemore')" style="width:100%" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ty-section">
+        <div class="ty-label">Intro fotografia</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-photo" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-photo" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-color-photo" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-color-photo').value=this.value" />
+                <input type="text" id="hex-color-photo" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-color-photo');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-photo">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-photo" oninput="syncSize('photo')" style="width:100%" />
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Interlinea <span id="v-lh-photo">178</span>%</label>
+              <input type="range" min="100" max="300" value="178" step="1" id="lh-photo" oninput="syncSize('photo-lh')" style="width:100%" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ty-section">
+        <div class="ty-label">Footer</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-footer" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-footer" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-color-footer" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-color-footer').value=this.value" />
+                <input type="text" id="hex-color-footer" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-color-footer');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-footer">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-footer" oninput="syncSize('footer')" style="width:100%" />
+            </div>
+          </div>
+        </div>
+      </div>
       </div>
 
       <div style="height:1px;background:var(--rule);margin:1.6rem 0"></div>
@@ -1363,12 +1620,7 @@
     }
     setLayout('a');
 
-    function updateFontWeights(which) {
-      const sel = document.getElementById('tp-font-' + which);
-      const wtSel = document.getElementById('tp-wt-' + which);
-      if (!sel || !wtSel) return;
-      const font = sel.value;
-      const fd = FONT_DATA[font] || { weights: [400] };
+    ;
       const curVal = parseInt(wtSel.value) || 400;
       wtSel.innerHTML = fd.weights.map(w =>
         `<option value="${w}" ${w === curVal || (curVal === 400 && fd.weights.includes(400)) ? 'selected' : ''}>${WEIGHT_NAMES[w] || w} (${w})</option>`
@@ -1377,8 +1629,7 @@
     }
 
     function updateTypoPreview() {
-      const pFont = document.getElementById('tp-font-primary')?.value || 'EB Garamond';
-      const pWt   = document.getElementById('tp-wt-primary')?.value   || 400;
+            const pWt   = document.getElementById('tp-wt-primary')?.value   || 400;
       const pIt   = document.getElementById('tp-it-primary')?.checked;
       const fd = FONT_DATA[pFont] || {};
       const prev = document.getElementById('tp-preview');
@@ -1402,53 +1653,7 @@
 
     function loadTypographyToAdmin(sc) {
       if (!sc) return;
-      const fp = document.getElementById('tp-font-primary');
-      const fs = document.getElementById('tp-font-secondary');
-      if (fp && sc.fontPrimary)   { fp.value = sc.fontPrimary;   updateFontWeights('primary'); }
-      if (fs && sc.fontSecondary) { fs.value = sc.fontSecondary; updateFontWeights('secondary'); }
-      const wpEl = document.getElementById('tp-wt-primary');
-      const wsEl = document.getElementById('tp-wt-secondary');
-      if (wpEl && sc.fontPrimaryWeight)   wpEl.value = sc.fontPrimaryWeight;
-      if (wsEl && sc.fontSecondaryWeight) wsEl.value = sc.fontSecondaryWeight;
-      const ipEl = document.getElementById('tp-it-primary');
-      const isEl = document.getElementById('tp-it-secondary');
-      if (ipEl) ipEl.checked = !!sc.fontPrimaryItalic;
-      if (isEl) isEl.checked = !!sc.fontSecondaryItalic;
-      /* sizes */
-      const sizeMap = {
-        'banner-title': sc.sizeBannerTitle,
-        'banner-sub':   sc.sizeBannerSubtitle,
-        'bio':          sc.sizeBio,
-        'pubs':         sc.sizePubs,
-        'talks':        sc.sizeTalks,
-        'photo':        sc.sizePhotoIntro,
-        'venue':       sc.sizeVenue,
-        'labels':       sc.sizeLabels,
-        'sublabels':    sc.sizeSublabels,
-        'seemore':      sc.sizeSeemore,
-        'footer':       sc.sizeFooter,
-      };
-      Object.entries(sizeMap).forEach(([k, v]) => {
-        if (!v) return;
-        const slider = document.getElementById('sz-' + k);
-        const label  = document.getElementById('v-' + k);
-        if (slider) slider.value = v;
-        if (label)  label.textContent = v;
-      });
-      if (sc.heroStyle) setLayout(sc.heroStyle);
-      updateTypoPreview();
-    }
-
-    /* wire preview updates to font/weight/italic changes */
-    ['tp-font-primary','tp-font-secondary','tp-wt-primary','tp-wt-secondary','tp-it-primary','tp-it-secondary']
-      .forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('change', updateTypoPreview);
-      });
-
-    /* init weight dropdowns */
-    updateFontWeights('primary');
-    updateFontWeights('secondary');
+      /* per-section fonts loaded by sizeMap */
 
 
     /* ── Color pickers ── */
@@ -1533,23 +1738,47 @@
         heroPosX:          cropX,
         heroPosY:          cropY,
         heroStyle:         currentLayout,
-        fontPrimary:       document.getElementById('tp-font-primary')?.value || 'EB Garamond',
-        fontSecondary:     document.getElementById('tp-font-secondary')?.value || 'DM Mono',
-        fontPrimaryWeight:   parseInt(document.getElementById('tp-wt-primary')?.value || 400),
-        fontSecondaryWeight: parseInt(document.getElementById('tp-wt-secondary')?.value || 300),
-        fontPrimaryItalic:   document.getElementById('tp-it-primary')?.checked || false,
-        fontSecondaryItalic: document.getElementById('tp-it-secondary')?.checked || false,
         sizeBannerTitle:   parseInt(document.getElementById('sz-banner-title')?.value || 100),
         sizeBannerSubtitle:parseInt(document.getElementById('sz-banner-sub')?.value || 100),
         sizeBio:           parseInt(document.getElementById('sz-bio')?.value || 100),
         sizePubs:          parseInt(document.getElementById('sz-pubs')?.value || 100),
-        sizeTalks:         parseInt(document.getElementById('sz-talks')?.value || 100),
+?.value || 100),
         sizePhotoIntro:    parseInt(document.getElementById('sz-photo')?.value || 100),
         sizeVenue:         parseInt(document.getElementById('sz-venue')?.value || 100),
         venueColor:        document.getElementById('cp-venue')?.value?.trim() || '#8a8480',
         sizeLabels:        parseInt(document.getElementById('sz-labels')?.value || 100),
         sizeSublabels:     parseInt(document.getElementById('sz-sublabels')?.value || 100),
         sizeSeemore:       parseInt(document.getElementById('sz-seemore')?.value || 100),
+        /* Per-section font/weight/color */
+        nameFont: document.getElementById('font-name')?.value || '',
+        nameFontWeight: parseInt(document.getElementById('wt-name')?.value) || 0,
+        nameColor: document.getElementById('hex-color-name')?.value || '',
+        subFont: document.getElementById('font-sub')?.value || '',
+        subFontWeight: parseInt(document.getElementById('wt-sub')?.value) || 0,
+        subColor: document.getElementById('hex-color-sub')?.value || '',
+        bioFont: document.getElementById('font-bio')?.value || '',
+        bioFontWeight: parseInt(document.getElementById('wt-bio')?.value) || 0,
+        bioColor: document.getElementById('hex-color-bio')?.value || '',
+        bioLineHeight2: parseInt(document.getElementById('sz-lh-bio')?.value) || 178,
+        pubsFont: document.getElementById('font-pubs')?.value || '',
+        pubsFontWeight: parseInt(document.getElementById('wt-pubs')?.value) || 0,
+        pubsColor: document.getElementById('hex-color-pubs')?.value || '',
+        pubsLineHeight: parseInt(document.getElementById('lh-pubs')?.value) || 145,
+        venueFont: document.getElementById('font-venue')?.value || '',
+        venueFontWeight: parseInt(document.getElementById('wt-venue')?.value) || 0,
+        labelsFont: document.getElementById('font-labels')?.value || '',
+        labelsFontWeight: parseInt(document.getElementById('wt-labels')?.value) || 0,
+        labelsColor: document.getElementById('hex-color-labels')?.value || '',
+        sublabelsFont: document.getElementById('font-sublabels')?.value || '',
+        sublabelsFontWeight: parseInt(document.getElementById('wt-sublabels')?.value) || 0,
+        sublabelsColor: document.getElementById('hex-color-sublabels')?.value || '',
+        seemoreFont: document.getElementById('font-seemore')?.value || '',
+        seemoreColor: document.getElementById('hex-color-seemore')?.value || '',
+        photoFont: document.getElementById('font-photo')?.value || '',
+        photoFontWeight: parseInt(document.getElementById('wt-photo')?.value) || 0,
+        photoColor: document.getElementById('hex-color-photo')?.value || '',
+        footerFont: document.getElementById('font-footer')?.value || '',
+        footerColor: document.getElementById('hex-color-footer')?.value || '',
         sizeFooter:        parseInt(document.getElementById('sz-footer')?.value || 100),
         bioLineHeight:     parseInt(document.getElementById('sz-lh-bio')?.value || 188),
         bgColor:           document.getElementById('cp-bg')?.value?.trim() || '#f5f2ec',
