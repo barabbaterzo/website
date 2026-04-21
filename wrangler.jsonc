@@ -1,0 +1,11 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "website",
+  "compatibility_date": "2026-04-20",
+  "main": "./worker.js",
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS"
+  },
+  "workers_dev": true
+}

@@ -4,6 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tomaso Pignocchi</title>
+  <script>
+    /* ── Apply saved layout instantly (prevents flash) ── */
+    (function() {
+      var layout = localStorage.getItem('tp_layout') || 'a';
+      document.documentElement.setAttribute('data-layout-pending', layout);
+      document.addEventListener('DOMContentLoaded', function() {
+        document.body.className = document.body.className.replace(/\bly-\S+/g, '').trim();
+        document.body.classList.add('ly-' + layout);
+      });
+    })();
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=New+Computer+Modern:ital,wght@0,400;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Cormorant+Garant:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Source+Sans+3:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet" />
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -760,9 +771,11 @@
       }
       if (sc.heroPosX != null && sc.heroPosY != null)
         document.documentElement.style.setProperty('--hero-pos', sc.heroPosX+'% '+sc.heroPosY+'%');
+        localStorage.setItem('tp_hero_pos', sc.heroPosX+'% '+sc.heroPosY+'%');
       if (sc.heroStyle) {
         document.body.className = document.body.className.replace(/\bly-\S+/g,'').trim();
         document.body.classList.add('ly-' + sc.heroStyle.toLowerCase());
+        localStorage.setItem('tp_layout', sc.heroStyle.toLowerCase());
         /* Layout P: inject name into nav via data attribute */
         const navLogo = document.querySelector('.nav-logo');
         if (navLogo) navLogo.dataset.name = 'Tomaso Pignocchi';
