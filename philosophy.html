@@ -14,8 +14,14 @@
       --font-secondary:'Inter',sans-serif;
       --wt-primary:300;--wt-secondary:300;
       --fs-primary:normal;--fs-secondary:normal;
-      --sz-bio:1;--sz-pubs:1;--sz-venue:1;--sz-labels:1;
-      --lh-bio:1.78;
+      --font-bio:var(--font-primary); --wt-bio:var(--wt-primary); --color-bio:var(--page-ink2);
+      --font-pubs:var(--font-primary); --wt-pubs:var(--wt-primary); --color-pubs:var(--page-ink);
+      --font-venue:var(--font-secondary); --wt-venue:300; --color-venue:var(--page-ink3);
+      --font-labels:var(--font-secondary); --wt-labels:300; --color-labels:var(--page-ink3);
+      --font-sublabels:var(--font-secondary); --wt-sublabels:300; --color-sublabels:var(--page-ink3);
+      --font-seemore:var(--font-secondary); --wt-seemore:300; --color-seemore:var(--page-ink3);
+      --sz-bio:1;--sz-pubs:1;--sz-venue:1;--sz-labels:1;--sz-sublabels:1;--sz-seemore:1;
+      --lh-bio:1.78; --lh-pubs:1.45;
       --gutter:clamp(1.5rem,4vw,3.2rem);
       --max-w:1200px;
     }
@@ -51,9 +57,9 @@
     /* BIO */
     .bio-section{padding:clamp(2rem,4vw,3.6rem) 0;border-bottom:0.5px solid var(--page-rule)}
     .bio-section p{
-      font-family:var(--font-primary);font-weight:var(--wt-primary);font-style:var(--fs-primary);
+      font-family:var(--font-bio,var(--font-primary));font-weight:var(--wt-bio,var(--wt-primary));font-style:var(--fs-primary);
       font-size:calc(clamp(0.95rem,1.4vw,1.08rem)*var(--sz-bio,1));
-      line-height:var(--lh-bio,1.78);color:var(--page-ink2);
+      line-height:var(--lh-bio,1.78);color:var(--color-bio,var(--page-ink2));
       text-align:justify;hyphens:auto;max-width:72ch;
     }
 
@@ -65,15 +71,20 @@
       border-bottom:0.5px solid var(--page-rule);
     }
     .section-label{
-      font-family:var(--font-secondary);font-size:calc(0.52rem*var(--sz-labels,1));
-      letter-spacing:0.3em;text-transform:uppercase;color:var(--page-ink3);
+      font-family:var(--font-labels,var(--font-secondary));font-weight:var(--wt-labels,300);font-size:calc(0.52rem*var(--sz-labels,1));
+      letter-spacing:0.3em;text-transform:uppercase;color:var(--color-labels,var(--page-ink3));
     }
     .see-more{
-      font-family:var(--font-secondary);font-size:0.52rem;letter-spacing:0.14em;
-      text-transform:uppercase;color:var(--page-ink3);text-decoration:none;
+      font-family:var(--font-seemore,var(--font-secondary));font-weight:var(--wt-seemore,300);font-size:calc(0.52rem*var(--sz-seemore,1));letter-spacing:0.14em;
+      text-transform:uppercase;color:var(--color-seemore,var(--page-ink3));text-decoration:none;
       border-bottom:0.5px solid var(--page-rule);
     }
     .see-more:hover{color:var(--page-ink);border-color:var(--page-ink)}
+    .pub-group-label{
+      font-family:var(--font-sublabels,var(--font-secondary));font-weight:var(--wt-sublabels,300);font-size:calc(0.5rem*var(--sz-sublabels,1));
+      letter-spacing:0.2em;text-transform:uppercase;color:var(--color-sublabels,var(--page-ink3));margin:1.6rem 0 0.8rem;
+    }
+    .pub-group-label:first-of-type{margin-top:0}
     .pub-list{list-style:none}
     .pub-list li{
       display:grid;grid-template-columns:2.8rem 1fr;gap:0 1rem;
@@ -82,12 +93,12 @@
     .pub-list li:last-child{border-bottom:0.5px solid var(--page-rule)}
     .pub-year{font-family:var(--font-secondary);font-size:0.58rem;font-weight:300;color:var(--page-ink3)}
     .pub-title{
-      font-family:var(--font-primary);font-weight:var(--wt-primary);font-style:var(--fs-primary);
-      font-size:calc(0.95rem*var(--sz-pubs,1));line-height:1.45;color:var(--page-ink);
+      font-family:var(--font-pubs,var(--font-primary));font-weight:var(--wt-pubs,var(--wt-primary));font-style:var(--fs-primary);
+      font-size:calc(0.95rem*var(--sz-pubs,1));line-height:var(--lh-pubs,1.45);color:var(--color-pubs,var(--page-ink));
     }
     .pub-title a{color:inherit;text-decoration:none;border-bottom:0.5px solid var(--page-rule)}
     .pub-title a:hover{border-color:var(--page-ink)}
-    .pub-venue{display:block;font-family:var(--font-secondary);font-size:calc(0.63rem*var(--sz-venue,1));font-weight:300;color:var(--page-ink3);margin-top:0.2rem}
+    .pub-venue{display:block;font-family:var(--font-venue,var(--font-secondary));font-size:calc(0.63rem*var(--sz-venue,1));font-weight:var(--wt-venue,300);color:var(--color-venue,var(--page-ink3));margin-top:0.2rem}
     .pub-tag{display:inline-block;font-family:var(--font-secondary);font-size:0.44rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--page-ink3);border:0.5px solid var(--page-rule);padding:1px 5px;margin-left:6px;vertical-align:middle}
 
     /* FOOTER */
@@ -117,17 +128,114 @@
     </div>
   </section>
 
-  <section class="pubs-section">
-    <div class="wrap">
-      <div class="section-header">
-        <span class="section-label">Publications</span>
-        <a class="see-more" href="https://icp.academia.edu/TomasoPignocchi" target="_blank">Full list on Academia.edu →</a>
-      </div>
-      <ul class="pub-list" id="pubList">
-        <!-- loaded from Contentful -->
+  
+<section class="pubs-section">
+  <div class="wrap">
+    <div class="section-header">
+      <span class="section-label">Publications</span>
+      <a class="see-more" href="https://icp.academia.edu/TomasoPignocchi" target="_blank">Full list on Academia.edu →</a>
+    </div>
+    <p class="pub-group-label">Peer-Reviewed Articles</p>
+    <ul class="pub-list" id="pubListArticles">
+      <li>
+        <span class="pub-year">2026</span>
+        <span class="pub-title">
+          «No Room for Play»: Anatomy of a Defensive Fantasy
+          <span class="pub-tag">forthcoming</span>
+          <span class="pub-venue">Pòlemos. Materiali di filosofia e critica sociale, 2/25</span>
+        </span>
+      </li>
+      <li>
+        <span class="pub-year">2026</span>
+        <span class="pub-title">
+          Question de perspectives. Images, raisons et méthodes philosophiques entre Wittgenstein et Nietzsche
+          <span class="pub-tag">forthcoming</span>
+          <span class="pub-venue">Transversalités, 179</span>
+        </span>
+      </li>
+      <li>
+        <span class="pub-year">2026</span>
+        <span class="pub-title">
+          <a href="https://link.springer.com/article/10.1007/s11245-026-10398-2" target="_blank">
+            When Rivers are Just Rivers: A Buddhist-Wittgensteinian Framework for a Non-Foundational Epistemology
+          </a>
+          <span class="pub-venue">Topoi, 45/2</span>
+        </span>
+      </li>
+      <li>
+        <span class="pub-year">2025</span>
+        <span class="pub-title">
+          «Il serpentesco inganno»: Linguaggio, illusione e conoscenza in Hamann e Wittgenstein
+          <span class="pub-venue">Annuario filosofico, 40, pp. 78–107</span>
+        </span>
+      </li>
+      <li>
+        <span class="pub-year">2025</span>
+        <span class="pub-title">
+          <a href="https://link.springer.com/epdf/10.1007/s11229-024-04857-9?sharing_token=eWPcmhCATbF0bETTNvtLqfe4RwlQNchNByi7wbcMAY4u8QU-fGvgMQcyub6FGk_b71uQTswrL5BDaND01PIlWsqX2l1bdDHN7kGH1Wi1gxerC7FchvXAb-sIqROEfatNg7ZEZWv6GKek6RnxZ_rqDGzgd1fivCEPFaZCH9B-d0Q%3D" target="_blank">
+            Beyond Belief: Deep Disagreement and Conversion in Wittgenstein's Philosophy
+          </a>
+          <span class="pub-venue">Synthese, 205, art. 39, pp. 1–25</span>
+        </span>
+      </li>
+      <li>
+        <span class="pub-year">2024</span>
+        <span class="pub-title">
+          <a href="https://synthesisonline.net/wp-content/uploads/2024/12/5.-tomaso-pignocchi-2.pdf" target="_blank">
+            The Buddhist Quest for Valid Experience from Dignāga to Candrakīrti
+          </a>
+          <span class="pub-venue">Synthesis — Journal for Philosophy, 4, pp. 115–148</span>
+        </span>
+      </li>
+      <li>
+        <span class="pub-year">2024</span>
+        <span class="pub-title">
+          <a href="https://www.cittadellaeditrice.com/munera/tutti-gli-articoli/munera-1-2024-tomaso-pignocchi-la-profondita-del-quotidiano-etica-e-senso-nella-poesia-haiku/" target="_blank">
+            La profondità del quotidiano. Etica e senso nella poesia haiku
+          </a>
+          <span class="pub-venue">Munera. Rivista europea di cultura, 1, pp. 115–123</span>
+        </span>
+      </li>
+      <li>
+        <span class="pub-year">2023</span>
+        <span class="pub-title">
+          <a href="http://www.rifl.unical.it/index.php/rifl/article/view/747/725" target="_blank">
+            Sull'uso della similitudine e del paradosso nel Tractatus di Wittgenstein e nel buddhismo
+          </a>
+          <span class="pub-venue">Rivista Italiana di Filosofia del Linguaggio, 17/1, pp. 96–108</span>
+        </span>
+      </li>
+      <li>
+        <span class="pub-year">2023</span>
+        <span class="pub-title">
+          <a href="https://philpapers.org/archive/PIGOAA.pdf" target="_blank">
+            Ordinary Aesthetics and Ethics in the Haiku Poetry of Matsuo Bashō: A Wittgensteinian Perspective
+          </a>
+          <span class="pub-venue">Open Philosophy, 6/1, pp. 1–16</span>
+        </span>
+      </li>
+    </ul>
+    <div id="pubChaptersSection">
+      <p class="pub-group-label" style="margin-top:1.8rem;">Book Chapters</p>
+      <ul class="pub-list" id="pubListChapters">
+        <li>
+          <span class="pub-year">2026</span>
+          <span class="pub-title">
+            Language and Emptiness. Toward a Non-Foundational Soteriological Epistemology
+            <span class="pub-venue">Studium — Contemporary Humanism Open Access Annals 2025, pp. 149–156</span>
+          </span>
+        </li>
+        <li>
+          <span class="pub-year">2025</span>
+          <span class="pub-title">
+            Language and Soteriology: Desire, Illusion and Liberation in Wittgenstein's and Buddhist Philosophies
+            <span class="pub-venue">Studium — Contemporary Humanism Open Access Annals 2024, pp. 260–267</span>
+          </span>
+        </li>
       </ul>
     </div>
-  </section>
+  </div>
+</section>
 
   <footer><div class="wrap"><p>© 2026 Tomaso Pignocchi</p><p>Paris · Rome · Kyoto</p></div></footer>
 
@@ -165,6 +273,24 @@
       'Source Sans Pro':"'Source Sans 3',sans-serif",'DM Mono':"'DM Mono',monospace",
     };
 
+    function renderPubList(id, pubs) {
+      const ul = document.getElementById(id);
+      if (!ul) return;
+      ul.innerHTML = '';
+      if (!pubs || !pubs.length) return;
+      pubs.forEach(p => {
+        const li = document.createElement('li');
+        li.innerHTML =
+          '<span class="pub-year">'+(p.year||'')+'</span>'+
+          '<span class="pub-title">'+
+            (p.link ? '<a href="'+p.link+'" target="_blank">'+(p.title||'')+'</a>' : (p.title||''))+
+            (p.forthcoming ? '<span class="pub-tag">forthcoming</span>' : '')+
+            (p.venue ? '<span class="pub-venue">'+p.venue+'</span>' : '')+
+          '</span>';
+        ul.appendChild(li);
+      });
+    }
+
     (async function() {
       try {
         /* Load settings */
@@ -178,9 +304,25 @@
           if (sc.sizePubs != null) root.style.setProperty('--sz-pubs', sc.sizePubs/100);
           if (sc.sizeVenue != null) root.style.setProperty('--sz-venue', sc.sizeVenue/100);
           if (sc.sizeLabels != null) root.style.setProperty('--sz-labels', sc.sizeLabels/100);
+          if (sc.sizeSublabels != null) root.style.setProperty('--sz-sublabels', sc.sizeSublabels/100);
+          if (sc.sizeSeemore != null) root.style.setProperty('--sz-seemore', sc.sizeSeemore/100);
           if (sc.bioLineHeight != null) root.style.setProperty('--lh-bio', sc.bioLineHeight/100);
+          if (sc.pubsLineHeight != null) root.style.setProperty('--lh-pubs', sc.pubsLineHeight/100);
           if (sc.bgColor) { root.style.setProperty('--page-bg', sc.bgColor); document.body.style.background = sc.bgColor; }
           if (sc.textColor) { root.style.setProperty('--page-ink', sc.textColor); }
+          if (sc.venueColor) root.style.setProperty('--color-venue', sc.venueColor);
+
+          function applySection(prefix) {
+            const fontKey = prefix + 'Font';
+            const wtKey = prefix + 'FontWeight';
+            const colorKey = prefix + 'Color';
+            const lhKey = prefix + 'LineHeight';
+            if (sc[fontKey]) root.style.setProperty('--font-' + prefix, FONT_CSS[sc[fontKey]] || sc[fontKey]);
+            if (sc[wtKey]) root.style.setProperty('--wt-' + prefix, sc[wtKey]);
+            if (sc[colorKey]) root.style.setProperty('--color-' + prefix, sc[colorKey]);
+            if (sc[lhKey]) root.style.setProperty('--lh-' + prefix, sc[lhKey] / 100);
+          }
+          ['bio','pubs','venue','labels','sublabels','seemore'].forEach(applySection);
         }
 
         /* Load siteSettings for nav name styling */
@@ -202,23 +344,18 @@
           }
         }
 
-        /* Load publications — peer-reviewed only, no chapters */
+        /* Load publications */
         const pubs = await cfGet('publication', { order: '-fields.year' });
-        const articles = (pubs||[]).filter(p => p.pubType !== 'chapter');
-        const ul = document.getElementById('pubList');
-        if (ul && articles.length) {
-          ul.innerHTML = '';
-          articles.forEach(p => {
-            const li = document.createElement('li');
-            li.innerHTML =
-              '<span class="pub-year">'+(p.year||'')+'</span>'+
-              '<span class="pub-title">'+
-                (p.link ? '<a href="'+p.link+'" target="_blank">'+p.title+'</a>' : (p.title||''))+
-                (p.forthcoming ? '<span class="pub-tag">forthcoming</span>' : '')+
-                (p.venue ? '<span class="pub-venue">'+p.venue+'</span>' : '')+
-              '</span>';
-            ul.appendChild(li);
-          });
+        if (pubs && pubs.length) {
+          const articles = pubs.filter(p => p.pubType !== 'chapter');
+          const chapters = pubs.filter(p => p.pubType === 'chapter');
+          renderPubList('pubListArticles', articles.length ? articles : pubs);
+          if (chapters.length) {
+            renderPubList('pubListChapters', chapters);
+          } else {
+            const section = document.getElementById('pubChaptersSection');
+            if (section) section.style.display = 'none';
+          }
         }
       } catch(e) { console.warn('Load error:', e.message); }
     })();

@@ -457,7 +457,7 @@
       font-family: var(--font-name, var(--font-primary));
       font-weight: var(--wt-name, var(--wt-primary));
       font-style: var(--fs-primary);
-      font-size: calc(1rem * var(--sz-banner-title, 1));
+      font-size: calc(clamp(1.2rem, 2.6vw, 2.9rem) * var(--sz-banner-title, 1));
       color: var(--color-name, var(--page-ink));
       margin-left: 0.8rem;
       letter-spacing: -0.01em;
@@ -482,7 +482,7 @@
       overflow: hidden;
       display: block;
       text-decoration: none;
-      aspect-ratio: 3 / 1;
+      aspect-ratio: 4 / 1;
       width: 100%;
     }
     .panel-s img {
@@ -524,7 +524,7 @@
     }
     @media (max-width: 700px) {
       .intro-s { gap: clamp(1.4rem, 5vw, 2rem); padding: clamp(1.4rem, 5vw, 2rem); }
-      .panel-s { aspect-ratio: 3 / 1; min-height: 160px; }
+      .panel-s { aspect-ratio: 4 / 1; min-height: 160px; }
     }
 
     /* RESPONSIVE */
@@ -557,7 +557,7 @@
       <ul class="nav-links">
         <li><a href="philosophy.html" class="nav-tab">Philosophy</a></li>
         <li><a href="photography.html" class="nav-tab">Photography</a></li>
-        <li><a href="#contact" onclick="showTab('contact');return false" class="nav-tab" data-tab="contact">Contact</a></li>
+        <li><a href="#contact" onclick="showTab('contact'); scrollToContactForm(); return false" class="nav-tab" data-tab="contact">Contact</a></li>
       </ul>
     </div>
   </header>
@@ -870,6 +870,16 @@
       } catch(e) { console.warn('Contentful load error:', e.message); }
     })();
 
+    function scrollToContactForm() {
+      const form = document.getElementById('contactForm');
+      if (!form) return;
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 60);
+      });
+    }
+
     function showTab(tab) {
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-tab[data-tab]').forEach(a => a.classList.remove('active'));
@@ -877,6 +887,7 @@
       if (panel) panel.classList.add('active');
       document.querySelectorAll('[data-tab="'+tab+'"]').forEach(a => a.classList.add('active'));
       if (tab) history.replaceState(null, '', '#'+tab);
+      if (tab === 'contact') scrollToContactForm();
     }
     if (window.location.hash === '#contact') showTab('contact');
 
