@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<hea
+        <button class="layout-opt" data-layout="s" onclick="setLayout('s')"
+          style="padding:8px 6px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center;line-height:1.3">
+          <div style="height:38px;margin-bottom:3px;border:0.5px solid var(--rule);border-radius:2px;overflow:hidden;background:#f0ede8">
+            <div style="height:8px;background:#f0ede8;border-bottom:0.5px solid #d0ccc4;display:flex;align-items:center;padding:0 3px;font-size:5px;font-family:serif">* Tomaso Pignocchi</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;height:30px">
+              <div style="background:#888;border-right:0.5px solid #d0ccc4;display:flex;align-items:flex-end;padding:2px;font-size:5px;color:rgba(255,255,255,0.9);font-family:serif">Philosophy</div>
+              <div style="background:#aaa;display:flex;align-items:flex-end;padding:2px;font-size:5px;color:rgba(255,255,255,0.9);font-family:serif">Photography</div>
+            </div>
+          </div>
+          S — Due pannelli
+        </button>d>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin — Photos</title>
@@ -1610,6 +1621,8 @@
     let currentLayout = 'a';
     function setLayout(s) {
       currentLayout = s;
+      const sSettings = document.getElementById('layout-s-settings');
+      if (sSettings) sSettings.style.display = s === 's' ? 'block' : 'none';
       document.querySelectorAll('.layout-opt').forEach(b => {
         const active = b.dataset.layout === s;
         b.style.borderColor = active ? 'var(--ink)' : 'var(--rule)';
@@ -2001,7 +2014,127 @@
     loadContent();
     loadPubs();
     loadTalks();
+    loadLayoutS();
     initCropPreview();
+    loadLayoutS();
+
+    /* ── Layout S ── */
+    async function saveLayoutS() {
+      if (!CF.isConnected()) { alert('Connect Contentful first'); return; }
+      const c = CF.cfg();
+      try {
+        const fields = {
+          banner1PosX: parseInt(document.getElementById('s1-pos-x')?.value)||50,
+          banner1PosY: parseInt(document.getElementById('s1-pos-y')?.value)||38,
+          banner1Url:  document.getElementById('s1-url')?.value?.trim()||'',
+          banner2Url:  document.getElementById('s2-url')?.value?.trim()||'',
+          banner2PosX: parseInt(document.getElementById('s2-pos-x')?.value)||50,
+          banner2PosY: parseInt(document.getElementById('s2-pos-y')?.value)||38,
+          label1Text:  document.getElementById('s1-text')?.value?.trim()||'Philosophy',
+          label1Font:  document.getElementById('s1-font')?.value||'',
+          label1Color: document.getElementById('hex-s1')?.value?.trim()||'#ffffff',
+          label1Size:  parseInt(document.getElementById('s1-size')?.value)||100,
+          label2Text:  document.getElementById('s2-text')?.value?.trim()||'Photography',
+          label2Font:  document.getElementById('s2-font')?.value||'',
+          label2Color: document.getElementById('hex-s2')?.value?.trim()||'#ffffff',
+          label2Size:  parseInt(document.getElementById('s2-size')?.value)||100,
+        };
+        const existing = await CF.get('siteSettings');
+        if (!existing||!existing.length) { alert('Create a siteSettings entry first'); return; }
+        const id = existing[0]._id;
+        const e = await CF.mgmt('GET', '/entries/'+id);
+        const merged = {...e.fields};
+        Object.entries(fields).forEach(([k,v]) => { merged[k] = {'en-US': v}; });
+        const r = await fetch(
+          'https://api.contentful.com/spaces/'+c.spaceId+'/environments/master/entries/'+id,
+          { method:'PUT', headers:{Authorization:'Bearer '+c.mgmtToken,'Content-Type':'application/vnd.contentful.management.v1+json','X-Contentful-Version':e.sys.version},
+            body: JSON.stringify({fields:merged}) }
+        );
+        const updated = await r.json();
+        if (!r.ok) throw new Error(updated.message||'Update failed');
+        await CF.publishEntry(id, updated.sys.version);
+        const msg = document.getElementById('s-save-msg');
+        if (msg) { msg.style.display='inline'; setTimeout(()=>msg.style.display='none',3000); }
+      } catch(e) { alert('Save error: '+e.message); }
+    }
+    async function uploadS1(file) {
+      if (!file||!CF.isConnected()) return;
+      try { const assetId=await CF.uploadAsset(file); const asset=await CF.mgmt('GET','/assets/'+assetId); document.getElementById('s1-url').value='https:'+asset.fields.file['en-US'].url; } catch(e) { alert('Upload error: '+e.message); }
+    }
+    async function uploadS2(file) {
+      if (!file||!CF.isConnected()) return;
+      try { const assetId=await CF.uploadAsset(file); const asset=await CF.mgmt('GET','/assets/'+assetId); document.getElementById('s2-url').value='https:'+asset.fields.file['en-US'].url; } catch(e) { alert('Upload error: '+e.message); }
+    }
+    async function loadLayoutS() {
+      if (!CF.isConnected()) return;
+      try {
+        const ss = await CF.get('siteSettings');
+        if (!ss||!ss.length) return;
+        const s = ss[0];
+        const set=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null)el.value=v;};
+        const setN=(id,vid,v)=>{set(id,v);const l=document.getElementById(vid);if(l&&v!=null)l.textContent=v;};
+        set('s1-url',s.banner1Url); set('s2-url',s.banner2Url);
+        setN('s1-pos-x','v-s1-x',s.banner1PosX); setN('s1-pos-y','v-s1-y',s.banner1PosY);
+        setN('s2-pos-x','v-s2-x',s.banner2PosX); setN('s2-pos-y','v-s2-y',s.banner2PosY);
+        set('s1-text',s.label1Text); set('s1-font',s.label1Font);
+        set('s2-text',s.label2Text); set('s2-font',s.label2Font);
+        setN('s1-size','v-s1-size',s.label1Size); setN('s2-size','v-s2-size',s.label2Size);
+        if(s.label1Color){set('hex-s1',s.label1Color);set('cp-s1',s.label1Color);}
+        if(s.label2Color){set('hex-s2',s.label2Color);set('cp-s2',s.label2Color);}
+      } catch(e) { console.warn('loadLayoutS',e); }
+    }
+
   </script>
 </body>
 </html>
+
+      <!-- Layout S settings -->
+      <div id="layout-s-settings" style="display:none;margin-top:2rem">
+        <p class="section-title" style="margin-bottom:1rem">Layout S — Impostazioni pannelli</p>
+        <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1rem">
+          <p style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem">Pannello 1 — Philosophy</p>
+          <div class="form-group" style="margin-bottom:0.8rem">
+            <label>Immagine</label>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+              <input type="text" id="s1-url" placeholder="URL immagine" style="flex:1" />
+              <button class="btn" onclick="document.getElementById('s1-file').click()">Upload</button>
+              <input type="file" id="s1-file" accept="image/*" style="display:none" onchange="uploadS1(this.files[0])" />
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem">
+            <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s1-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s1-pos-x" oninput="document.getElementById('v-s1-x').textContent=this.value" style="width:100%" /></div>
+            <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s1-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s1-pos-y" oninput="document.getElementById('v-s1-y').textContent=this.value" style="width:100%" /></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
+            <div><label>Font etichetta</label><select id="s1-font" style="width:100%;font-size:0.62rem"><option value="">Default</option><option>EB Garamond</option><option>Cormorant Garant</option><option>Playfair Display</option><option>Spectral</option><option>Libre Baskerville</option><option>Inter</option><option>Lato</option><option>DM Mono</option></select></div>
+            <div><label>Colore etichetta</label><div style="display:flex;gap:4px"><input type="color" id="cp-s1" value="#ffffff" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule)" oninput="document.getElementById('hex-s1').value=this.value" /><input type="text" id="hex-s1" value="#ffffff" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-s1');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" /></div></div>
+            <div><label>Dimensione <span id="v-s1-size">100</span>%</label><input type="range" min="60" max="200" value="100" id="s1-size" oninput="document.getElementById('v-s1-size').textContent=this.value" style="width:100%" /></div>
+          </div>
+          <div class="form-group"><label>Testo etichetta</label><input type="text" id="s1-text" value="Philosophy" /></div>
+        </div>
+        <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem">
+          <p style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem">Pannello 2 — Photography</p>
+          <div class="form-group" style="margin-bottom:0.8rem">
+            <label>Immagine</label>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+              <input type="text" id="s2-url" placeholder="URL immagine" style="flex:1" />
+              <button class="btn" onclick="document.getElementById('s2-file').click()">Upload</button>
+              <input type="file" id="s2-file" accept="image/*" style="display:none" onchange="uploadS2(this.files[0])" />
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem">
+            <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s2-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s2-pos-x" oninput="document.getElementById('v-s2-x').textContent=this.value" style="width:100%" /></div>
+            <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s2-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s2-pos-y" oninput="document.getElementById('v-s2-y').textContent=this.value" style="width:100%" /></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
+            <div><label>Font etichetta</label><select id="s2-font" style="width:100%;font-size:0.62rem"><option value="">Default</option><option>EB Garamond</option><option>Cormorant Garant</option><option>Playfair Display</option><option>Spectral</option><option>Libre Baskerville</option><option>Inter</option><option>Lato</option><option>DM Mono</option></select></div>
+            <div><label>Colore etichetta</label><div style="display:flex;gap:4px"><input type="color" id="cp-s2" value="#ffffff" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule)" oninput="document.getElementById('hex-s2').value=this.value" /><input type="text" id="hex-s2" value="#ffffff" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-s2');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" /></div></div>
+            <div><label>Dimensione <span id="v-s2-size">100</span>%</label><input type="range" min="60" max="200" value="100" id="s2-size" oninput="document.getElementById('v-s2-size').textContent=this.value" style="width:100%" /></div>
+          </div>
+          <div class="form-group"><label>Testo etichetta</label><input type="text" id="s2-text" value="Photography" /></div>
+        </div>
+        <div style="margin-top:1rem">
+          <button class="btn primary" onclick="saveLayoutS()">Save layout S →</button>
+          <span id="s-save-msg" style="display:none;margin-left:1rem;font-size:0.62rem;color:#4a7c59">Saved ✓</span>
+        </div>
+      </div>

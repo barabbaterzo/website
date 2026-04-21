@@ -142,9 +142,9 @@
     .photo-item img {
       width: 100%;
       display: block;
-      filter: grayscale(100%) brightness(0.82);
-      transform: scale(1.03);
-      transition: filter 0.5s ease, transform 0.5s ease;
+      filter: none;
+      transform: scale(1);
+      transition: transform 0.4s ease;
       pointer-events: none;   /* drag protection */
       user-select: none;
       -webkit-user-select: none;
@@ -152,8 +152,7 @@
     }
 
     .photo-item:hover img {
-      filter: grayscale(0%) brightness(0.95);
-      transform: scale(1);
+      transform: scale(1.04);
     }
 
     .photo-item .overlay {
