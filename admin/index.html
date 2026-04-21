@@ -1044,6 +1044,64 @@
       No photos yet. Upload your first one above.
     </div>
 
+  
+    <!-- Layout S settings -->
+    <div id="layout-s-settings" style="display:none;margin-top:2rem">
+      <p class="section-title" style="margin-bottom:1rem">Layout S &mdash; Impostazioni pannelli</p>
+
+      <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1rem">
+        <p style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem">Pannello 1 &mdash; Philosophy</p>
+
+        <div style="margin-bottom:0.8rem">
+          <label style="display:block;margin-bottom:0.4rem">Immagine selezionata</label>
+          <img id="s1-preview" src="" alt="" style="width:100%;max-height:120px;object-fit:cover;border:1px solid var(--rule);border-radius:3px;display:none;margin-bottom:0.4rem" />
+          <p style="font-size:0.6rem;color:var(--ink3);margin-bottom:0.4rem">Scegli dalle foto caricate:</p>
+          <div id="s1-picker-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:4px;max-height:160px;overflow-y:auto;border:1px solid var(--rule);border-radius:3px;padding:4px"></div>
+          <input type="hidden" id="s1-url" value="" />
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem">
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s1-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s1-pos-x" oninput="document.getElementById('v-s1-x').textContent=this.value" style="width:100%" /></div>
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s1-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s1-pos-y" oninput="document.getElementById('v-s1-y').textContent=this.value" style="width:100%" /></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
+          <div><label>Font etichetta</label><select id="s1-font" style="width:100%;font-size:0.62rem"><option value="">Default</option><option>EB Garamond</option><option>Cormorant Garant</option><option>Playfair Display</option><option>Spectral</option><option>Libre Baskerville</option><option>Inter</option><option>Lato</option><option>DM Mono</option></select></div>
+          <div><label>Colore etichetta</label><div style="display:flex;gap:4px"><input type="color" id="cp-s1" value="#ffffff" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule)" oninput="document.getElementById('hex-s1').value=this.value" /><input type="text" id="hex-s1" value="#ffffff" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value))document.getElementById('cp-s1').value=this.value" /></div></div>
+          <div><label>Dimensione <span id="v-s1-size">100</span>%</label><input type="range" min="60" max="200" value="100" id="s1-size" oninput="document.getElementById('v-s1-size').textContent=this.value" style="width:100%" /></div>
+        </div>
+        <div class="form-group"><label>Testo etichetta</label><input type="text" id="s1-text" value="Philosophy" /></div>
+      </div>
+
+      <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem">
+        <p style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem">Pannello 2 &mdash; Photography</p>
+
+        <div style="margin-bottom:0.8rem">
+          <label style="display:block;margin-bottom:0.4rem">Immagine selezionata</label>
+          <img id="s2-preview" src="" alt="" style="width:100%;max-height:120px;object-fit:cover;border:1px solid var(--rule);border-radius:3px;display:none;margin-bottom:0.4rem" />
+          <p style="font-size:0.6rem;color:var(--ink3);margin-bottom:0.4rem">Scegli dalle foto caricate:</p>
+          <div id="s2-picker-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:4px;max-height:160px;overflow-y:auto;border:1px solid var(--rule);border-radius:3px;padding:4px"></div>
+          <input type="hidden" id="s2-url" value="" />
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem">
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s2-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s2-pos-x" oninput="document.getElementById('v-s2-x').textContent=this.value" style="width:100%" /></div>
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s2-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s2-pos-y" oninput="document.getElementById('v-s2-y').textContent=this.value" style="width:100%" /></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
+          <div><label>Font etichetta</label><select id="s2-font" style="width:100%;font-size:0.62rem"><option value="">Default</option><option>EB Garamond</option><option>Cormorant Garant</option><option>Playfair Display</option><option>Spectral</option><option>Libre Baskerville</option><option>Inter</option><option>Lato</option><option>DM Mono</option></select></div>
+          <div><label>Colore etichetta</label><div style="display:flex;gap:4px"><input type="color" id="cp-s2" value="#ffffff" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule)" oninput="document.getElementById('hex-s2').value=this.value" /><input type="text" id="hex-s2" value="#ffffff" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value))document.getElementById('cp-s2').value=this.value" /></div></div>
+          <div><label>Dimensione <span id="v-s2-size">100</span>%</label><input type="range" min="60" max="200" value="100" id="s2-size" oninput="document.getElementById('v-s2-size').textContent=this.value" style="width:100%" /></div>
+        </div>
+        <div class="form-group"><label>Testo etichetta</label><input type="text" id="s2-text" value="Photography" /></div>
+      </div>
+
+      <div style="margin-top:1rem">
+        <button class="btn primary" onclick="saveLayoutS()">Save layout S &rarr;</button>
+        <span id="s-save-msg" style="display:none;margin-left:1rem;font-size:0.62rem;color:#4a7c59">Saved &check;</span>
+      </div>
+    </div>
   </div><!-- /panel-photos -->
 
   <!-- ═══ SETTINGS PANEL ═══ -->
@@ -2068,12 +2126,33 @@
     async function loadLayoutS() {
       if (!CF.isConnected()) return;
       try {
-        const ss = await CF.get('siteSettings');
+        const [ss, photoList] = await Promise.all([CF.get('siteSettings'), CF.get('photo')]);
+        /* Populate photo picker grids */
+        ['s1','s2'].forEach(p => {
+          const grid = document.getElementById(p+'-picker-grid');
+          if (!grid || !photoList) return;
+          grid.innerHTML = '';
+          photoList.forEach(ph => {
+            if (!ph.image) return;
+            const img = document.createElement('img');
+            img.src = ph.image; img.alt = ph.title||'';
+            img.style.cssText = 'width:100%;aspect-ratio:3/2;object-fit:cover;cursor:pointer;border-radius:2px;border:2px solid transparent;transition:border-color 0.15s';
+            img.onclick = () => {
+              document.getElementById(p+'-url').value = ph.image;
+              const prev = document.getElementById(p+'-preview');
+              if (prev) { prev.src = ph.image; prev.style.display='block'; }
+              grid.querySelectorAll('img').forEach(i => i.style.borderColor='transparent');
+              img.style.borderColor = 'var(--ink)';
+            };
+            grid.appendChild(img);
+          });
+        });
         if (!ss||!ss.length) return;
         const s = ss[0];
         const set=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null)el.value=v;};
         const setN=(id,vid,v)=>{set(id,v);const l=document.getElementById(vid);if(l&&v!=null)l.textContent=v;};
-        set('s1-url',s.banner1Url); set('s2-url',s.banner2Url);
+        if (s.banner1Url) { set('s1-url',s.banner1Url); const p=document.getElementById('s1-preview'); if(p){p.src=s.banner1Url;p.style.display='block';} }
+        if (s.banner2Url) { set('s2-url',s.banner2Url); const p=document.getElementById('s2-preview'); if(p){p.src=s.banner2Url;p.style.display='block';} }
         setN('s1-pos-x','v-s1-x',s.banner1PosX); setN('s1-pos-y','v-s1-y',s.banner1PosY);
         setN('s2-pos-x','v-s2-x',s.banner2PosX); setN('s2-pos-y','v-s2-y',s.banner2PosY);
         set('s1-text',s.label1Text); set('s1-font',s.label1Font);
@@ -2087,54 +2166,3 @@
   </script>
 </body>
 </html>
-
-      <!-- Layout S settings -->
-      <div id="layout-s-settings" style="display:none;margin-top:2rem">
-        <p class="section-title" style="margin-bottom:1rem">Layout S — Impostazioni pannelli</p>
-        <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1rem">
-          <p style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem">Pannello 1 — Philosophy</p>
-          <div class="form-group" style="margin-bottom:0.8rem">
-            <label>Immagine</label>
-            <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
-              <input type="text" id="s1-url" placeholder="URL immagine" style="flex:1" />
-              <button class="btn" onclick="document.getElementById('s1-file').click()">Upload</button>
-              <input type="file" id="s1-file" accept="image/*" style="display:none" onchange="uploadS1(this.files[0])" />
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem">
-            <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s1-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s1-pos-x" oninput="document.getElementById('v-s1-x').textContent=this.value" style="width:100%" /></div>
-            <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s1-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s1-pos-y" oninput="document.getElementById('v-s1-y').textContent=this.value" style="width:100%" /></div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
-            <div><label>Font etichetta</label><select id="s1-font" style="width:100%;font-size:0.62rem"><option value="">Default</option><option>EB Garamond</option><option>Cormorant Garant</option><option>Playfair Display</option><option>Spectral</option><option>Libre Baskerville</option><option>Inter</option><option>Lato</option><option>DM Mono</option></select></div>
-            <div><label>Colore etichetta</label><div style="display:flex;gap:4px"><input type="color" id="cp-s1" value="#ffffff" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule)" oninput="document.getElementById('hex-s1').value=this.value" /><input type="text" id="hex-s1" value="#ffffff" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-s1');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" /></div></div>
-            <div><label>Dimensione <span id="v-s1-size">100</span>%</label><input type="range" min="60" max="200" value="100" id="s1-size" oninput="document.getElementById('v-s1-size').textContent=this.value" style="width:100%" /></div>
-          </div>
-          <div class="form-group"><label>Testo etichetta</label><input type="text" id="s1-text" value="Philosophy" /></div>
-        </div>
-        <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem">
-          <p style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem">Pannello 2 — Photography</p>
-          <div class="form-group" style="margin-bottom:0.8rem">
-            <label>Immagine</label>
-            <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
-              <input type="text" id="s2-url" placeholder="URL immagine" style="flex:1" />
-              <button class="btn" onclick="document.getElementById('s2-file').click()">Upload</button>
-              <input type="file" id="s2-file" accept="image/*" style="display:none" onchange="uploadS2(this.files[0])" />
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem">
-            <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s2-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s2-pos-x" oninput="document.getElementById('v-s2-x').textContent=this.value" style="width:100%" /></div>
-            <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s2-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s2-pos-y" oninput="document.getElementById('v-s2-y').textContent=this.value" style="width:100%" /></div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
-            <div><label>Font etichetta</label><select id="s2-font" style="width:100%;font-size:0.62rem"><option value="">Default</option><option>EB Garamond</option><option>Cormorant Garant</option><option>Playfair Display</option><option>Spectral</option><option>Libre Baskerville</option><option>Inter</option><option>Lato</option><option>DM Mono</option></select></div>
-            <div><label>Colore etichetta</label><div style="display:flex;gap:4px"><input type="color" id="cp-s2" value="#ffffff" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule)" oninput="document.getElementById('hex-s2').value=this.value" /><input type="text" id="hex-s2" value="#ffffff" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-s2');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" /></div></div>
-            <div><label>Dimensione <span id="v-s2-size">100</span>%</label><input type="range" min="60" max="200" value="100" id="s2-size" oninput="document.getElementById('v-s2-size').textContent=this.value" style="width:100%" /></div>
-          </div>
-          <div class="form-group"><label>Testo etichetta</label><input type="text" id="s2-text" value="Photography" /></div>
-        </div>
-        <div style="margin-top:1rem">
-          <button class="btn primary" onclick="saveLayoutS()">Save layout S →</button>
-          <span id="s-save-msg" style="display:none;margin-left:1rem;font-size:0.62rem;color:#4a7c59">Saved ✓</span>
-        </div>
-      </div>
