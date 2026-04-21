@@ -16,7 +16,7 @@
       --wt-primary:300; --wt-secondary:300;
       --fs-primary:normal; --fs-secondary:normal;
       --sz-banner-title:1; --sz-banner-sub:1; --sz-bio:1;
-      --sz-pubs:1; --sz-venue:1; --color-venue:var(--page-ink3); --sz-photo:1; --sz-labels:1; --sz-footer:1;
+      --sz-pubs:1; --sz-venue:1; --color-venue:var(--page-ink3); --sz-photo:1; --sz-labels:1; --sz-sublabels:1; --sz-seemore:1; --sz-footer:1;
       --lh-bio:1.78; --hero-pos:center 38%;
       --gutter:clamp(1.5rem,4vw,3.2rem);
     }
@@ -322,7 +322,7 @@
       text-transform:uppercase;color:var(--page-ink3);
     }
     .see-more{
-      font-family:var(--font-secondary);font-size:.52rem;letter-spacing:.14em;
+      font-family:var(--font-secondary);font-size:calc(.52rem*var(--sz-seemore,1));letter-spacing:.14em;
       text-transform:uppercase;color:var(--page-ink3);text-decoration:none;
       border-bottom:.5px solid var(--page-rule);transition:color .2s,border-color .2s;
     }
@@ -330,7 +330,7 @@
 
     /* PUBLICATIONS */
     .pub-group-label{
-      font-family:var(--font-secondary);font-size:.5rem;letter-spacing:.2em;
+      font-family:var(--font-secondary);font-size:calc(.5rem*var(--sz-sublabels,1));letter-spacing:.2em;
       text-transform:uppercase;color:var(--page-ink3);margin:1.6rem 0 .8rem;
     }
     .pub-group-label:first-of-type{margin-top:0}
@@ -381,6 +381,25 @@
     footer .wrap{padding-top:1.4rem;padding-bottom:1.4rem;display:flex;justify-content:space-between;align-items:center}
     footer p{font-family:var(--font-secondary);font-weight:300;font-size:calc(.5rem*var(--sz-footer,1));letter-spacing:.14em;text-transform:uppercase;color:var(--page-ink3)}
 
+
+    /* ─── P: nome nella nav + sottotitolo grande + foto|bio ─── */
+    body.ly-p .site-nav .nav-logo::after { content: attr(data-name); font-family: var(--font-primary); font-weight: var(--wt-primary); font-size: calc(1rem * var(--sz-banner-title,1)); color: var(--page-ink); margin-left: 1rem; letter-spacing: -0.01em; }
+    body.ly-p .intro { display: block; }
+    body.ly-p .i-text { display: block; padding: clamp(1.6rem,3vw,2.4rem) var(--gutter) 0; border-bottom: 0.5px solid var(--page-rule); }
+    body.ly-p .i-name { display: none; }
+    body.ly-p .i-role { display: block; margin: 0; font-size: calc(clamp(1.4rem,3vw,3rem)*var(--sz-banner-sub,1)); letter-spacing: 0.04em; text-transform: none; color: var(--page-ink3); line-height: 1.2; padding-bottom: clamp(1rem,2vw,1.6rem); }
+    body.ly-p .i-role span { display: block; }
+    body.ly-p .i-bio { display: none; }
+    body.ly-p .i-photo { aspect-ratio: unset; height: 52vh; min-height: 220px; display: grid; grid-template-columns: 1fr 1fr; }
+    body.ly-p .i-photo::after { content: attr(data-bio); display: flex; align-items: center; padding: clamp(1.2rem,2.5vw,2rem) var(--gutter); font-family: var(--font-primary); font-weight: var(--wt-primary); font-size: calc(clamp(0.92rem,1.3vw,1.05rem)*var(--sz-bio,1)); line-height: var(--lh-bio,1.78); color: var(--page-ink2); text-align: justify; hyphens: auto; border-left: 0.5px solid var(--page-rule); background: var(--page-bg); }
+
+    /* ─── R: margini laterali stile rivista ─── */
+    body.ly-r .intro { display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 54px); max-width: 1400px; margin: 0 auto; border-left: 0.5px solid var(--page-rule); border-right: 0.5px solid var(--page-rule); }
+    body.ly-r .i-photo { aspect-ratio: unset; height: 100%; }
+    body.ly-r .i-text { display: flex; flex-direction: column; justify-content: space-between; padding: clamp(2rem,4vw,3.6rem) clamp(1.6rem,3.5vw,3.2rem); background: rgba(0,0,0,0.025); }
+    body.ly-r .i-name { margin-bottom: 0.7rem; }
+    body.ly-r .i-bio { margin-top: auto; padding-top: 1.8rem; border-top: 0.5px solid var(--page-rule); }
+
     /* RESPONSIVE */
     @media(max-width:700px){
       body.ly-a .intro,body.ly-c .intro,body.ly-h .intro,body.ly-m .intro,body.ly-n .intro{grid-template-columns:1fr;min-height:auto}
@@ -393,7 +412,10 @@
       body.ly-j .i-bio{grid-column:1;grid-template-columns:1fr}
       body.ly-j .i-bio p+p{border-left:none;border-top:.5px solid var(--page-rule)}
       body.ly-b .i-photo,body.ly-f .i-photo,body.ly-k .i-photo{grid-template-columns:1fr;height:45vw}
-      body.ly-b .i-photo::after,body.ly-f .i-photo::after{display:none}
+      body.ly-b .i-photo::after,body.ly-f .i-photo::after,body.ly-p .i-photo::after{display:none}
+      body.ly-q .intro{grid-template-columns:1fr;min-height:auto}
+      body.ly-q .i-photo{aspect-ratio:3/2!important;height:auto!important}
+      body.ly-r .i-photo{max-width:100%}
       .contact-wrap{grid-template-columns:1fr}
       .nav-links{gap:1.2rem}
       .nav-links a{font-size:.5rem;letter-spacing:.12em}
@@ -664,6 +686,8 @@
       if (sc.venueColor)       root.style.setProperty('--color-venue',      sc.venueColor);
       if (sc.sizePhotoIntro   != null) root.style.setProperty('--sz-photo',         sc.sizePhotoIntro   / 100);
       if (sc.sizeLabels       != null) root.style.setProperty('--sz-labels',        sc.sizeLabels       / 100);
+      if (sc.sizeSublabels    != null) root.style.setProperty('--sz-sublabels',     sc.sizeSublabels    / 100);
+      if (sc.sizeSeemore      != null) root.style.setProperty('--sz-seemore',       sc.sizeSeemore      / 100);
       if (sc.sizeFooter       != null) root.style.setProperty('--sz-footer',        sc.sizeFooter       / 100);
       if (sc.bioLineHeight    != null) root.style.setProperty('--lh-bio',           sc.bioLineHeight    / 100);
       if (sc.bgColor || sc.textColor) {
@@ -699,6 +723,9 @@
       if (sc.heroStyle) {
         document.body.className = document.body.className.replace(/\bly-\S+/g,'').trim();
         document.body.classList.add('ly-' + sc.heroStyle.toLowerCase());
+        /* Layout P: inject name into nav via data attribute */
+        const navLogo = document.querySelector('.nav-logo');
+        if (navLogo) navLogo.dataset.name = 'Tomaso Pignocchi';
         const photo = document.querySelector('.i-photo');
         const bioEl = document.getElementById('bioText');
         const roleEl = document.getElementById('nameplateSubtitle');
