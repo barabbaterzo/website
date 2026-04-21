@@ -395,13 +395,13 @@
 
             /* ─── R: tutto il sito con margini laterali (stile rivista) ─── */
     body.ly-r .site-nav { border-bottom: 0.5px solid var(--page-rule); }
-    body.ly-r .site-nav .wrap { max-width: 1100px; }
+    body.ly-r .site-nav .wrap { max-width: 1200px; }
 
     body.ly-r .intro {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: 1fr 1.4fr;
+      grid-template-columns: 3fr 2fr;
       min-height: calc(100vh - 54px);
       border: none;
     }
@@ -417,10 +417,10 @@
 
     /* sections: same max-width, no side borders, small top margin */
     body.ly-r .tab-panel > .page-section {
-      max-width: 1100px; margin: clamp(1rem,2vw,1.8rem) auto 0;
+      max-width: 1200px; margin: clamp(1rem,2vw,1.8rem) auto 0;
       border-left: none; border-right: none;
     }
-    body.ly-r footer .wrap { max-width: 1100px; }
+    body.ly-r footer .wrap { max-width: 1200px; }
 
     /* RESPONSIVE */
     @media(max-width:700px){
