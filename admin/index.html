@@ -1734,24 +1734,6 @@
       }
     }
 
-      );
-      const updated = await putResp.json();
-      if (!putResp.ok) throw new Error(updated.message || 'Could not update siteContent schema');
-      const publishResp = await fetch(
-        `https://api.contentful.com/spaces/${c.spaceId}/environments/master/content_types/siteContent/published`,
-        {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${c.mgmtToken}`,
-            'Content-Type': 'application/vnd.contentful.management.v1+json',
-            'X-Contentful-Version': updated.sys.version
-          }
-        }
-      );
-      const publishJson = await publishResp.json().catch(() => ({}));
-      if (!publishResp.ok) throw new Error(publishJson.message || 'Could not publish updated siteContent schema');
-    }
-
     /* ── Banner crop tool ── */
     let cropX = 50, cropY = 38;
 
