@@ -1066,8 +1066,9 @@
           <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s1-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s1-pos-y" oninput="document.getElementById('v-s1-y').textContent=this.value;updateLayoutSPreview('s1')" style="width:100%" /></div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
+        <div style="display:grid;grid-template-columns:1.1fr 0.9fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
           <div><label>Font etichetta</label><select id="s1-font" style="width:100%;font-size:0.62rem"><option value="">Default</option><option>EB Garamond</option><option>Cormorant Garant</option><option>Playfair Display</option><option>Spectral</option><option>Libre Baskerville</option><option>Inter</option><option>Lato</option><option>DM Mono</option></select></div>
+          <div><label>Peso</label><select id="s1-weight" style="width:100%;font-size:0.62rem"><option value="">Default</option><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option></select></div>
           <div><label>Colore etichetta</label><div style="display:flex;gap:4px"><input type="color" id="cp-s1" value="#ffffff" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule)" oninput="document.getElementById('hex-s1').value=this.value" /><input type="text" id="hex-s1" value="#ffffff" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value))document.getElementById('cp-s1').value=this.value" /></div></div>
           <div><label>Dimensione <span id="v-s1-size">100</span>%</label><input type="range" min="60" max="200" value="100" id="s1-size" oninput="document.getElementById('v-s1-size').textContent=this.value" style="width:100%" /></div>
         </div>
@@ -1090,8 +1091,9 @@
           <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s2-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s2-pos-y" oninput="document.getElementById('v-s2-y').textContent=this.value;updateLayoutSPreview('s2')" style="width:100%" /></div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
+        <div style="display:grid;grid-template-columns:1.1fr 0.9fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
           <div><label>Font etichetta</label><select id="s2-font" style="width:100%;font-size:0.62rem"><option value="">Default</option><option>EB Garamond</option><option>Cormorant Garant</option><option>Playfair Display</option><option>Spectral</option><option>Libre Baskerville</option><option>Inter</option><option>Lato</option><option>DM Mono</option></select></div>
+          <div><label>Peso</label><select id="s2-weight" style="width:100%;font-size:0.62rem"><option value="">Default</option><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option></select></div>
           <div><label>Colore etichetta</label><div style="display:flex;gap:4px"><input type="color" id="cp-s2" value="#ffffff" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule)" oninput="document.getElementById('hex-s2').value=this.value" /><input type="text" id="hex-s2" value="#ffffff" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value))document.getElementById('cp-s2').value=this.value" /></div></div>
           <div><label>Dimensione <span id="v-s2-size">100</span>%</label><input type="range" min="60" max="200" value="100" id="s2-size" oninput="document.getElementById('v-s2-size').textContent=this.value" style="width:100%" /></div>
         </div>
@@ -2079,11 +2081,33 @@
     loadLayoutS();
 
     /* ── Layout S ── */
+    function encodePackedLabelFont(font, weight) {
+      const f = (font || '').trim();
+      const w = parseInt(weight) || 0;
+      if (!f && !w) return '';
+      return `${f}||${w || ''}`;
+    }
+
+    function decodePackedLabelFont(rawFont, fallbackWeight) {
+      let font = typeof rawFont === 'string' ? rawFont : '';
+      let weight = parseInt(fallbackWeight) || 0;
+      if (typeof font === 'string' && font.includes('||')) {
+        const [packedFont, packedWeight] = font.split('||');
+        font = packedFont || '';
+        if (!weight && /^\d+$/.test((packedWeight || '').trim())) weight = parseInt(packedWeight, 10) || 0;
+      }
+      return { font, weight };
+    }
+
     async function saveLayoutS() {
       if (!CF.isConnected()) { alert('Connect Contentful first'); return; }
       const c = CF.cfg();
       setLayout('s');
       try {
+        const label1FontValue = document.getElementById('s1-font')?.value || '';
+        const label1WeightValue = parseInt(document.getElementById('s1-weight')?.value) || 0;
+        const label2FontValue = document.getElementById('s2-font')?.value || '';
+        const label2WeightValue = parseInt(document.getElementById('s2-weight')?.value) || 0;
         const fields = {
           banner1posX: parseInt(document.getElementById('s1-pos-x')?.value)||50,
           banner1posY: parseInt(document.getElementById('s1-pos-y')?.value)||38,
@@ -2092,14 +2116,18 @@
           banner2posX: parseInt(document.getElementById('s2-pos-x')?.value)||50,
           banner2posY: parseInt(document.getElementById('s2-pos-y')?.value)||38,
           label1text:  document.getElementById('s1-text')?.value?.trim()||'Philosophy',
-          label1font:  document.getElementById('s1-font')?.value||'',
+          label1font:  encodePackedLabelFont(label1FontValue, label1WeightValue),
           label1color: document.getElementById('hex-s1')?.value?.trim()||'#ffffff',
           label1size:  parseInt(document.getElementById('s1-size')?.value)||100,
           label2text:  document.getElementById('s2-text')?.value?.trim()||'Photography',
-          label2font:  document.getElementById('s2-font')?.value||'',
+          label2font:  encodePackedLabelFont(label2FontValue, label2WeightValue),
           label2color: document.getElementById('hex-s2')?.value?.trim()||'#ffffff',
           label2size:  parseInt(document.getElementById('s2-size')?.value)||100,
         };
+        fields.label1font = label1FontValue;
+        fields.label1weight = label1WeightValue;
+        fields.label2font = label2FontValue;
+        fields.label2weight = label2WeightValue;
         const existing = await CF.get('siteSettings');
         if (!existing||!existing.length) { alert('Create a siteSettings entry first'); return; }
         const id = existing[0]._id;
@@ -2197,19 +2225,23 @@
         const banner2PosX = s.banner2posX ?? s.banner2PosX;
         const banner2PosY = s.banner2posY ?? s.banner2PosY;
         const label1Text = s.label1text ?? s.label1Text;
-        const label1Font = s.label1font ?? s.label1Font;
+        const label1FontRaw = s.label1font ?? s.label1Font;
+        const label1WeightRaw = s.label1weight ?? s.label1Weight;
         const label1Color = s.label1color ?? s.label1Color;
         const label1Size = s.label1size ?? s.label1Size;
         const label2Text = s.label2text ?? s.label2Text;
-        const label2Font = s.label2font ?? s.label2Font;
+        const label2FontRaw = s.label2font ?? s.label2Font;
+        const label2WeightRaw = s.label2weight ?? s.label2Weight;
         const label2Color = s.label2color ?? s.label2Color;
         const label2Size = s.label2size ?? s.label2Size;
+        const label1FontData = decodePackedLabelFont(label1FontRaw, label1WeightRaw);
+        const label2FontData = decodePackedLabelFont(label2FontRaw, label2WeightRaw);
         if (banner1Url) { set('s1-url',banner1Url); const p=document.getElementById('s1-preview'); if(p){p.src=banner1Url;p.style.display='block';} }
         if (banner2Url) { set('s2-url',banner2Url); const p=document.getElementById('s2-preview'); if(p){p.src=banner2Url;p.style.display='block';} }
         setN('s1-pos-x','v-s1-x',banner1PosX); setN('s1-pos-y','v-s1-y',banner1PosY);
         setN('s2-pos-x','v-s2-x',banner2PosX); setN('s2-pos-y','v-s2-y',banner2PosY);
-        set('s1-text',label1Text); set('s1-font',label1Font);
-        set('s2-text',label2Text); set('s2-font',label2Font);
+        set('s1-text',label1Text); set('s1-font',label1FontData.font); set('s1-weight', label1FontData.weight || '');
+        set('s2-text',label2Text); set('s2-font',label2FontData.font); set('s2-weight', label2FontData.weight || '');
         setN('s1-size','v-s1-size',label1Size); setN('s2-size','v-s2-size',label2Size);
         if(label1Color){set('hex-s1',label1Color);set('cp-s1',label1Color);}
         if(label2Color){set('hex-s2',label2Color);set('cp-s2',label2Color);}

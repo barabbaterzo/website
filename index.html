@@ -509,7 +509,7 @@
     }
     .panel-s-label {
       font-family: var(--font-label-s1, var(--font-primary));
-      font-weight: var(--wt-label-s, var(--wt-primary));
+      font-weight: var(--wt-label-s1, var(--wt-label-s, var(--wt-primary)));
       font-size: calc(clamp(1.8rem, 3.5vw, 3.6rem) * var(--sz-label-s1, 1));
       color: var(--color-label-s1, #fff);
       letter-spacing: -0.02em;
@@ -518,6 +518,7 @@
     }
     #panel-s-2 .panel-s-label {
       font-family: var(--font-label-s2, var(--font-primary));
+      font-weight: var(--wt-label-s2, var(--wt-label-s, var(--wt-primary)));
       font-size: calc(clamp(1.8rem, 3.5vw, 3.6rem) * var(--sz-label-s2, 1));
       color: var(--color-label-s2, #fff);
     }
@@ -905,6 +906,17 @@
     }
 
     (async function init() {
+      function decodePackedLabelFont(rawFont, fallbackWeight) {
+        let font = typeof rawFont === 'string' ? rawFont : '';
+        let weight = parseInt(fallbackWeight) || 0;
+        if (typeof font === 'string' && font.includes('||')) {
+          const [packedFont, packedWeight] = font.split('||');
+          font = packedFont || '';
+          if (!weight && /^\d+$/.test((packedWeight || '').trim())) weight = parseInt(packedWeight, 10) || 0;
+        }
+        return { font, weight };
+      }
+
       try {
         const items = await cfGet('siteContent');
         if (items && items.length) applySettings(items[0]);
@@ -924,13 +936,17 @@
           const banner2PosX = pick('banner2posX', 'banner2PosX');
           const banner2PosY = pick('banner2posY', 'banner2PosY');
           const label1Text = pick('label1text', 'label1Text');
-          const label1Font = pick('label1font', 'label1Font');
+          const label1FontRaw = pick('label1font', 'label1Font');
+          const label1WeightRaw = pick('label1weight', 'label1Weight');
           const label1Color = pick('label1color', 'label1Color');
           const label1Size = pick('label1size', 'label1Size');
           const label2Text = pick('label2text', 'label2Text');
-          const label2Font = pick('label2font', 'label2Font');
+          const label2FontRaw = pick('label2font', 'label2Font');
+          const label2WeightRaw = pick('label2weight', 'label2Weight');
           const label2Color = pick('label2color', 'label2Color');
           const label2Size = pick('label2size', 'label2Size');
+          const label1FontData = decodePackedLabelFont(label1FontRaw, label1WeightRaw);
+          const label2FontData = decodePackedLabelFont(label2FontRaw, label2WeightRaw);
           /* Banner 1 (hero) */
           if (ss.heroBanner) {
             const img = document.getElementById('heroBannerImg');
@@ -953,10 +969,12 @@
             root.style.setProperty('--pos-s1', banner1PosX + '% ' + banner1PosY + '%');
           if (banner2PosX != null && banner2PosY != null)
             root.style.setProperty('--pos-s2', banner2PosX + '% ' + banner2PosY + '%');
-          if (label1Font)  root.style.setProperty('--font-label-s1', label1Font);
+          if (label1FontData.font)  root.style.setProperty('--font-label-s1', label1FontData.font);
+          if (label1FontData.weight) root.style.setProperty('--wt-label-s1', label1FontData.weight);
           if (label1Color) root.style.setProperty('--color-label-s1', label1Color);
           if (label1Size)  root.style.setProperty('--sz-label-s1', label1Size / 100);
-          if (label2Font)  root.style.setProperty('--font-label-s2', label2Font);
+          if (label2FontData.font)  root.style.setProperty('--font-label-s2', label2FontData.font);
+          if (label2FontData.weight) root.style.setProperty('--wt-label-s2', label2FontData.weight);
           if (label2Color) root.style.setProperty('--color-label-s2', label2Color);
           if (label2Size)  root.style.setProperty('--sz-label-s2', label2Size / 100);
           if (label1Text) { const el = document.getElementById('labelS1'); if (el) el.textContent = label1Text; }

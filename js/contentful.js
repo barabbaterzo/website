@@ -277,10 +277,12 @@ const CF = (() => {
           { id: 'banner2posY', name: 'banner2PosY', type: 'Integer' },
           { id: 'label1text',  name: 'label1Text',  type: 'Symbol' },
           { id: 'label1font',  name: 'label1Font',  type: 'Symbol' },
+          { id: 'label1weight',name: 'label1Weight',type: 'Integer' },
           { id: 'label1color', name: 'label1Color', type: 'Symbol' },
           { id: 'label1size',  name: 'label1Size',  type: 'Integer' },
           { id: 'label2text',  name: 'label2Text',  type: 'Symbol' },
           { id: 'label2font',  name: 'label2Font',  type: 'Symbol' },
+          { id: 'label2weight',name: 'label2Weight',type: 'Integer' },
           { id: 'label2color', name: 'label2Color', type: 'Symbol' },
           { id: 'label2size',  name: 'label2Size',  type: 'Integer' }
         ],
