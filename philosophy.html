@@ -341,7 +341,7 @@
           ['bio','pubs','venue','labels','sublabels','seemore'].forEach(applySection);
         }
 
-        /* Load siteSettings for nav name styling */
+        /* Load siteSettings for nav name styling + philosophy portrait */
         const ss = await cfGet('siteSettings');
         if (ss && ss.length) {
           const s = ss[0];
@@ -357,6 +357,19 @@
           if (s.navNameSize) {
             const el = document.querySelector('.nav-site-name');
             if (el) el.style.fontSize = (s.navNameSize/100) + 'rem';
+          }
+
+          const portraitUrl = s.philosophyPortraitUrl || s.philosophyportraiturl || '';
+          const portraitWrap = document.getElementById('bioPortraitWrap');
+          const portraitImg = document.getElementById('bioPortraitImg');
+          if (portraitWrap && portraitImg) {
+            if (portraitUrl) {
+              portraitImg.src = portraitUrl;
+              portraitWrap.classList.add('visible');
+            } else {
+              portraitImg.removeAttribute('src');
+              portraitWrap.classList.remove('visible');
+            }
           }
         }
 

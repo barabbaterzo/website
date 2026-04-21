@@ -1684,28 +1684,56 @@
       return new Set((ct.fields || []).map(f => f.id));
     }
 
-    async function ensureSiteContentPortraitField() {
+    function pickExistingFieldId(fieldIds, candidates) {
+      for (const id of candidates) if (fieldIds.has(id)) return id;
+      return null;
+    }
+
+    async function savePhilosophyPortraitToSiteSettings(url) {
+      const allowedFieldIds = await getContentTypeFieldIds('siteSettings');
+      const portraitFieldId = pickExistingFieldId(allowedFieldIds, ['philosophyPortraitUrl', 'philosophyportraiturl']);
+      if (!portraitFieldId) throw new Error('Site Settings is missing the philosophyPortraitUrl field');
+      const payloadFields = {
+        key: 'main',
+        [portraitFieldId]: (url || '').trim()
+      };
+      const filtered = Object.fromEntries(Object.entries(payloadFields).filter(([k]) => allowedFieldIds.has(k)));
       const c = CF.cfg();
-      const ct = await CF.mgmt('GET', '/content_types/siteContent');
-      const fields = ct.fields || [];
-      if (fields.some(f => f.id === 'philosophyPortraitUrl')) return;
-      fields.push({ id: 'philosophyPortraitUrl', name: 'Philosophy portrait URL', type: 'Symbol', required: false, localized: false, disabled: false, omitted: false, validations: [] });
-      const putResp = await fetch(
-        `https://api.contentful.com/spaces/${c.spaceId}/environments/master/content_types/siteContent`,
-        {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${c.mgmtToken}`,
+      const existing = await CF.get('siteSettings');
+      if (existing && existing.length) {
+        const id = existing[0]._id;
+        const e = await CF.mgmt('GET', `/entries/${id}`);
+        const updR = await fetch(
+          `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${id}`,
+          { method: 'PUT',
+            headers: { Authorization: `Bearer ${c.mgmtToken}`,
+              'Content-Type': 'application/vnd.contentful.management.v1+json',
+              'X-Contentful-Version': e.sys.version },
+            body: JSON.stringify({ fields: Object.fromEntries(Object.entries(filtered).map(([k,v]) => [k, {'en-US': v}])) })
+          }
+        );
+        const upd = await updR.json();
+        if (!updR.ok) throw new Error(upd.message || 'Could not update Site Settings');
+        await CF.publishEntry(id, upd.sys.version);
+      } else {
+        const r = await fetch(
+          `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries`,
+          { method: 'POST',
+            headers: { Authorization: `Bearer ${c.mgmtToken}`,
+              'Content-Type': 'application/vnd.contentful.management.v1+json',
+              'X-Contentful-Content-Type': 'siteSettings' },
+            body: JSON.stringify({ fields: Object.fromEntries(Object.entries(filtered).map(([k,v]) => [k, {'en-US': v}])) })
+          }
+        );
+        const entry = await r.json();
+        if (!r.ok) throw new Error(entry.message || 'Could not create Site Settings');
+        await fetch(`https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entry.sys.id}/published`,
+          { method: 'PUT', headers: { Authorization: `Bearer ${c.mgmtToken}`,
             'Content-Type': 'application/vnd.contentful.management.v1+json',
-            'X-Contentful-Version': ct.sys.version
-          },
-          body: JSON.stringify({
-            name: ct.name,
-            description: ct.description || null,
-            displayField: ct.displayField,
-            fields
-          })
-        }
+            'X-Contentful-Version': entry.sys.version }});
+      }
+    }
+
       );
       const updated = await putResp.json();
       if (!putResp.ok) throw new Error(updated.message || 'Could not update siteContent schema');
@@ -1951,11 +1979,14 @@
         if (sc.bioText)           document.getElementById('sc-bio').value = sc.bioText;
         if (sc.photoIntro)        document.getElementById('sc-photo-intro').value = sc.photoIntro;
         if (sc.contactInfo)       document.getElementById('sc-contact').value = sc.contactInfo;
-        setPhilosophyPortrait(sc.philosophyPortraitUrl || sc.philosophyportraiturl || '', false);
         if (sc.heroPosX !== undefined) { cropX = sc.heroPosX; cropY = sc.heroPosY || 38; updateCrop(); }
         if (sc.heroStyle) setLayout(String(sc.heroStyle).toLowerCase());
         loadTypographyToAdmin(sc);
         loadColorsToAdmin(sc);
+
+        const settings = await CF.get('siteSettings');
+        const ss = settings && settings.length ? settings[0] : null;
+        setPhilosophyPortrait((ss && (ss.philosophyPortraitUrl || ss.philosophyportraiturl)) || '', false);
       } catch(e) { console.warn('loadContent error', e); }
       initCropPreview();
     }
@@ -1968,7 +1999,6 @@
         bioText:           document.getElementById('sc-bio').value.trim(),
         photoIntro:        document.getElementById('sc-photo-intro').value.trim(),
         contactInfo:       document.getElementById('sc-contact').value.trim(),
-        philosophyPortraitUrl: document.getElementById('sc-philo-url')?.value?.trim() || '',
         heroPosX:          cropX,
         heroPosY:          cropY,
         heroStyle:         currentLayout,
@@ -2018,7 +2048,6 @@
       };
       try {
         console.log('[DEBUG] Saving fields:', JSON.stringify(fields));
-        await ensureSiteContentPortraitField();
         const allowedFieldIds = await getContentTypeFieldIds('siteContent');
         const payloadFields = Object.fromEntries(Object.entries(fields).filter(([k]) => allowedFieldIds.has(k)));
         const c = CF.cfg();
@@ -2055,6 +2084,7 @@
               'Content-Type': 'application/vnd.contentful.management.v1+json',
               'X-Contentful-Version': entry.sys.version }});
         }
+        await savePhilosophyPortraitToSiteSettings(document.getElementById('sc-philo-url')?.value?.trim() || '');
         const msg = document.getElementById('contentSaveMsg');
         msg.style.display = 'block';
         setTimeout(() => msg.style.display = 'none', 2500);
