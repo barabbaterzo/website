@@ -451,7 +451,7 @@
     body.ly-r footer .wrap { max-width: 1200px; }
 
 
-    /* ─── S: two horizontal panels stacked ─── */
+    /* ─── S: two portrait panels ─── */
     .nav-site-name {
       display: none;
       font-family: var(--font-name, var(--font-primary));
@@ -467,24 +467,23 @@
     body.ly-s .nav-links li:not(:last-child) { display: none; }
 
     body.ly-s .intro { display: none !important; }
+    body.ly-s .intro-s { display: grid; }
 
     .intro-s {
       display: none;
-      flex-direction: column;
+      grid-template-columns: 1fr 1fr;
+      height: calc(100vh - 54px);
       border-bottom: 0.5px solid var(--page-rule);
     }
-    body.ly-s .intro-s { display: flex; }
 
     .panel-s {
       position: relative;
       overflow: hidden;
       display: block;
       text-decoration: none;
-      aspect-ratio: 3/2;
-      width: 100%;
     }
-    .panel-s + .panel-s {
-      border-top: 0.5px solid var(--page-rule);
+    .panel-s:first-child {
+      border-right: 0.5px solid var(--page-rule);
     }
     .panel-s img {
       position: absolute; inset: 0;
@@ -495,17 +494,17 @@
       transition: filter 0.5s ease, transform 0.5s ease;
       transform: scale(1.0);
     }
-    #panel-s-2 img {
+    .panel-s:last-child img {
       object-position: var(--pos-s2, center 38%);
     }
     .panel-s:hover img {
-      filter: grayscale(0%) brightness(0.88);
-      transform: scale(1.03);
+      filter: grayscale(0%) brightness(0.85);
+      transform: scale(1.04);
     }
     .panel-s-overlay {
       position: absolute; inset: 0;
-      display: flex; align-items: flex-start;
-      padding: clamp(1.2rem, 2.5vw, 2.2rem) clamp(1.2rem, 2.5vw, 2.2rem);
+      display: flex; align-items: flex-end;
+      padding: clamp(1.4rem, 3vw, 2.8rem);
     }
     .panel-s-label {
       font-family: var(--font-label-s1, var(--font-primary));
@@ -514,12 +513,18 @@
       color: var(--color-label-s1, #fff);
       letter-spacing: -0.02em;
       line-height: 1;
-      text-shadow: 0 1px 12px rgba(0,0,0,0.4);
+      text-shadow: 0 1px 8px rgba(0,0,0,0.3);
+      transition: opacity 0.3s;
     }
     #panel-s-2 .panel-s-label {
       font-family: var(--font-label-s2, var(--font-primary));
       font-size: calc(clamp(1.8rem, 3.5vw, 3.6rem) * var(--sz-label-s2, 1));
       color: var(--color-label-s2, #fff);
+    }
+    @media (max-width: 700px) {
+      .intro-s { grid-template-columns: 1fr; height: auto; }
+      .panel-s { height: 50vw; min-height: 220px; }
+      .panel-s:first-child { border-right: none; border-bottom: 0.5px solid var(--page-rule); }
     }
 
     /* RESPONSIVE */
