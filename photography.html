@@ -32,10 +32,10 @@
       border-bottom: 0.5px solid var(--rule);
     }
     .photo-bio-section p {
-      font-family: 'EB Garamond', serif;
-      font-size: clamp(1rem, 1.5vw, 1.12rem);
+      font-family: var(--font-photo, 'EB Garamond', serif);
+      font-size: calc(clamp(1rem, 1.5vw, 1.12rem) * var(--sz-photo, 1));
       line-height: 1.78;
-      color: var(--text);
+      color: var(--color-photo, var(--text));
       opacity: 0.75;
       text-align: justify;
       hyphens: auto;
@@ -507,15 +507,14 @@
           const sc = data.items[0].fields;
           const el = document.getElementById('photoBioText');
           if (el && sc.photoIntro) el.textContent = sc.photoIntro;
-          /* Apply photo intro size */
-          if (sc.sizePhotoIntro != null) {
-            document.querySelectorAll('.photo-bio-section p').forEach(p => {
-              p.style.fontSize = (sc.sizePhotoIntro / 100) + 'rem';
-            });
-          }
-          /* Apply colors if set */
-          if (sc.bgColor) document.documentElement.style.setProperty('--bg', sc.bgColor);
-          if (sc.textColor) document.documentElement.style.setProperty('--text', sc.textColor);
+          /* Apply typography settings */
+          const root = document.documentElement;
+          if (sc.sizePhotoIntro != null) root.style.setProperty('--sz-photo', sc.sizePhotoIntro / 100);
+          if (sc.photoFont)      root.style.setProperty('--font-photo', sc.photoFont);
+          if (sc.photoColor)     root.style.setProperty('--color-photo', sc.photoColor);
+          /* Apply colors */
+          if (sc.bgColor)    root.style.setProperty('--bg', sc.bgColor);
+          if (sc.textColor)  root.style.setProperty('--text', sc.textColor);
         }
       } catch(e) { console.warn('Bio load error', e); }
     })();
