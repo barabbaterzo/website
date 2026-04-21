@@ -497,7 +497,7 @@
   </script>
 
   <script>
-    /* ── Load photo bio from Contentful ── */
+    /* ── Load photo bio + settings from Contentful ── */
     (async function() {
       try {
         const qs = new URLSearchParams({ content_type: 'siteContent', limit: 1 });
@@ -510,6 +510,15 @@
           const sc = data.items[0].fields;
           const el = document.getElementById('photoBioText');
           if (el && sc.photoIntro) el.textContent = sc.photoIntro;
+          /* Apply photo intro size */
+          if (sc.sizePhotoIntro != null) {
+            document.querySelectorAll('.photo-bio-section p').forEach(p => {
+              p.style.fontSize = (sc.sizePhotoIntro / 100) + 'rem';
+            });
+          }
+          /* Apply colors if set */
+          if (sc.bgColor) document.documentElement.style.setProperty('--bg', sc.bgColor);
+          if (sc.textColor) document.documentElement.style.setProperty('--text', sc.textColor);
         }
       } catch(e) { console.warn('Bio load error', e); }
     })();
