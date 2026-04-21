@@ -1062,8 +1062,8 @@
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem">
-          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s1-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s1-pos-x" oninput="document.getElementById('v-s1-x').textContent=this.value" style="width:100%" /></div>
-          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s1-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s1-pos-y" oninput="document.getElementById('v-s1-y').textContent=this.value" style="width:100%" /></div>
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s1-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s1-pos-x" oninput="document.getElementById('v-s1-x').textContent=this.value;updateLayoutSPreview('s1')" style="width:100%" /></div>
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s1-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s1-pos-y" oninput="document.getElementById('v-s1-y').textContent=this.value;updateLayoutSPreview('s1')" style="width:100%" /></div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
@@ -1086,8 +1086,8 @@
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem">
-          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s2-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s2-pos-x" oninput="document.getElementById('v-s2-x').textContent=this.value" style="width:100%" /></div>
-          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s2-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s2-pos-y" oninput="document.getElementById('v-s2-y').textContent=this.value" style="width:100%" /></div>
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s2-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s2-pos-x" oninput="document.getElementById('v-s2-x').textContent=this.value;updateLayoutSPreview('s2')" style="width:100%" /></div>
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s2-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s2-pos-y" oninput="document.getElementById('v-s2-y').textContent=this.value;updateLayoutSPreview('s2')" style="width:100%" /></div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
@@ -2083,20 +2083,20 @@
       const c = CF.cfg();
       try {
         const fields = {
-          banner1PosX: parseInt(document.getElementById('s1-pos-x')?.value)||50,
-          banner1PosY: parseInt(document.getElementById('s1-pos-y')?.value)||38,
-          banner1Url:  document.getElementById('s1-url')?.value?.trim()||'',
-          banner2Url:  document.getElementById('s2-url')?.value?.trim()||'',
-          banner2PosX: parseInt(document.getElementById('s2-pos-x')?.value)||50,
-          banner2PosY: parseInt(document.getElementById('s2-pos-y')?.value)||38,
-          label1Text:  document.getElementById('s1-text')?.value?.trim()||'Philosophy',
-          label1Font:  document.getElementById('s1-font')?.value||'',
-          label1Color: document.getElementById('hex-s1')?.value?.trim()||'#ffffff',
-          label1Size:  parseInt(document.getElementById('s1-size')?.value)||100,
-          label2Text:  document.getElementById('s2-text')?.value?.trim()||'Photography',
-          label2Font:  document.getElementById('s2-font')?.value||'',
-          label2Color: document.getElementById('hex-s2')?.value?.trim()||'#ffffff',
-          label2Size:  parseInt(document.getElementById('s2-size')?.value)||100,
+          banner1posX: parseInt(document.getElementById('s1-pos-x')?.value)||50,
+          banner1posY: parseInt(document.getElementById('s1-pos-y')?.value)||38,
+          banner1url:  document.getElementById('s1-url')?.value?.trim()||'',
+          banner2url:  document.getElementById('s2-url')?.value?.trim()||'',
+          banner2posX: parseInt(document.getElementById('s2-pos-x')?.value)||50,
+          banner2posY: parseInt(document.getElementById('s2-pos-y')?.value)||38,
+          label1text:  document.getElementById('s1-text')?.value?.trim()||'Philosophy',
+          label1font:  document.getElementById('s1-font')?.value||'',
+          label1color: document.getElementById('hex-s1')?.value?.trim()||'#ffffff',
+          label1size:  parseInt(document.getElementById('s1-size')?.value)||100,
+          label2text:  document.getElementById('s2-text')?.value?.trim()||'Photography',
+          label2font:  document.getElementById('s2-font')?.value||'',
+          label2color: document.getElementById('hex-s2')?.value?.trim()||'#ffffff',
+          label2size:  parseInt(document.getElementById('s2-size')?.value)||100,
         };
         const existing = await CF.get('siteSettings');
         if (!existing||!existing.length) { alert('Create a siteSettings entry first'); return; }
@@ -2116,13 +2116,24 @@
         if (msg) { msg.style.display='inline'; setTimeout(()=>msg.style.display='none',3000); }
       } catch(e) { alert('Save error: '+e.message); }
     }
+
+    function updateLayoutSPreview(prefix) {
+      const preview = document.getElementById(prefix + '-preview');
+      const posX = document.getElementById(prefix + '-pos-x');
+      const posY = document.getElementById(prefix + '-pos-y');
+      if (!preview || !preview.src) return;
+      const x = posX?.value ?? 50;
+      const y = posY?.value ?? 38;
+      preview.style.objectPosition = `${x}% ${y}%`;
+    }
+
     async function uploadS1(file) {
       if (!file||!CF.isConnected()) return;
-      try { const assetId=await CF.uploadAsset(file); const asset=await CF.mgmt('GET','/assets/'+assetId); document.getElementById('s1-url').value='https:'+asset.fields.file['en-US'].url; } catch(e) { alert('Upload error: '+e.message); }
+      try { const assetId=await CF.uploadAsset(file); const asset=await CF.mgmt('GET','/assets/'+assetId); document.getElementById('s1-url').value='https:'+asset.fields.file['en-US'].url; const p=document.getElementById('s1-preview'); if(p){ p.src='https:'+asset.fields.file['en-US'].url; p.style.display='block'; updateLayoutSPreview('s1'); } } catch(e) { alert('Upload error: '+e.message); }
     }
     async function uploadS2(file) {
       if (!file||!CF.isConnected()) return;
-      try { const assetId=await CF.uploadAsset(file); const asset=await CF.mgmt('GET','/assets/'+assetId); document.getElementById('s2-url').value='https:'+asset.fields.file['en-US'].url; } catch(e) { alert('Upload error: '+e.message); }
+      try { const assetId=await CF.uploadAsset(file); const asset=await CF.mgmt('GET','/assets/'+assetId); document.getElementById('s2-url').value='https:'+asset.fields.file['en-US'].url; const p=document.getElementById('s2-preview'); if(p){ p.src='https:'+asset.fields.file['en-US'].url; p.style.display='block'; updateLayoutSPreview('s2'); } } catch(e) { alert('Upload error: '+e.message); }
     }
     async function loadLayoutS() {
       if (!CF.isConnected()) return;
@@ -2141,7 +2152,7 @@
             img.onclick = () => {
               document.getElementById(p+'-url').value = ph.image;
               const prev = document.getElementById(p+'-preview');
-              if (prev) { prev.src = ph.image; prev.style.display='block'; }
+              if (prev) { prev.src = ph.image; prev.style.display='block'; updateLayoutSPreview(p); }
               grid.querySelectorAll('img').forEach(i => i.style.borderColor='transparent');
               img.style.borderColor = 'var(--ink)';
             };
@@ -2152,15 +2163,31 @@
         const s = ss[0];
         const set=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null)el.value=v;};
         const setN=(id,vid,v)=>{set(id,v);const l=document.getElementById(vid);if(l&&v!=null)l.textContent=v;};
-        if (s.banner1Url) { set('s1-url',s.banner1Url); const p=document.getElementById('s1-preview'); if(p){p.src=s.banner1Url;p.style.display='block';} }
-        if (s.banner2Url) { set('s2-url',s.banner2Url); const p=document.getElementById('s2-preview'); if(p){p.src=s.banner2Url;p.style.display='block';} }
-        setN('s1-pos-x','v-s1-x',s.banner1PosX); setN('s1-pos-y','v-s1-y',s.banner1PosY);
-        setN('s2-pos-x','v-s2-x',s.banner2PosX); setN('s2-pos-y','v-s2-y',s.banner2PosY);
-        set('s1-text',s.label1Text); set('s1-font',s.label1Font);
-        set('s2-text',s.label2Text); set('s2-font',s.label2Font);
-        setN('s1-size','v-s1-size',s.label1Size); setN('s2-size','v-s2-size',s.label2Size);
-        if(s.label1Color){set('hex-s1',s.label1Color);set('cp-s1',s.label1Color);}
-        if(s.label2Color){set('hex-s2',s.label2Color);set('cp-s2',s.label2Color);}
+        const banner1Url = s.banner1url ?? s.banner1Url;
+        const banner2Url = s.banner2url ?? s.banner2Url;
+        const banner1PosX = s.banner1posX ?? s.banner1PosX;
+        const banner1PosY = s.banner1posY ?? s.banner1PosY;
+        const banner2PosX = s.banner2posX ?? s.banner2PosX;
+        const banner2PosY = s.banner2posY ?? s.banner2PosY;
+        const label1Text = s.label1text ?? s.label1Text;
+        const label1Font = s.label1font ?? s.label1Font;
+        const label1Color = s.label1color ?? s.label1Color;
+        const label1Size = s.label1size ?? s.label1Size;
+        const label2Text = s.label2text ?? s.label2Text;
+        const label2Font = s.label2font ?? s.label2Font;
+        const label2Color = s.label2color ?? s.label2Color;
+        const label2Size = s.label2size ?? s.label2Size;
+        if (banner1Url) { set('s1-url',banner1Url); const p=document.getElementById('s1-preview'); if(p){p.src=banner1Url;p.style.display='block';} }
+        if (banner2Url) { set('s2-url',banner2Url); const p=document.getElementById('s2-preview'); if(p){p.src=banner2Url;p.style.display='block';} }
+        setN('s1-pos-x','v-s1-x',banner1PosX); setN('s1-pos-y','v-s1-y',banner1PosY);
+        setN('s2-pos-x','v-s2-x',banner2PosX); setN('s2-pos-y','v-s2-y',banner2PosY);
+        set('s1-text',label1Text); set('s1-font',label1Font);
+        set('s2-text',label2Text); set('s2-font',label2Font);
+        setN('s1-size','v-s1-size',label1Size); setN('s2-size','v-s2-size',label2Size);
+        if(label1Color){set('hex-s1',label1Color);set('cp-s1',label1Color);}
+        if(label2Color){set('hex-s2',label2Color);set('cp-s2',label2Color);}
+        updateLayoutSPreview('s1');
+        updateLayoutSPreview('s2');
       } catch(e) { console.warn('loadLayoutS',e); }
     }
 
