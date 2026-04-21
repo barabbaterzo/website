@@ -1620,25 +1620,9 @@
     }
     setLayout('a');
 
-    ;
-      const curVal = parseInt(wtSel.value) || 400;
-      wtSel.innerHTML = fd.weights.map(w =>
-        `<option value="${w}" ${w === curVal || (curVal === 400 && fd.weights.includes(400)) ? 'selected' : ''}>${WEIGHT_NAMES[w] || w} (${w})</option>`
-      ).join('');
-      updateTypoPreview();
-    }
 
-    function updateTypoPreview() {
-            const pWt   = document.getElementById('tp-wt-primary')?.value   || 400;
-      const pIt   = document.getElementById('tp-it-primary')?.checked;
-      const fd = FONT_DATA[pFont] || {};
-      const prev = document.getElementById('tp-preview');
-      if (prev) {
-        prev.style.fontFamily  = fd.css || pFont;
-        prev.style.fontWeight  = pWt;
-        prev.style.fontStyle   = pIt ? 'italic' : 'normal';
-      }
-    }
+
+    function updateTypoPreview() { /* replaced by per-section controls */ }
 
     function syncSize(key) {
       const slider = document.getElementById('sz-' + key);
@@ -1653,8 +1637,53 @@
 
     function loadTypographyToAdmin(sc) {
       if (!sc) return;
-      /* per-section fonts loaded by sizeMap */
+      /* Load sizes into sliders */
+      const sizeMap = {
+        'banner-title': sc.sizeBannerTitle,
+        'banner-sub':   sc.sizeBannerSubtitle,
+        'bio':          sc.sizeBio,
+        'pubs':         sc.sizePubs,
+        'photo':        sc.sizePhotoIntro,
+        'labels':       sc.sizeLabels,
+        'sublabels':    sc.sizeSublabels,
+        'seemore':      sc.sizeSeemore,
+        'venue':        sc.sizeVenue,
+        'footer':       sc.sizeFooter,
+      };
+      Object.entries(sizeMap).forEach(([k, v]) => {
+        if (!v) return;
+        const slider = document.getElementById('sz-' + k);
+        const label  = document.getElementById('v-sz-' + k) || document.getElementById('v-' + k);
+        if (slider) slider.value = v;
+        if (label)  label.textContent = v;
+      });
+      if (sc.bioLineHeight) {
+        const s = document.getElementById('sz-lh-bio');
+        const l = document.getElementById('v-sz-lh-bio') || document.getElementById('v-lh-bio');
+        if (s) s.value = sc.bioLineHeight;
+        if (l) l.textContent = sc.bioLineHeight;
+      }
 
+      /* Load per-section font/weight/color */
+      const sections = ['name','sub','bio','pubs','venue','labels','sublabels','seemore','photo','footer'];
+      sections.forEach(sec => {
+        const fontSel  = document.getElementById('font-' + sec);
+        const wtSel    = document.getElementById('wt-' + sec);
+        const colorHex = document.getElementById('hex-color-' + sec);
+        const colorPick= document.getElementById('cp-color-' + sec);
+        if (fontSel  && sc[sec + 'Font'])        fontSel.value  = sc[sec + 'Font'];
+        if (wtSel    && sc[sec + 'FontWeight'])   wtSel.value   = sc[sec + 'FontWeight'];
+        if (colorHex && sc[sec + 'Color'])        colorHex.value = sc[sec + 'Color'];
+        if (colorPick && sc[sec + 'Color'] && /^#[0-9a-fA-F]{6}$/.test(sc[sec + 'Color']))
+          colorPick.value = sc[sec + 'Color'];
+      });
+
+      /* Legacy venue color */
+      if (sc.venueColor) {
+        const vh = document.getElementById('cp-venue'); if(vh) vh.value = sc.venueColor;
+        const vp = document.getElementById('cp-venue-picker'); if(vp) vp.value = sc.venueColor;
+      }
+    }
 
     /* ── Color pickers ── */
     let currentLogoVariant = 'light';
