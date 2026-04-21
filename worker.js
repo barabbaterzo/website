@@ -36,7 +36,7 @@ async function getLayout(env) {
 
     /* Cache in KV for 60 seconds */
     if (env.KV) {
-      env.KV.put('layout', layout, { expirationTtl: 60 }).catch(() => {});
+      env.KV.put('layout', layout, { expirationTtl: 5 }).catch(() => {});
     }
     return layout;
   } catch {

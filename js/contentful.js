@@ -267,8 +267,22 @@ const CF = (() => {
         id: 'siteSettings',
         name: 'Site Settings',
         fields: [
-          { id: 'key',        name: 'Key',         type: 'Symbol',  required: true },
-          { id: 'heroBanner', name: 'Hero Banner',  type: 'Link', linkType: 'Asset' }
+          { id: 'key',         name: 'Key',         type: 'Symbol',  required: true },
+          { id: 'heroBanner',  name: 'Hero Banner', type: 'Link', linkType: 'Asset' },
+          { id: 'banner1url',  name: 'banner1Url',  type: 'Symbol' },
+          { id: 'banner1posX', name: 'banner1PosX', type: 'Integer' },
+          { id: 'banner1posY', name: 'banner1PosY', type: 'Integer' },
+          { id: 'banner2url',  name: 'banner2Url',  type: 'Symbol' },
+          { id: 'banner2posX', name: 'banner2PosX', type: 'Integer' },
+          { id: 'banner2posY', name: 'banner2PosY', type: 'Integer' },
+          { id: 'label1text',  name: 'label1Text',  type: 'Symbol' },
+          { id: 'label1font',  name: 'label1Font',  type: 'Symbol' },
+          { id: 'label1color', name: 'label1Color', type: 'Symbol' },
+          { id: 'label1size',  name: 'label1Size',  type: 'Integer' },
+          { id: 'label2text',  name: 'label2Text',  type: 'Symbol' },
+          { id: 'label2font',  name: 'label2Font',  type: 'Symbol' },
+          { id: 'label2color', name: 'label2Color', type: 'Symbol' },
+          { id: 'label2size',  name: 'label2Size',  type: 'Integer' }
         ],
         displayField: 'key'
       },

@@ -916,6 +916,26 @@
         const settings = await cfGet('siteSettings');
         if (settings && settings.length) {
           const ss = settings[0];
+          const pick = (...keys) => {
+            for (const key of keys) {
+              if (ss[key] != null && ss[key] !== '') return ss[key];
+            }
+            return null;
+          };
+          const banner1Url = pick('banner1url', 'banner1Url');
+          const banner2Url = pick('banner2url', 'banner2Url');
+          const banner1PosX = pick('banner1posX', 'banner1PosX');
+          const banner1PosY = pick('banner1posY', 'banner1PosY');
+          const banner2PosX = pick('banner2posX', 'banner2PosX');
+          const banner2PosY = pick('banner2posY', 'banner2PosY');
+          const label1Text = pick('label1text', 'label1Text');
+          const label1Font = pick('label1font', 'label1Font');
+          const label1Color = pick('label1color', 'label1Color');
+          const label1Size = pick('label1size', 'label1Size');
+          const label2Text = pick('label2text', 'label2Text');
+          const label2Font = pick('label2font', 'label2Font');
+          const label2Color = pick('label2color', 'label2Color');
+          const label2Size = pick('label2size', 'label2Size');
           /* Banner 1 (hero) */
           if (ss.heroBanner) {
             const img = document.getElementById('heroBannerImg');
@@ -923,29 +943,29 @@
           }
           /* Layout S banners */
           const root = document.documentElement;
-          if (ss.banner2Url) {
+          if (banner2Url) {
             const img2 = document.getElementById('bannerS2Img');
-            if (img2) img2.src = ss.banner2Url;
+            if (img2) img2.src = banner2Url;
           }
-          if (ss.banner1Url) {
+          if (banner1Url) {
             const img1 = document.getElementById('bannerS1Img');
-            if (img1) img1.src = ss.banner1Url;
+            if (img1) img1.src = banner1Url;
           } else if (ss.heroBanner) {
             const img1 = document.getElementById('bannerS1Img');
             if (img1) img1.src = ss.heroBanner;
           }
-          if (ss.banner1PosX != null && ss.banner1PosY != null)
-            root.style.setProperty('--pos-s1', ss.banner1PosX + '% ' + ss.banner1PosY + '%');
-          if (ss.banner2PosX != null && ss.banner2PosY != null)
-            root.style.setProperty('--pos-s2', ss.banner2PosX + '% ' + ss.banner2PosY + '%');
-          if (ss.label1Font)  root.style.setProperty('--font-label-s1', ss.label1Font);
-          if (ss.label1Color) root.style.setProperty('--color-label-s1', ss.label1Color);
-          if (ss.label1Size)  root.style.setProperty('--sz-label-s1', ss.label1Size / 100);
-          if (ss.label2Font)  root.style.setProperty('--font-label-s2', ss.label2Font);
-          if (ss.label2Color) root.style.setProperty('--color-label-s2', ss.label2Color);
-          if (ss.label2Size)  root.style.setProperty('--sz-label-s2', ss.label2Size / 100);
-          if (ss.label1Text) { const el = document.getElementById('labelS1'); if (el) el.textContent = ss.label1Text; }
-          if (ss.label2Text) { const el = document.getElementById('labelS2'); if (el) el.textContent = ss.label2Text; }
+          if (banner1PosX != null && banner1PosY != null)
+            root.style.setProperty('--pos-s1', banner1PosX + '% ' + banner1PosY + '%');
+          if (banner2PosX != null && banner2PosY != null)
+            root.style.setProperty('--pos-s2', banner2PosX + '% ' + banner2PosY + '%');
+          if (label1Font)  root.style.setProperty('--font-label-s1', label1Font);
+          if (label1Color) root.style.setProperty('--color-label-s1', label1Color);
+          if (label1Size)  root.style.setProperty('--sz-label-s1', label1Size / 100);
+          if (label2Font)  root.style.setProperty('--font-label-s2', label2Font);
+          if (label2Color) root.style.setProperty('--color-label-s2', label2Color);
+          if (label2Size)  root.style.setProperty('--sz-label-s2', label2Size / 100);
+          if (label1Text) { const el = document.getElementById('labelS1'); if (el) el.textContent = label1Text; }
+          if (label2Text) { const el = document.getElementById('labelS2'); if (el) el.textContent = label2Text; }
         }
         const pubs = await cfGet('publication', { order: '-fields.year' });
         if (pubs && pubs.length) {

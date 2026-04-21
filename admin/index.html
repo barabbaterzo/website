@@ -1824,6 +1824,7 @@
         if (sc.photoIntro)        document.getElementById('sc-photo-intro').value = sc.photoIntro;
         if (sc.contactInfo)       document.getElementById('sc-contact').value = sc.contactInfo;
         if (sc.heroPosX !== undefined) { cropX = sc.heroPosX; cropY = sc.heroPosY || 38; updateCrop(); }
+        if (sc.heroStyle) setLayout(String(sc.heroStyle).toLowerCase());
         loadTypographyToAdmin(sc);
         loadColorsToAdmin(sc);
       } catch(e) { console.warn('loadContent error', e); }
@@ -2081,6 +2082,7 @@
     async function saveLayoutS() {
       if (!CF.isConnected()) { alert('Connect Contentful first'); return; }
       const c = CF.cfg();
+      setLayout('s');
       try {
         const fields = {
           banner1posX: parseInt(document.getElementById('s1-pos-x')?.value)||50,
@@ -2112,6 +2114,31 @@
         const updated = await r.json();
         if (!r.ok) throw new Error(updated.message||'Update failed');
         await CF.publishEntry(id, updated.sys.version);
+
+        /* Make Layout S go live immediately on the homepage */
+        const scExisting = await CF.get('siteContent');
+        if (scExisting && scExisting.length) {
+          const scId = scExisting[0]._id;
+          const scEntry = await CF.mgmt('GET', '/entries/' + scId);
+          const scFields = { ...(scEntry.fields || {}) };
+          scFields.heroStyle = { 'en-US': 's' };
+          const scResp = await fetch(
+            'https://api.contentful.com/spaces/' + c.spaceId + '/environments/master/entries/' + scId,
+            {
+              method: 'PUT',
+              headers: {
+                Authorization: 'Bearer ' + c.mgmtToken,
+                'Content-Type': 'application/vnd.contentful.management.v1+json',
+                'X-Contentful-Version': scEntry.sys.version
+              },
+              body: JSON.stringify({ fields: scFields })
+            }
+          );
+          const scUpdated = await scResp.json();
+          if (!scResp.ok) throw new Error(scUpdated.message || 'Could not activate Layout S');
+          await CF.publishEntry(scId, scUpdated.sys.version);
+        }
+
         const msg = document.getElementById('s-save-msg');
         if (msg) { msg.style.display='inline'; setTimeout(()=>msg.style.display='none',3000); }
       } catch(e) { alert('Save error: '+e.message); }
