@@ -1625,7 +1625,7 @@
 
     function syncSize(key) {
       const slider = document.getElementById('sz-' + key);
-      const label  = document.getElementById('v-' + key);
+      const label  = document.getElementById('v-' + key) || document.getElementById('v-sz-' + key);
       if (slider && label) label.textContent = slider.value;
       const prev = document.getElementById('tp-bio-preview');
       if (!prev || !slider) return;
