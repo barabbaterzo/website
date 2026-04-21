@@ -2,7 +2,6 @@ import { EmailMessage } from 'cloudflare:email';
 
 const CF_SPACE    = 'fejt7dmbrv9e';
 const CF_DELIVERY = 'tOHgPb2AaW4raBzCEnxzs5QhFMnNdyOGJDF3sTKGAgc';
-const CACHE_TTL   = 60; // seconds to cache the layout setting
 
 function json(body, init = {}) {
   return new Response(JSON.stringify(body), {
@@ -18,22 +17,27 @@ function escapeHtml(value = '') {
     .replace(/'/g, '&#39;');
 }
 
-/* ── Fetch layout from Contentful (with cache) ── */
-async function getLayout(ctx) {
-  const cacheKey = 'cf-layout-v1';
-  const cached = await ctx.env?.KV?.get(cacheKey).catch(() => null);
-  if (cached) return cached;
+async function getLayout(env) {
+  /* Try KV cache first */
+  if (env.KV) {
+    const cached = await env.KV.get('layout').catch(() => null);
+    if (cached) return cached;
+  }
 
+  /* Fetch from Contentful */
   try {
     const r = await fetch(
       `https://cdn.contentful.com/spaces/${CF_SPACE}/environments/master/entries?content_type=siteContent&limit=1`,
-      { headers: { Authorization: `Bearer ${CF_DELIVERY}` }, cf: { cacheTtl: CACHE_TTL } }
+      { headers: { Authorization: `Bearer ${CF_DELIVERY}` } }
     );
     if (!r.ok) return 'a';
     const data = await r.json();
-    const style = data.items?.[0]?.fields?.heroStyle || 'a';
-    const layout = style.toLowerCase();
-    ctx.env?.KV?.put(cacheKey, layout, { expirationTtl: CACHE_TTL }).catch(() => {});
+    const layout = (data.items?.[0]?.fields?.heroStyle || 'a').toLowerCase();
+
+    /* Cache in KV for 60 seconds */
+    if (env.KV) {
+      env.KV.put('layout', layout, { expirationTtl: 60 }).catch(() => {});
+    }
     return layout;
   } catch {
     return 'a';
@@ -97,31 +101,32 @@ export default {
     if (url.pathname === '/api/contact')
       return handleContact(request, env);
 
-    /* For the homepage only: inject layout class server-side */
+    /* For homepage: inject layout class server-side using HTMLRewriter */
     if (url.pathname === '/' || url.pathname === '/index.html') {
-      const assetResponse = await env.ASSETS.fetch(request);
+      const [assetResponse, layout] = await Promise.all([
+        env.ASSETS.fetch(request),
+        getLayout(env)
+      ]);
+
       if (!assetResponse.ok) return assetResponse;
 
-      /* Get layout from Contentful (fast, cached) */
-      const layout = await getLayout({ env, ctx });
-
-      /* Inject class into <body> tag */
-      const html = await assetResponse.text();
-      const patched = html.replace(
-        /<body([^>]*)class="([^"]*)">/,
-        (match, attrs, classes) => {
-          const cleaned = classes.replace(/\bly-\S+/g, '').trim();
-          return `<body${attrs}class="${cleaned} ly-${layout}">`;
-        }
-      );
-
-      return new Response(patched, {
-        headers: {
-          ...Object.fromEntries(assetResponse.headers),
-          'content-type': 'text/html; charset=utf-8',
-          'cache-control': 'no-store', /* always fresh */
-        }
-      });
+      /* Use HTMLRewriter to inject class into <body> — streaming, no buffering */
+      return new HTMLRewriter()
+        .on('body', {
+          element(el) {
+            /* Replace ly-* class with the correct one */
+            const existing = el.getAttribute('class') || '';
+            const cleaned  = existing.replace(/\bly-\S+/g, '').trim();
+            el.setAttribute('class', (cleaned + ' ly-' + layout).trim());
+          }
+        })
+        .transform(new Response(assetResponse.body, {
+          headers: {
+            ...Object.fromEntries(assetResponse.headers),
+            'content-type': 'text/html; charset=utf-8',
+            'cache-control': 'no-store',
+          }
+        }));
     }
 
     return env.ASSETS.fetch(request);
