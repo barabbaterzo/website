@@ -16,7 +16,7 @@
       --wt-primary:300; --wt-secondary:300;
       --fs-primary:normal; --fs-secondary:normal;
       --sz-banner-title:1; --sz-banner-sub:1; --sz-bio:1;
-      --sz-pubs:1; --sz-venue:1; --sz-photo:1; --sz-labels:1; --sz-footer:1;
+      --sz-pubs:1; --sz-venue:1; --color-venue:var(--page-ink3); --sz-photo:1; --sz-labels:1; --sz-footer:1;
       --lh-bio:1.78; --hero-pos:center 38%;
       --gutter:clamp(1.5rem,4vw,3.2rem);
     }
@@ -347,7 +347,7 @@
     }
     .pub-title a{color:inherit;text-decoration:none;border-bottom:.5px solid var(--page-rule)}
     .pub-title a:hover{border-color:var(--page-ink)}
-    .pub-venue{display:block;font-family:var(--font-secondary);font-size:calc(.63rem*var(--sz-venue,1));font-weight:300;color:var(--page-ink3);margin-top:.2rem}
+    .pub-venue{display:block;font-family:var(--font-secondary);font-size:calc(.63rem*var(--sz-venue,1));font-weight:300;color:var(--color-venue,var(--page-ink3));margin-top:.2rem}
     .pub-tag{
       display:inline-block;font-family:var(--font-secondary);font-size:.44rem;
       letter-spacing:.14em;text-transform:uppercase;color:var(--page-ink3);
@@ -661,6 +661,7 @@
       if (sc.sizeBio          != null) root.style.setProperty('--sz-bio',           sc.sizeBio          / 100);
       if (sc.sizePubs         != null) root.style.setProperty('--sz-pubs',          sc.sizePubs         / 100);
       if (sc.sizeVenue        != null) root.style.setProperty('--sz-venue',         sc.sizeVenue        / 100);
+      if (sc.venueColor)       root.style.setProperty('--color-venue',      sc.venueColor);
       if (sc.sizePhotoIntro   != null) root.style.setProperty('--sz-photo',         sc.sizePhotoIntro   / 100);
       if (sc.sizeLabels       != null) root.style.setProperty('--sz-labels',        sc.sizeLabels       / 100);
       if (sc.sizeFooter       != null) root.style.setProperty('--sz-footer',        sc.sizeFooter       / 100);

@@ -521,6 +521,15 @@
         <div>
           <label style="display:flex;justify-content:space-between;margin-bottom:3px">Rivista/venue <span id="v-venue">100</span>%</label>
           <input type="range" min="60" max="180" value="100" step="1" id="sz-venue" oninput="syncSize('venue')" style="width:100%" />
+          <div style="display:flex;gap:6px;align-items:center;margin-top:6px">
+            <input type="color" id="cp-venue-picker" value="#8a8480"
+              oninput="document.getElementById('cp-venue').value=this.value"
+              style="width:36px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" />
+            <input type="text" id="cp-venue" value="#8a8480" placeholder="#8a8480" maxlength="7"
+              oninput="var p=document.getElementById('cp-venue-picker');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value"
+              style="font-family:'DM Mono',monospace;font-size:0.75rem;width:90px" />
+            <span style="font-size:0.5rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3)">Colore venue</span>
+          </div>
         </div>
         <div>
           <label style="display:flex;justify-content:space-between;margin-bottom:3px">Talk <span id="v-talks">100</span>%</label>
@@ -1515,6 +1524,7 @@
         sizeTalks:         parseInt(document.getElementById('sz-talks')?.value || 100),
         sizePhotoIntro:    parseInt(document.getElementById('sz-photo')?.value || 100),
         sizeVenue:         parseInt(document.getElementById('sz-venue')?.value || 100),
+        venueColor:        document.getElementById('cp-venue')?.value?.trim() || '#8a8480',
         sizeLabels:        parseInt(document.getElementById('sz-labels')?.value || 100),
         sizeFooter:        parseInt(document.getElementById('sz-footer')?.value || 100),
         bioLineHeight:     parseInt(document.getElementById('sz-lh-bio')?.value || 188),
