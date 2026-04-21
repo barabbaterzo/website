@@ -56,11 +56,20 @@
 
     /* BIO */
     .bio-section{padding:clamp(2rem,4vw,3.6rem) 0;border-bottom:0.5px solid var(--page-rule)}
-    .bio-section p{
+    .bio-grid{display:grid;grid-template-columns:minmax(0,1fr) clamp(160px,20vw,230px);gap:clamp(1rem,2.8vw,2rem);align-items:start}
+    .bio-copy p{
       font-family:var(--font-bio,var(--font-primary));font-weight:var(--wt-bio,var(--wt-primary));font-style:var(--fs-primary);
       font-size:calc(clamp(0.95rem,1.4vw,1.08rem)*var(--sz-bio,1));
       line-height:var(--lh-bio,1.78);color:var(--color-bio,var(--page-ink2));
       text-align:justify;hyphens:auto;max-width:72ch;
+    }
+    .bio-portrait{display:none;justify-self:end;width:100%;max-width:230px}
+    .bio-portrait.visible{display:block}
+    .bio-portrait img{display:block;width:100%;aspect-ratio:3 / 4;object-fit:cover;object-position:center center;border:0.5px solid var(--page-rule);background:#ece8e1}
+    @media (max-width: 760px){
+      .bio-grid{grid-template-columns:1fr}
+      .bio-copy p{max-width:none}
+      .bio-portrait{justify-self:start;max-width:180px}
     }
 
     /* PUBLICATIONS */
@@ -124,7 +133,14 @@
 
   <section class="bio-section">
     <div class="wrap">
-      <p id="bioText">I am a Ph.D. candidate in philosophy at the Institut Catholique de Paris and Università degli Studi La Sapienza, Roma. My research investigates the intersection of Wittgenstein's later philosophy and Madhyamaka Buddhism.</p>
+      <div class="bio-grid">
+        <div class="bio-copy">
+          <p id="bioText">I am a Ph.D. candidate in philosophy at the Institut Catholique de Paris and Università degli Studi La Sapienza, Roma. My research investigates the intersection of Wittgenstein's later philosophy and Madhyamaka Buddhism.</p>
+        </div>
+        <figure class="bio-portrait" id="bioPortraitWrap">
+          <img id="bioPortraitImg" src="" alt="Portrait of Tomaso Pignocchi" />
+        </figure>
+      </div>
     </div>
   </section>
 
