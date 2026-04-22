@@ -293,6 +293,11 @@
     <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1.8rem">
 
       <div class="form-group" style="margin-bottom:0.9rem">
+        <label>Site title <span style="color:var(--ink3);font-size:0.48rem">(your name shown on the homepage)</span></label>
+        <input type="text" id="sc-title" placeholder="e.g. Tomaso Pignocchi" />
+      </div>
+
+      <div class="form-group" style="margin-bottom:0.9rem">
         <label>Nameplate subtitle <span style="color:var(--ink3);font-size:0.48rem">(under your name in the hero)</span></label>
         <input type="text" id="sc-subtitle" placeholder="e.g. Philosophy · Paris · Kyoto" />
       </div>
@@ -499,6 +504,11 @@
             ✦ Scuro (su sfondo chiaro)
           </button>
         </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0.9rem">
+        <label>Dimensione logo <span id="v-sz-logo">100</span>%</label>
+        <input type="range" min="40" max="220" value="100" step="1" id="sz-logo" oninput="syncSize('logo')" style="width:100%;margin-top:0.45rem" />
       </div>
 
       <div style="height:1px;background:var(--rule);margin:1.6rem 0"></div>
@@ -1521,61 +1531,7 @@
       /* save to Contentful if connected */
       if (CF.isConnected()) {
         try {
-          const c = CF.cfg();
-          /* check if siteSettings entry exists */
-          const existing = await getMainEntry('siteSettings');
-          const assetId = url.match(/contentful\.com/) ? null : null; /* URL already resolved */
-
-          if (existing) {
-            /* update */
-            const entryId = existing._id;
-            const e = await CF.mgmt('GET', `/entries/${entryId}`);
-            const bannerR = await fetch(
-              `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entryId}`,
-              { method: 'PUT',
-                headers: { Authorization: `Bearer ${c.mgmtToken}`,
-                  'Content-Type': 'application/vnd.contentful.management.v1+json',
-                  'X-Contentful-Version': e.sys.version },
-                body: JSON.stringify({ fields: { ...e.fields, heroBanner: { 'en-US': url } } })
-              }
-            );
-            const updated = await bannerR.json();
-            if (!bannerR.ok) throw new Error(updated.message || 'Update failed');
-            await CF.publishEntry(entryId, updated.sys.version);
-          } else {
-            /* create */
-            const r = await fetch(
-              `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries`,
-              {
-                method: 'POST',
-                headers: {
-                  Authorization: `Bearer ${c.mgmtToken}`,
-                  'Content-Type': 'application/vnd.contentful.management.v1+json',
-                  'X-Contentful-Content-Type': 'siteSettings'
-                },
-                body: JSON.stringify({
-                  fields: {
-                    key: { 'en-US': 'main' },
-                    heroBanner: { 'en-US': url }
-                  }
-                })
-              }
-            );
-            const entry = await r.json();
-            if (r.ok) {
-              await fetch(
-                `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entry.sys.id}/published`,
-                {
-                  method: 'PUT',
-                  headers: {
-                    Authorization: `Bearer ${c.mgmtToken}`,
-                    'Content-Type': 'application/vnd.contentful.management.v1+json',
-                    'X-Contentful-Version': entry.sys.version
-                  }
-                }
-              );
-            }
-          }
+          await upsertMainEntry('siteSettings', { key: 'main', heroBanner: url });
         } catch (e) {
           console.warn('Could not save banner to Contentful:', e);
         }
@@ -1721,18 +1677,12 @@
       return items.find(item => item && item.key === 'main') || items[0];
     }
 
-
-    async function savePhilosophyPortraitToSiteSettings(url) {
-      const allowedFieldIds = await getContentTypeFieldIds('siteSettings');
-      const portraitFieldId = pickExistingFieldId(allowedFieldIds, ['philosophyPortraitUrl', 'philosophyportraiturl']);
-      if (!portraitFieldId) throw new Error('Site Settings is missing the philosophyPortraitUrl field');
-      const payloadFields = {
-        key: 'main',
-        [portraitFieldId]: (url || '').trim()
-      };
-      const filtered = Object.fromEntries(Object.entries(payloadFields).filter(([k]) => allowedFieldIds.has(k)));
+    async function upsertMainEntry(contentTypeId, fieldMap) {
+      const allowedFieldIds = await getContentTypeFieldIds(contentTypeId);
+      const filtered = Object.fromEntries(Object.entries(fieldMap).filter(([k]) => allowedFieldIds.has(k)));
+      if (!Object.keys(filtered).length) return null;
       const c = CF.cfg();
-      const existing = await getMainEntry('siteSettings');
+      const existing = await getMainEntry(contentTypeId);
       if (existing) {
         const id = existing._id;
         const e = await CF.mgmt('GET', `/entries/${id}`);
@@ -1748,25 +1698,55 @@
           }
         );
         const upd = await updR.json();
-        if (!updR.ok) throw new Error(upd.message || 'Could not update Site Settings');
+        if (!updR.ok) throw new Error(upd.message || `Could not update ${contentTypeId}`);
         await CF.publishEntry(id, upd.sys.version);
-      } else {
-        const r = await fetch(
-          `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries`,
-          { method: 'POST',
-            headers: { Authorization: `Bearer ${c.mgmtToken}`,
-              'Content-Type': 'application/vnd.contentful.management.v1+json',
-              'X-Contentful-Content-Type': 'siteSettings' },
-            body: JSON.stringify({ fields: Object.fromEntries(Object.entries(filtered).map(([k,v]) => [k, {'en-US': v}])) })
-          }
-        );
-        const entry = await r.json();
-        if (!r.ok) throw new Error(entry.message || 'Could not create Site Settings');
-        await fetch(`https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entry.sys.id}/published`,
-          { method: 'PUT', headers: { Authorization: `Bearer ${c.mgmtToken}`,
-            'Content-Type': 'application/vnd.contentful.management.v1+json',
-            'X-Contentful-Version': entry.sys.version }});
+        return upd;
       }
+
+      const createFields = { ...(filtered.key === undefined && allowedFieldIds.has('key') ? { key: 'main' } : {}), ...filtered };
+      const r = await fetch(
+        `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries`,
+        { method: 'POST',
+          headers: { Authorization: `Bearer ${c.mgmtToken}`,
+            'Content-Type': 'application/vnd.contentful.management.v1+json',
+            'X-Contentful-Content-Type': contentTypeId },
+          body: JSON.stringify({ fields: Object.fromEntries(Object.entries(createFields).map(([k, v]) => [k, { 'en-US': v }])) })
+        }
+      );
+      const entry = await r.json();
+      if (!r.ok) throw new Error(entry.message || `Could not create ${contentTypeId}`);
+      await fetch(`https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entry.sys.id}/published`,
+        { method: 'PUT', headers: { Authorization: `Bearer ${c.mgmtToken}`,
+          'Content-Type': 'application/vnd.contentful.management.v1+json',
+          'X-Contentful-Version': entry.sys.version }});
+      return entry;
+    }
+
+
+    async function savePhilosophyPortraitToSiteSettings(url) {
+      const allowedFieldIds = await getContentTypeFieldIds('siteSettings');
+      const portraitFieldId = pickExistingFieldId(allowedFieldIds, ['philosophyPortraitUrl', 'philosophyportraiturl']);
+      if (!portraitFieldId) throw new Error('Site Settings is missing the philosophyPortraitUrl field');
+      await upsertMainEntry('siteSettings', {
+        key: 'main',
+        [portraitFieldId]: (url || '').trim()
+      });
+    }
+
+
+    async function saveTitleAndLogoToSiteSettings(title, logoSize) {
+      const allowedFieldIds = await getContentTypeFieldIds('siteSettings');
+      const titleFieldId = pickExistingFieldId(allowedFieldIds, ['siteTitle', 'sitetitle']);
+      const logoSizeFieldId = pickExistingFieldId(allowedFieldIds, ['logoSize', 'logosize']);
+      const missing = [];
+      if (!titleFieldId) missing.push('siteTitle');
+      if (!logoSizeFieldId) missing.push('logoSize');
+      if (missing.length) throw new Error('Site Settings is missing field(s): ' + missing.join(', '));
+      await upsertMainEntry('siteSettings', {
+        key: 'main',
+        [titleFieldId]: (title || 'Tomaso Pignocchi').trim(),
+        [logoSizeFieldId]: parseInt(logoSize || 100, 10) || 100,
+      });
     }
 
     /* ── Portrait crop tool (reusing heroPosX / heroPosY) ── */
@@ -1898,6 +1878,7 @@
         'seemore':      sc.sizeSeemore,
         'venue':        sc.sizeVenue,
         'footer':       sc.sizeFooter,
+        'logo':         sc.logoSize,
       };
       Object.entries(sizeMap).forEach(([k, v]) => {
         if (!v) return;
@@ -1997,17 +1978,20 @@
         const sc = (items && items.find(item => item && item.key === 'main')) || (items && items.length ? items[0] : null);
         if (!sc) { console.log('[DEBUG] No siteContent entry found'); return; }
         console.log('[DEBUG] siteContent fields:', JSON.stringify(sc));
+
+        const settings = await CF.get('siteSettings');
+        const ss = (settings && settings.find(item => item && item.key === 'main')) || (settings && settings.length ? settings[0] : null);
+        const contentUi = { ...(sc || {}), ...(ss || {}) };
+
+        document.getElementById('sc-title').value = contentUi.siteTitle || contentUi.sitetitle || 'Tomaso Pignocchi';
         if (sc.nameplateSubtitle) document.getElementById('sc-subtitle').value = sc.nameplateSubtitle;
         if (sc.bioText)           document.getElementById('sc-bio').value = sc.bioText;
         if (sc.photoIntro)        document.getElementById('sc-photo-intro').value = sc.photoIntro;
         if (sc.contactInfo)       document.getElementById('sc-contact').value = sc.contactInfo;
         if (sc.heroPosX !== undefined) { cropX = sc.heroPosX; cropY = sc.heroPosY || 38; updateCrop(); }
         if (sc.heroStyle) setLayout(String(sc.heroStyle).toLowerCase());
-        loadTypographyToAdmin(sc);
-        loadColorsToAdmin(sc);
-
-        const settings = await CF.get('siteSettings');
-        const ss = (settings && settings.find(item => item && item.key === 'main')) || (settings && settings.length ? settings[0] : null);
+        loadTypographyToAdmin(contentUi);
+        loadColorsToAdmin(contentUi);
         setPhilosophyPortrait((ss && (ss.philosophyPortraitUrl || ss.philosophyportraiturl)) || '', false);
       } catch(e) { console.warn('loadContent error', e); }
       initCropPreview();
@@ -2068,46 +2052,12 @@
         textColor:         document.getElementById('cp-ink')?.value?.trim() || '#1a1814',
         logoVariant:       currentLogoVariant,
       };
+      const siteTitleValue = document.getElementById('sc-title')?.value?.trim() || 'Tomaso Pignocchi';
+      const logoSizeValue = parseInt(document.getElementById('sz-logo')?.value || 100, 10) || 100;
       try {
         console.log('[DEBUG] Saving fields:', JSON.stringify(fields));
-        const allowedFieldIds = await getContentTypeFieldIds('siteContent');
-        const payloadFields = Object.fromEntries(Object.entries(fields).filter(([k]) => allowedFieldIds.has(k)));
-        const c = CF.cfg();
-        const existing = await getMainEntry('siteContent');
-        if (existing) {
-          const id = existing._id;
-          const e = await CF.mgmt('GET', `/entries/${id}`);
-          const mergedFields = { ...(e.fields || {}) };
-          Object.entries(payloadFields).forEach(([k, v]) => { mergedFields[k] = { 'en-US': v }; });
-          const updR = await fetch(
-            `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${id}`,
-            { method: 'PUT',
-              headers: { Authorization: `Bearer ${c.mgmtToken}`,
-                'Content-Type': 'application/vnd.contentful.management.v1+json',
-                'X-Contentful-Version': e.sys.version },
-              body: JSON.stringify({ fields: mergedFields })
-            }
-          );
-          const upd = await updR.json();
-          if (!updR.ok) throw new Error(upd.message || 'Update failed');
-          await CF.publishEntry(id, upd.sys.version);
-        } else {
-          const r = await fetch(
-            `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries`,
-            { method: 'POST',
-              headers: { Authorization: `Bearer ${c.mgmtToken}`,
-                'Content-Type': 'application/vnd.contentful.management.v1+json',
-                'X-Contentful-Content-Type': 'siteContent' },
-              body: JSON.stringify({ fields: Object.fromEntries(Object.entries(payloadFields).map(([k,v]) => [k, {'en-US': v}])) })
-            }
-          );
-          const entry = await r.json();
-          if (!r.ok) throw new Error(entry.message);
-          await fetch(`https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entry.sys.id}/published`,
-            { method: 'PUT', headers: { Authorization: `Bearer ${c.mgmtToken}`,
-              'Content-Type': 'application/vnd.contentful.management.v1+json',
-              'X-Contentful-Version': entry.sys.version }});
-        }
+        await upsertMainEntry('siteContent', fields);
+        await saveTitleAndLogoToSiteSettings(siteTitleValue, logoSizeValue);
         await savePhilosophyPortraitToSiteSettings(document.getElementById('sc-philo-url')?.value?.trim() || '');
         const msg = document.getElementById('contentSaveMsg');
         msg.style.display = 'block';
@@ -2313,44 +2263,10 @@
         fields.label1weight = label1WeightValue;
         fields.label2font = label2FontValue;
         fields.label2weight = label2WeightValue;
-        const existing = await getMainEntry('siteSettings');
-        if (!existing) { alert('Create a siteSettings entry first'); return; }
-        const id = existing._id;
-        const e = await CF.mgmt('GET', '/entries/'+id);
-        const merged = {...e.fields};
-        Object.entries(fields).forEach(([k,v]) => { merged[k] = {'en-US': v}; });
-        const r = await fetch(
-          'https://api.contentful.com/spaces/'+c.spaceId+'/environments/master/entries/'+id,
-          { method:'PUT', headers:{Authorization:'Bearer '+c.mgmtToken,'Content-Type':'application/vnd.contentful.management.v1+json','X-Contentful-Version':e.sys.version},
-            body: JSON.stringify({fields:merged}) }
-        );
-        const updated = await r.json();
-        if (!r.ok) throw new Error(updated.message||'Update failed');
-        await CF.publishEntry(id, updated.sys.version);
+        await upsertMainEntry('siteSettings', { key: 'main', ...fields });
 
         /* Make Layout S go live immediately on the homepage */
-        const scExisting = await getMainEntry('siteContent');
-        if (scExisting) {
-          const scId = scExisting._id;
-          const scEntry = await CF.mgmt('GET', '/entries/' + scId);
-          const scFields = { ...(scEntry.fields || {}) };
-          scFields.heroStyle = { 'en-US': 's' };
-          const scResp = await fetch(
-            'https://api.contentful.com/spaces/' + c.spaceId + '/environments/master/entries/' + scId,
-            {
-              method: 'PUT',
-              headers: {
-                Authorization: 'Bearer ' + c.mgmtToken,
-                'Content-Type': 'application/vnd.contentful.management.v1+json',
-                'X-Contentful-Version': scEntry.sys.version
-              },
-              body: JSON.stringify({ fields: scFields })
-            }
-          );
-          const scUpdated = await scResp.json();
-          if (!scResp.ok) throw new Error(scUpdated.message || 'Could not activate Layout S');
-          await CF.publishEntry(scId, scUpdated.sys.version);
-        }
+        await upsertMainEntry('siteContent', { key: 'main', heroStyle: 's' });
 
         const msg = document.getElementById('s-save-msg');
         if (msg) { msg.style.display='inline'; setTimeout(()=>msg.style.display='none',3000); }

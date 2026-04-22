@@ -36,7 +36,7 @@
       --font-secondary:'Inter',sans-serif;
       --wt-primary:300; --wt-secondary:300;
       --fs-primary:normal; --fs-secondary:normal;
-      --sz-banner-title:1; --sz-banner-sub:1; --sz-bio:1;
+      --sz-banner-title:1; --sz-banner-sub:1; --sz-bio:1; --sz-logo:1;
       --sz-pubs:1; --sz-venue:1; --color-venue:var(--page-ink3); --sz-photo:1; --sz-labels:1; --sz-sublabels:1; --sz-seemore:1; --sz-footer:1;
       /* per-section fonts/colors */
       --font-name:inherit; --wt-name:inherit; --color-name:var(--page-ink);
@@ -527,7 +527,7 @@
       min-width: 0;
     }
     .intro-s-mark {
-      width: calc(clamp(1.8rem,3vw,3.4rem) * var(--sz-banner-title,1) * 0.5);
+      width: calc(clamp(1.8rem,3vw,3.4rem) * var(--sz-banner-title,1) * var(--sz-logo,1) * 0.5);
       height: auto;
       flex: 0 0 auto;
       display: block;
@@ -621,7 +621,7 @@
       body.ly-s .intro-s-head{grid-template-columns:1fr}
       body.ly-s .intro-s-panels{gap:1.2rem}
       .intro-s-name-row{gap:0.45rem}
-      .intro-s-mark{width: calc(clamp(1.45rem,6vw,2.2rem) * var(--sz-banner-title,1) * 0.48)}
+      .intro-s-mark{width: calc(clamp(1.45rem,6vw,2.2rem) * var(--sz-banner-title,1) * var(--sz-logo,1) * 0.48)}
       body.ly-s .intro-s .i-name{font-size: calc(clamp(1.45rem,6vw,2.2rem) * var(--sz-banner-title,1));}
       .contact-wrap{grid-template-columns:1fr}
       .nav-links{gap:1.2rem}
@@ -635,7 +635,7 @@
     <div class="i-photo"><img id="heroBannerImg" src="" alt="" /></div>
     <div class="i-text">
       <div class="i-header">
-        <h1 class="i-name">Tomaso<br>Pignocchi</h1>
+        <h1 class="i-name" id="siteTitleMain">Tomaso<br>Pignocchi</h1>
         <div class="home-subrow">
           <p class="i-role" id="nameplateSubtitle"><span>Philosophy &middot; Paris &middot; Kyoto</span></p>
           <a href="#contact" onclick="showTab('contact'); scrollToContactForm(); return false" class="home-contact-link">Contact</a>
@@ -653,7 +653,7 @@
       <div class="intro-s-title-wrap">
         <div class="intro-s-name-row">
           <img class="intro-s-mark" src="assets/asterisco-black.svg" alt="" aria-hidden="true" />
-          <h1 class="i-name">Tomaso Pignocchi</h1>
+          <h1 class="i-name" id="siteTitleS">Tomaso Pignocchi</h1>
         </div>
         <div class="home-subrow">
         <p class="i-role" id="nameplateSubtitleS"><span>Philosophy &middot; Paris &middot; Kyoto</span></p>
@@ -734,7 +734,7 @@
     </section>
   </div>
 
-  <footer><div class="wrap"><p>&copy; 2026 Tomaso Pignocchi</p><p>Paris &middot; Rome &middot; Kyoto</p></div></footer>
+  <footer><div class="wrap"><p id="footerName">&copy; 2026 Tomaso Pignocchi</p><p>Paris &middot; Rome &middot; Kyoto</p></div></footer>
 
   <script src="js/contentful.js"></script>
   <script>
@@ -767,11 +767,30 @@
     }
 
 
+    function formatSiteTitleWithBreak(title) {
+      const clean = (title || 'Tomaso Pignocchi').trim();
+      return clean.replace(/\s+([^\s]+)$/, '<br>$1');
+    }
+
+    function setSiteTitle(title) {
+      const clean = (title || 'Tomaso Pignocchi').trim();
+      const main = document.getElementById('siteTitleMain');
+      if (main) main.innerHTML = formatSiteTitleWithBreak(clean);
+      const single = document.getElementById('siteTitleS');
+      if (single) single.textContent = clean;
+      const footer = document.getElementById('footerName');
+      if (footer) footer.innerHTML = '&copy; 2026 ' + clean;
+      document.title = clean;
+      return clean;
+    }
+
     function applySettings(sc) {
       if (!sc) return;
+      setSiteTitle(sc.siteTitle || 'Tomaso Pignocchi');
       const root = document.documentElement;
       /* Global font fields removed — using per-section fonts */
       if (sc.sizeBannerTitle  != null) root.style.setProperty('--sz-banner-title', sc.sizeBannerTitle  / 100);
+      if (sc.logoSize != null) root.style.setProperty('--sz-logo', sc.logoSize / 100);
       if (sc.sizeBannerSubtitle!=null) root.style.setProperty('--sz-banner-sub',   sc.sizeBannerSubtitle/100);
       if (sc.sizeBio          != null) root.style.setProperty('--sz-bio',           sc.sizeBio          / 100);
       if (sc.sizePubs         != null) root.style.setProperty('--sz-pubs',          sc.sizePubs         / 100);
@@ -849,7 +868,7 @@
         if (introS) introS.style.display = ly === 's' ? '' : 'none';
         /* Layout P: inject name into nav via data attribute */
         const navLogo = document.querySelector('.nav-logo');
-        if (navLogo) navLogo.dataset.name = 'Tomaso Pignocchi';
+        if (navLogo) navLogo.dataset.name = ((document.getElementById('siteTitleS')?.textContent || document.getElementById('siteTitleMain')?.textContent || 'Tomaso Pignocchi') + '').replace(/\s+/g, ' ').trim();
         const photo = document.querySelector('.i-photo');
         const bioEl = document.getElementById('bioText');
         const roleEl = document.getElementById('nameplateSubtitle');
@@ -877,6 +896,8 @@
       });
     }
 
+    setSiteTitle('Tomaso Pignocchi');
+
     (async function init() {
       function decodePackedLabelFont(rawFont, fallbackWeight) {
         let font = typeof rawFont === 'string' ? rawFont : '';
@@ -891,10 +912,13 @@
 
       try {
         const items = await cfGet('siteContent');
-        if (items && items.length) applySettings(items[0]);
         const settings = await cfGet('siteSettings');
-        if (settings && settings.length) {
-          const ss = settings[0];
+        const sc = (items && items.find(item => item && item.key === 'main')) || (items && items.length ? items[0] : null);
+        const ss = (settings && settings.find(item => item && item.key === 'main')) || (settings && settings.length ? settings[0] : null);
+        if (sc || ss) {
+          applySettings({ ...(sc || {}), ...(ss || {}) });
+        }
+        if (ss) {
           const pick = (...keys) => {
             for (const key of keys) {
               if (ss[key] != null && ss[key] !== '') return ss[key];

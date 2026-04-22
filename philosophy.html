@@ -141,7 +141,7 @@
           <p id="bioText">I am a Ph.D. candidate in philosophy at the Institut Catholique de Paris and Università degli Studi La Sapienza, Roma. My research investigates the intersection of Wittgenstein's later philosophy and Madhyamaka Buddhism.</p>
         </div>
         <figure class="bio-portrait" id="bioPortraitWrap">
-          <img id="bioPortraitImg" src="" alt="Portrait of Tomaso Pignocchi" />
+          <img id="bioPortraitImg" src="" alt="Portrait" />
         </figure>
       </div>
     </div>
@@ -256,7 +256,7 @@
   </div>
 </section>
 
-  <footer><div class="wrap"><p>© 2026 Tomaso Pignocchi</p><p>Paris · Rome · Kyoto</p></div></footer>
+  <footer><div class="wrap"><p id="footerName">© 2026 Tomaso Pignocchi</p><p>Paris · Rome · Kyoto</p></div></footer>
 
   <script>
     const CF_SPACE    = 'fejt7dmbrv9e';
@@ -315,10 +315,26 @@
 
     (async function() {
       try {
+        function setSiteTitle(name) {
+          const clean = (name || 'Tomaso Pignocchi').trim();
+          const nav = document.getElementById('navName');
+          if (nav) nav.textContent = clean;
+          const footer = document.getElementById('footerName');
+          if (footer) footer.textContent = '© 2026 ' + clean;
+          document.title = clean + ' — Philosophy';
+          const portrait = document.getElementById('bioPortraitImg');
+          if (portrait) portrait.alt = 'Portrait of ' + clean;
+        }
+        setSiteTitle('Tomaso Pignocchi');
         /* Load settings */
         const items = await cfGet('siteContent');
-        if (items && items.length) {
-          const sc = items.find(item => item && item.key === 'main') || items[0];
+        const settings = await cfGet('siteSettings');
+        const sc = (items && items.find(item => item && item.key === 'main')) || (items && items.length ? items[0] : null);
+        const ss = (settings && settings.find(item => item && item.key === 'main')) || (settings && settings.length ? settings[0] : null);
+        const settingsTitle = ss && (ss.siteTitle || ss.sitetitle);
+        if (settingsTitle) setSiteTitle(settingsTitle);
+        if (sc) {
+          if (!settingsTitle && sc.siteTitle) setSiteTitle(sc.siteTitle);
           if (sc.heroPosX != null) window.__philoCropX = sc.heroPosX;
           if (sc.heroPosY != null) window.__philoCropY = sc.heroPosY;
           const root = document.documentElement;
