@@ -451,7 +451,7 @@
     body.ly-r footer .wrap { max-width: 1200px; }
 
 
-    /* ─── S: two horizontal panels stacked ─── */
+    /* ─── S: title in R position + same frame margins ─── */
     .nav-site-name {
       display: none;
       font-family: var(--font-name, var(--font-primary));
@@ -463,19 +463,49 @@
       letter-spacing: -0.01em;
       text-decoration: none;
     }
-    body.ly-s .nav-site-name { display: inline; }
+    body.ly-s .nav-site-name { display: none; }
     body.ly-s .nav-links li:not(:last-child) { display: none; }
+    body.ly-s .site-nav { border-bottom: 0.5px solid var(--page-rule); }
+    body.ly-s .site-nav .wrap { max-width: 1200px; }
 
     body.ly-s .intro { display: none !important; }
 
     .intro-s {
+      --s-frame: clamp(1.6rem, 3vw, 2.8rem);
       display: none;
-      flex-direction: column;
-      gap: clamp(1.8rem, 4vw, 3.2rem);
-      padding: clamp(1.8rem, 4vw, 3.2rem);
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: clamp(2rem, 4vw, 3.2rem) var(--s-frame) var(--s-frame);
+      gap: var(--s-frame);
       border-bottom: 0.5px solid var(--page-rule);
+      box-sizing: border-box;
     }
     body.ly-s .intro-s { display: flex; }
+
+    .intro-s-head {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      align-items: start;
+      min-height: 0;
+    }
+    .intro-s-title-wrap {
+      grid-column: 1;
+      max-width: 100%;
+    }
+    body.ly-s .intro-s .i-name {
+      margin-bottom: 0.7rem;
+      font-size: calc(clamp(1.8rem,3vw,3.4rem) * var(--sz-banner-title,1));
+      line-height: 0.92;
+    }
+    body.ly-s .intro-s .i-role {
+      margin-top: 0;
+      padding-top: 0;
+    }
+    .intro-s-panels {
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-frame);
+    }
 
     .panel-s {
       position: relative;
@@ -538,6 +568,9 @@
       body.ly-q .intro{grid-template-columns:1fr;min-height:auto}
       body.ly-q .i-photo{aspect-ratio:3/2!important;height:auto!important}
       body.ly-r .i-photo{max-width:100%}
+      body.ly-s .intro-s{padding:1.2rem;gap:1.2rem}
+      body.ly-s .intro-s-head{grid-template-columns:1fr}
+      body.ly-s .intro-s-panels{gap:1.2rem}
       .contact-wrap{grid-template-columns:1fr}
       .nav-links{gap:1.2rem}
       .nav-links a{font-size:.5rem;letter-spacing:.12em}
@@ -570,20 +603,28 @@
     </div>
   </section>
 
-  <!-- Layout S: two portrait panels -->
+  <!-- Layout S: title positioned like layout R + two framed banners -->
   <div class="intro-s" id="about-s" style="display:none">
-    <a href="philosophy.html" class="panel-s" id="panel-s-1">
-      <img id="bannerS1Img" src="" alt="" />
-      <div class="panel-s-overlay">
-        <span class="panel-s-label" id="labelS1">Philosophy</span>
+    <div class="intro-s-head">
+      <div class="intro-s-title-wrap">
+        <h1 class="i-name">Tomaso<br>Pignocchi</h1>
+        <p class="i-role" id="nameplateSubtitleS"><span>Philosophy &middot; Paris &middot; Kyoto</span></p>
       </div>
-    </a>
-    <a href="photography.html" class="panel-s" id="panel-s-2">
-      <img id="bannerS2Img" src="" alt="" />
-      <div class="panel-s-overlay">
-        <span class="panel-s-label" id="labelS2">Photography</span>
-      </div>
-    </a>
+    </div>
+    <div class="intro-s-panels">
+      <a href="philosophy.html" class="panel-s" id="panel-s-1">
+        <img id="bannerS1Img" src="" alt="" />
+        <div class="panel-s-overlay">
+          <span class="panel-s-label" id="labelS1">Philosophy</span>
+        </div>
+      </a>
+      <a href="photography.html" class="panel-s" id="panel-s-2">
+        <img id="bannerS2Img" src="" alt="" />
+        <div class="panel-s-overlay">
+          <span class="panel-s-label" id="labelS2">Photography</span>
+        </div>
+      </a>
+    </div>
   </div>
 
 
@@ -732,8 +773,10 @@
         );
       }
       if (sc.nameplateSubtitle) {
-        const el = document.getElementById('nameplateSubtitle');
-        if (el) el.querySelector('span') ? el.querySelector('span').textContent = sc.nameplateSubtitle : el.textContent = sc.nameplateSubtitle;
+        ['nameplateSubtitle', 'nameplateSubtitleS'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.querySelector('span') ? el.querySelector('span').textContent = sc.nameplateSubtitle : el.textContent = sc.nameplateSubtitle;
+        });
       }
       if (sc.bioText) {
         const el = document.getElementById('bioText');
@@ -749,7 +792,7 @@
         localStorage.setItem('tp_layout', ly);
         /* Show/hide intro-s */
         const introS = document.getElementById('about-s');
-        if (introS) introS.style.display = ly === 's' ? 'grid' : 'none';
+        if (introS) introS.style.display = ly === 's' ? '' : 'none';
         /* Layout P: inject name into nav via data attribute */
         const navLogo = document.querySelector('.nav-logo');
         if (navLogo) navLogo.dataset.name = 'Tomaso Pignocchi';
