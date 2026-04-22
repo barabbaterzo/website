@@ -521,7 +521,7 @@
     }
     .intro-s-name-row {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: clamp(0.4rem, 0.9vw, 0.75rem);
       width: 100%;
       min-width: 0;
@@ -531,13 +531,14 @@
       height: auto;
       flex: 0 0 auto;
       display: block;
-      transform: translateY(-0.02em);
+      transform: translateY(0);
     }
     body.ly-s .intro-s .i-name {
       margin-bottom: 1.35rem;
       font-size: calc(clamp(1.8rem,3vw,3.4rem) * var(--sz-banner-title,1));
       line-height: 0.94;
       white-space: nowrap;
+      display: block;
     }
     body.ly-s .intro-s .i-role {
       margin-top: 0;
