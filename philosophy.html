@@ -307,12 +307,17 @@
       });
     }
 
+    window.__philoCropX = 50;
+    window.__philoCropY = 38;
+
     (async function() {
       try {
         /* Load settings */
         const items = await cfGet('siteContent');
         if (items && items.length) {
           const sc = items[0];
+          if (sc.heroPosX != null) window.__philoCropX = sc.heroPosX;
+          if (sc.heroPosY != null) window.__philoCropY = sc.heroPosY;
           const root = document.documentElement;
           if (sc.bioText) { const el = document.getElementById('bioText'); if (el) el.innerHTML = sc.bioText.replace(/\n/g,'<br>'); }
           if (sc.fontPrimary || sc.bioFont) root.style.setProperty('--font-primary', FONT_CSS[sc.bioFont||sc.fontPrimary] || sc.bioFont || sc.fontPrimary);
@@ -365,6 +370,7 @@
           if (portraitWrap && portraitImg) {
             if (portraitUrl) {
               portraitImg.src = portraitUrl;
+              portraitImg.style.objectPosition = `${window.__philoCropX}% ${window.__philoCropY}%`;
               portraitWrap.classList.add('visible');
             } else {
               portraitImg.removeAttribute('src');

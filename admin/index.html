@@ -315,6 +315,28 @@
             <input type="file" id="philoPortraitInput" accept="image/*" style="display:none" />
             <input type="text" id="sc-philo-url" placeholder="https://..." style="font-family:'DM Mono',monospace;font-size:0.72rem" oninput="setPhilosophyPortrait(this.value.trim(), false)" />
             <p style="font-size:0.56rem;line-height:1.6;color:var(--ink3);margin-top:0.45rem">You can upload a new image directly here, or upload it in Photos and then pick it from the library.</p>
+
+            <div style="margin-top:1rem">
+              <label>Portrait crop position <span style="color:var(--ink3);font-size:0.48rem">(drag on the image or use the sliders)</span></label>
+              <div id="cropTool" style="position:relative;width:min(210px,100%);aspect-ratio:3 / 4;background:#111;border-radius:3px;overflow:hidden;cursor:crosshair;border:1px solid var(--rule);margin-top:0.45rem;user-select:none">
+                <img id="cropPreview" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 38%;pointer-events:none;filter:grayscale(15%) brightness(0.92)" />
+                <div id="cropCross" style="position:absolute;transform:translate(-50%,-50%);pointer-events:none;left:50%;top:38%">
+                  <div style="position:absolute;top:50%;left:-12px;width:24px;height:1px;background:rgba(255,255,255,0.9)"></div>
+                  <div style="position:absolute;left:50%;top:-12px;width:1px;height:24px;background:rgba(255,255,255,0.9)"></div>
+                  <div style="position:absolute;top:-5px;left:-5px;width:10px;height:10px;border:1.5px solid rgba(255,255,255,0.9);border-radius:50%"></div>
+                </div>
+              </div>
+              <div style="display:flex;gap:1.2rem;margin-top:0.7rem;align-items:center">
+                <div style="flex:1">
+                  <label style="margin-bottom:0.25rem;display:block">Horizontal — <span id="posXVal">50</span>%</label>
+                  <input type="range" id="posX" min="0" max="100" value="50" style="width:100%" oninput="updateCrop()" />
+                </div>
+                <div style="flex:1">
+                  <label style="margin-bottom:0.25rem;display:block">Vertical — <span id="posYVal">38</span>%</label>
+                  <input type="range" id="posY" min="0" max="100" value="38" style="width:100%" oninput="updateCrop()" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -329,27 +351,7 @@
         <textarea id="sc-contact" style="min-height:90px"></textarea>
       </div>
 
-      <div class="form-group" style="margin-bottom:0.9rem">
-        <label>Banner crop position <span style="color:var(--ink3);font-size:0.48rem">(drag or use sliders to choose which part of the banner to show)</span></label>
-        <div id="cropTool" style="position:relative;width:100%;height:180px;background:#111;border-radius:3px;overflow:hidden;cursor:crosshair;border:1px solid var(--rule);margin-top:0.4rem;user-select:none">
-          <img id="cropPreview" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 38%;pointer-events:none;filter:grayscale(15%) brightness(0.8)" />
-          <div id="cropCross" style="position:absolute;transform:translate(-50%,-50%);pointer-events:none;left:50%;top:38%">
-            <div style="position:absolute;top:50%;left:-12px;width:24px;height:1px;background:rgba(255,255,255,0.9)"></div>
-            <div style="position:absolute;left:50%;top:-12px;width:1px;height:24px;background:rgba(255,255,255,0.9)"></div>
-            <div style="position:absolute;top:-5px;left:-5px;width:10px;height:10px;border:1.5px solid rgba(255,255,255,0.9);border-radius:50%"></div>
-          </div>
-        </div>
-        <div style="display:flex;gap:1.2rem;margin-top:0.7rem;align-items:center">
-          <div style="flex:1">
-            <label style="margin-bottom:0.25rem;display:block">Horizontal — <span id="posXVal">50</span>%</label>
-            <input type="range" id="posX" min="0" max="100" value="50" style="width:100%" oninput="updateCrop()" />
-          </div>
-          <div style="flex:1">
-            <label style="margin-bottom:0.25rem;display:block">Vertical — <span id="posYVal">38</span>%</label>
-            <input type="range" id="posY" min="0" max="100" value="38" style="width:100%" oninput="updateCrop()" />
-          </div>
-        </div>
-      </div>
+      
 
 
       <div style="height:1px;background:var(--rule);margin:1.6rem 0"></div>
@@ -1075,15 +1077,22 @@
 
         <div style="margin-bottom:0.8rem">
           <label style="display:block;margin-bottom:0.4rem">Immagine selezionata</label>
-          <img id="s1-preview" src="" alt="" style="width:100%;max-height:120px;object-fit:cover;border:1px solid var(--rule);border-radius:3px;display:none;margin-bottom:0.4rem" />
+          <div id="s1-crop-tool" style="position:relative;width:100%;aspect-ratio:4 / 1;background:#111;border:1px solid var(--rule);border-radius:3px;overflow:hidden;cursor:crosshair;margin-bottom:0.4rem;user-select:none">
+            <img id="s1-preview" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 38%;display:none;pointer-events:none" />
+            <div id="s1-crop-cross" style="position:absolute;transform:translate(-50%,-50%);pointer-events:none;left:50%;top:38%">
+              <div style="position:absolute;top:50%;left:-12px;width:24px;height:1px;background:rgba(255,255,255,0.9)"></div>
+              <div style="position:absolute;left:50%;top:-12px;width:1px;height:24px;background:rgba(255,255,255,0.9)"></div>
+              <div style="position:absolute;top:-5px;left:-5px;width:10px;height:10px;border:1.5px solid rgba(255,255,255,0.9);border-radius:50%"></div>
+            </div>
+          </div>
           <p style="font-size:0.6rem;color:var(--ink3);margin-bottom:0.4rem">Scegli dalle foto caricate:</p>
           <div id="s1-picker-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:4px;max-height:160px;overflow-y:auto;border:1px solid var(--rule);border-radius:3px;padding:4px"></div>
           <input type="hidden" id="s1-url" value="" />
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem">
-          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s1-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s1-pos-x" oninput="document.getElementById('v-s1-x').textContent=this.value;updateLayoutSPreview('s1')" style="width:100%" /></div>
-          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s1-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s1-pos-y" oninput="document.getElementById('v-s1-y').textContent=this.value;updateLayoutSPreview('s1')" style="width:100%" /></div>
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s1-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s1-pos-x" oninput="updateLayoutSPreview('s1')" style="width:100%" /></div>
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s1-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s1-pos-y" oninput="updateLayoutSPreview('s1')" style="width:100%" /></div>
         </div>
 
         <div style="display:grid;grid-template-columns:1.1fr 0.9fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
@@ -1100,15 +1109,22 @@
 
         <div style="margin-bottom:0.8rem">
           <label style="display:block;margin-bottom:0.4rem">Immagine selezionata</label>
-          <img id="s2-preview" src="" alt="" style="width:100%;max-height:120px;object-fit:cover;border:1px solid var(--rule);border-radius:3px;display:none;margin-bottom:0.4rem" />
+          <div id="s2-crop-tool" style="position:relative;width:100%;aspect-ratio:4 / 1;background:#111;border:1px solid var(--rule);border-radius:3px;overflow:hidden;cursor:crosshair;margin-bottom:0.4rem;user-select:none">
+            <img id="s2-preview" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 38%;display:none;pointer-events:none" />
+            <div id="s2-crop-cross" style="position:absolute;transform:translate(-50%,-50%);pointer-events:none;left:50%;top:38%">
+              <div style="position:absolute;top:50%;left:-12px;width:24px;height:1px;background:rgba(255,255,255,0.9)"></div>
+              <div style="position:absolute;left:50%;top:-12px;width:1px;height:24px;background:rgba(255,255,255,0.9)"></div>
+              <div style="position:absolute;top:-5px;left:-5px;width:10px;height:10px;border:1.5px solid rgba(255,255,255,0.9);border-radius:50%"></div>
+            </div>
+          </div>
           <p style="font-size:0.6rem;color:var(--ink3);margin-bottom:0.4rem">Scegli dalle foto caricate:</p>
           <div id="s2-picker-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:4px;max-height:160px;overflow-y:auto;border:1px solid var(--rule);border-radius:3px;padding:4px"></div>
           <input type="hidden" id="s2-url" value="" />
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem">
-          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s2-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s2-pos-x" oninput="document.getElementById('v-s2-x').textContent=this.value;updateLayoutSPreview('s2')" style="width:100%" /></div>
-          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s2-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s2-pos-y" oninput="document.getElementById('v-s2-y').textContent=this.value;updateLayoutSPreview('s2')" style="width:100%" /></div>
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s2-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s2-pos-x" oninput="updateLayoutSPreview('s2')" style="width:100%" /></div>
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s2-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s2-pos-y" oninput="updateLayoutSPreview('s2')" style="width:100%" /></div>
         </div>
 
         <div style="display:grid;grid-template-columns:1.1fr 0.9fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
@@ -1635,10 +1651,17 @@
       const preview = document.getElementById('sc-philo-preview');
       const empty = document.getElementById('sc-philo-empty');
       const input = document.getElementById('sc-philo-url');
+      const cropPreview = document.getElementById('cropPreview');
       if (syncInput && input) input.value = clean;
       if (preview) {
         preview.src = clean;
         preview.style.display = clean ? 'block' : 'none';
+        preview.style.objectPosition = `${cropX}% ${cropY}%`;
+      }
+      if (cropPreview) {
+        cropPreview.src = clean;
+        cropPreview.style.display = clean ? 'block' : 'none';
+        cropPreview.style.objectPosition = `${cropX}% ${cropY}%`;
       }
       if (empty) empty.style.display = clean ? 'none' : 'flex';
     }
@@ -1734,7 +1757,7 @@
       }
     }
 
-    /* ── Banner crop tool ── */
+    /* ── Portrait crop tool (reusing heroPosX / heroPosY) ── */
     let cropX = 50, cropY = 38;
 
     function updateCrop(x, y) {
@@ -1749,14 +1772,23 @@
       if (valX) valX.textContent = cropX;
       if (valY) valY.textContent = cropY;
       const preview = document.getElementById('cropPreview');
+      const staticPreview = document.getElementById('sc-philo-preview');
       const cross = document.getElementById('cropCross');
       if (preview) preview.style.objectPosition = `${cropX}% ${cropY}%`;
+      if (staticPreview) staticPreview.style.objectPosition = `${cropX}% ${cropY}%`;
       if (cross) { cross.style.left = cropX + '%'; cross.style.top = cropY + '%'; }
-      /* live update homepage if open in another tab */
-      localStorage.setItem('tp_hero_pos', `${cropX}% ${cropY}%`);
+      localStorage.setItem('tp_philosophy_portrait_pos', `${cropX}% ${cropY}%`);
     }
 
-    /* slider input handler */
+    function getCropPointForTool(tool, e) {
+      const rect = tool.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const x = Math.max(0, Math.min(100, Math.round((clientX - rect.left) / rect.width * 100)));
+      const y = Math.max(0, Math.min(100, Math.round((clientY - rect.top) / rect.height * 100)));
+      return { x, y };
+    }
+
     document.getElementById('posX') && document.getElementById('posX').addEventListener('input', function() {
       cropX = parseInt(this.value);
       updateCrop();
@@ -1766,35 +1798,31 @@
       updateCrop();
     });
 
-    /* drag on preview */
     const cropTool = document.getElementById('cropTool');
     if (cropTool) {
       let dragging = false;
-      function getCropFromEvent(e) {
-        const rect = cropTool.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        const x = Math.max(0, Math.min(100, Math.round((clientX - rect.left) / rect.width * 100)));
-        const y = Math.max(0, Math.min(100, Math.round((clientY - rect.top) / rect.height * 100)));
-        return { x, y };
-      }
-      cropTool.addEventListener('mousedown', e => { dragging = true; const p = getCropFromEvent(e); updateCrop(p.x, p.y); });
-      cropTool.addEventListener('mousemove', e => { if (dragging) { const p = getCropFromEvent(e); updateCrop(p.x, p.y); } });
+      cropTool.addEventListener('mousedown', e => { dragging = true; const p = getCropPointForTool(cropTool, e); updateCrop(p.x, p.y); });
+      cropTool.addEventListener('mousemove', e => { if (dragging) { const p = getCropPointForTool(cropTool, e); updateCrop(p.x, p.y); } });
       cropTool.addEventListener('mouseup', () => dragging = false);
       cropTool.addEventListener('mouseleave', () => dragging = false);
-      cropTool.addEventListener('touchstart', e => { e.preventDefault(); const p = getCropFromEvent(e); updateCrop(p.x, p.y); }, { passive: false });
-      cropTool.addEventListener('touchmove', e => { e.preventDefault(); const p = getCropFromEvent(e); updateCrop(p.x, p.y); }, { passive: false });
+      window.addEventListener('mouseup', () => dragging = false);
+      cropTool.addEventListener('touchstart', e => { e.preventDefault(); const p = getCropPointForTool(cropTool, e); updateCrop(p.x, p.y); }, { passive: false });
+      cropTool.addEventListener('touchmove', e => { e.preventDefault(); const p = getCropPointForTool(cropTool, e); updateCrop(p.x, p.y); }, { passive: false });
     }
 
     function initCropPreview() {
-      const banner = localStorage.getItem('tp_banner_url') || '';
+      const portrait = document.getElementById('sc-philo-url')?.value?.trim() || document.getElementById('sc-philo-preview')?.getAttribute('src') || '';
       const preview = document.getElementById('cropPreview');
-      if (preview && banner) preview.src = banner;
-      const saved = localStorage.getItem('tp_hero_pos');
-      if (saved) {
+      if (preview) {
+        preview.src = portrait;
+        preview.style.display = portrait ? 'block' : 'none';
+      }
+      const saved = localStorage.getItem('tp_philosophy_portrait_pos');
+      if (saved && (cropX === undefined || cropY === undefined)) {
         const parts = saved.match(/(\d+)%\s+(\d+)%/);
-        if (parts) { cropX = parseInt(parts[1]); cropY = parseInt(parts[2]); updateCrop(); }
-      } else { updateCrop(); }
+        if (parts) { cropX = parseInt(parts[1]); cropY = parseInt(parts[2]); }
+      }
+      updateCrop();
     }
 
 
@@ -2315,14 +2343,45 @@
       } catch(e) { alert('Save error: '+e.message); }
     }
 
-    function updateLayoutSPreview(prefix) {
+    function updateLayoutSPreview(prefix, nextX, nextY) {
       const preview = document.getElementById(prefix + '-preview');
       const posX = document.getElementById(prefix + '-pos-x');
       const posY = document.getElementById(prefix + '-pos-y');
-      if (!preview || !preview.src) return;
-      const x = posX?.value ?? 50;
-      const y = posY?.value ?? 38;
-      preview.style.objectPosition = `${x}% ${y}%`;
+      const cross = document.getElementById(prefix + '-crop-cross');
+      const valX = document.getElementById('v-' + prefix + '-x');
+      const valY = document.getElementById('v-' + prefix + '-y');
+      if (posX && nextX !== undefined) posX.value = Math.round(nextX);
+      if (posY && nextY !== undefined) posY.value = Math.round(nextY);
+      const x = parseInt(posX?.value ?? 50);
+      const y = parseInt(posY?.value ?? 38);
+      if (valX) valX.textContent = x;
+      if (valY) valY.textContent = y;
+      if (preview) {
+        preview.style.display = preview.src ? 'block' : 'none';
+        preview.style.objectPosition = `${x}% ${y}%`;
+      }
+      if (cross) {
+        cross.style.left = x + '%';
+        cross.style.top = y + '%';
+      }
+    }
+
+    function bindLayoutSCropDrag(prefix) {
+      const tool = document.getElementById(prefix + '-crop-tool');
+      if (!tool || tool.dataset.bound === '1') return;
+      tool.dataset.bound = '1';
+      let dragging = false;
+      const apply = (e) => {
+        const p = getCropPointForTool(tool, e);
+        updateLayoutSPreview(prefix, p.x, p.y);
+      };
+      tool.addEventListener('mousedown', e => { dragging = true; apply(e); });
+      tool.addEventListener('mousemove', e => { if (dragging) apply(e); });
+      tool.addEventListener('mouseup', () => dragging = false);
+      tool.addEventListener('mouseleave', () => dragging = false);
+      window.addEventListener('mouseup', () => dragging = false);
+      tool.addEventListener('touchstart', e => { e.preventDefault(); apply(e); }, { passive: false });
+      tool.addEventListener('touchmove', e => { e.preventDefault(); apply(e); }, { passive: false });
     }
 
     async function uploadS1(file) {
@@ -2333,6 +2392,8 @@
       if (!file||!CF.isConnected()) return;
       try { const assetId=await CF.uploadAsset(file); const asset=await CF.mgmt('GET','/assets/'+assetId); document.getElementById('s2-url').value='https:'+asset.fields.file['en-US'].url; const p=document.getElementById('s2-preview'); if(p){ p.src='https:'+asset.fields.file['en-US'].url; p.style.display='block'; updateLayoutSPreview('s2'); } } catch(e) { alert('Upload error: '+e.message); }
     }
+    bindLayoutSCropDrag('s1');
+    bindLayoutSCropDrag('s2');
     async function loadLayoutS() {
       if (!CF.isConnected()) return;
       try {
@@ -2357,6 +2418,8 @@
             grid.appendChild(img);
           });
         });
+        bindLayoutSCropDrag('s1');
+        bindLayoutSCropDrag('s2');
         if (!ss||!ss.length) return;
         const s = ss[0];
         const set=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null)el.value=v;};
