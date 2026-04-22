@@ -866,10 +866,11 @@
 
       try {
         const items = await cfGet('siteContent');
-        if (items && items.length) applySettings(items[0]);
+        const mainContent = (items && items.find(item => item && item.key === 'main')) || (items && items.length ? items[0] : null);
+        if (mainContent) applySettings(mainContent);
         const settings = await cfGet('siteSettings');
         if (settings && settings.length) {
-          const ss = settings[0];
+          const ss = settings.find(item => item && item.key === 'main') || settings[0];
           const pick = (...keys) => {
             for (const key of keys) {
               if (ss[key] != null && ss[key] !== '') return ss[key];

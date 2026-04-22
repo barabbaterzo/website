@@ -1494,8 +1494,8 @@
 
       if (!url && CF.isConnected()) {
         try {
-          const s = await CF.get('siteSettings');
-          if (s && s.length && s[0].heroBanner) url = s[0].heroBanner;
+          const s = await getMainEntry('siteSettings');
+          if (s && s.heroBanner) url = s.heroBanner;
         } catch {}
       }
 
@@ -1523,12 +1523,12 @@
         try {
           const c = CF.cfg();
           /* check if siteSettings entry exists */
-          const existing = await CF.get('siteSettings');
+          const existing = await getMainEntry('siteSettings');
           const assetId = url.match(/contentful\.com/) ? null : null; /* URL already resolved */
 
-          if (existing && existing.length) {
+          if (existing) {
             /* update */
-            const entryId = existing[0]._id;
+            const entryId = existing._id;
             const e = await CF.mgmt('GET', `/entries/${entryId}`);
             const bannerR = await fetch(
               `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entryId}`,
@@ -1715,6 +1715,13 @@
       return null;
     }
 
+    async function getMainEntry(contentTypeId) {
+      const items = await CF.get(contentTypeId);
+      if (!items || !items.length) return null;
+      return items.find(item => item && item.key === 'main') || items[0];
+    }
+
+
     async function savePhilosophyPortraitToSiteSettings(url) {
       const allowedFieldIds = await getContentTypeFieldIds('siteSettings');
       const portraitFieldId = pickExistingFieldId(allowedFieldIds, ['philosophyPortraitUrl', 'philosophyportraiturl']);
@@ -1725,17 +1732,19 @@
       };
       const filtered = Object.fromEntries(Object.entries(payloadFields).filter(([k]) => allowedFieldIds.has(k)));
       const c = CF.cfg();
-      const existing = await CF.get('siteSettings');
-      if (existing && existing.length) {
-        const id = existing[0]._id;
+      const existing = await getMainEntry('siteSettings');
+      if (existing) {
+        const id = existing._id;
         const e = await CF.mgmt('GET', `/entries/${id}`);
+        const mergedFields = { ...(e.fields || {}) };
+        Object.entries(filtered).forEach(([k, v]) => { mergedFields[k] = { 'en-US': v }; });
         const updR = await fetch(
           `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${id}`,
           { method: 'PUT',
             headers: { Authorization: `Bearer ${c.mgmtToken}`,
               'Content-Type': 'application/vnd.contentful.management.v1+json',
               'X-Contentful-Version': e.sys.version },
-            body: JSON.stringify({ fields: Object.fromEntries(Object.entries(filtered).map(([k,v]) => [k, {'en-US': v}])) })
+            body: JSON.stringify({ fields: mergedFields })
           }
         );
         const upd = await updR.json();
@@ -1985,7 +1994,7 @@
       try {
         const items = await CF.get('siteContent');
         console.log('[DEBUG] siteContent items:', JSON.stringify(items));
-        const sc = items && items.length ? items[0] : null;
+        const sc = (items && items.find(item => item && item.key === 'main')) || (items && items.length ? items[0] : null);
         if (!sc) { console.log('[DEBUG] No siteContent entry found'); return; }
         console.log('[DEBUG] siteContent fields:', JSON.stringify(sc));
         if (sc.nameplateSubtitle) document.getElementById('sc-subtitle').value = sc.nameplateSubtitle;
@@ -1998,7 +2007,7 @@
         loadColorsToAdmin(sc);
 
         const settings = await CF.get('siteSettings');
-        const ss = settings && settings.length ? settings[0] : null;
+        const ss = (settings && settings.find(item => item && item.key === 'main')) || (settings && settings.length ? settings[0] : null);
         setPhilosophyPortrait((ss && (ss.philosophyPortraitUrl || ss.philosophyportraiturl)) || '', false);
       } catch(e) { console.warn('loadContent error', e); }
       initCropPreview();
@@ -2064,17 +2073,19 @@
         const allowedFieldIds = await getContentTypeFieldIds('siteContent');
         const payloadFields = Object.fromEntries(Object.entries(fields).filter(([k]) => allowedFieldIds.has(k)));
         const c = CF.cfg();
-        const existing = await CF.get('siteContent');
-        if (existing && existing.length) {
-          const id = existing[0]._id;
+        const existing = await getMainEntry('siteContent');
+        if (existing) {
+          const id = existing._id;
           const e = await CF.mgmt('GET', `/entries/${id}`);
+          const mergedFields = { ...(e.fields || {}) };
+          Object.entries(payloadFields).forEach(([k, v]) => { mergedFields[k] = { 'en-US': v }; });
           const updR = await fetch(
             `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${id}`,
             { method: 'PUT',
               headers: { Authorization: `Bearer ${c.mgmtToken}`,
                 'Content-Type': 'application/vnd.contentful.management.v1+json',
                 'X-Contentful-Version': e.sys.version },
-              body: JSON.stringify({ fields: Object.fromEntries(Object.entries(payloadFields).map(([k,v]) => [k, {'en-US': v}])) })
+              body: JSON.stringify({ fields: mergedFields })
             }
           );
           const upd = await updR.json();
@@ -2302,9 +2313,9 @@
         fields.label1weight = label1WeightValue;
         fields.label2font = label2FontValue;
         fields.label2weight = label2WeightValue;
-        const existing = await CF.get('siteSettings');
-        if (!existing||!existing.length) { alert('Create a siteSettings entry first'); return; }
-        const id = existing[0]._id;
+        const existing = await getMainEntry('siteSettings');
+        if (!existing) { alert('Create a siteSettings entry first'); return; }
+        const id = existing._id;
         const e = await CF.mgmt('GET', '/entries/'+id);
         const merged = {...e.fields};
         Object.entries(fields).forEach(([k,v]) => { merged[k] = {'en-US': v}; });
@@ -2318,9 +2329,9 @@
         await CF.publishEntry(id, updated.sys.version);
 
         /* Make Layout S go live immediately on the homepage */
-        const scExisting = await CF.get('siteContent');
-        if (scExisting && scExisting.length) {
-          const scId = scExisting[0]._id;
+        const scExisting = await getMainEntry('siteContent');
+        if (scExisting) {
+          const scId = scExisting._id;
           const scEntry = await CF.mgmt('GET', '/entries/' + scId);
           const scFields = { ...(scEntry.fields || {}) };
           scFields.heroStyle = { 'en-US': 's' };

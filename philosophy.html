@@ -318,7 +318,7 @@
         /* Load settings */
         const items = await cfGet('siteContent');
         if (items && items.length) {
-          const sc = items[0];
+          const sc = items.find(item => item && item.key === 'main') || items[0];
           if (sc.heroPosX != null) window.__philoCropX = sc.heroPosX;
           if (sc.heroPosY != null) window.__philoCropY = sc.heroPosY;
           const root = document.documentElement;
@@ -352,7 +352,7 @@
         /* Load siteSettings for nav name styling + philosophy portrait */
         const ss = await cfGet('siteSettings');
         if (ss && ss.length) {
-          const s = ss[0];
+          const s = ss.find(item => item && item.key === 'main') || ss[0];
           const root = document.documentElement;
           if (s.navNameFont) {
             const el = document.querySelector('.nav-site-name');

@@ -499,14 +499,15 @@
     /* ── Load photo bio + settings from Contentful ── */
     (async function() {
       try {
-        const qs = new URLSearchParams({ content_type: 'siteContent', limit: 1 });
+        const qs = new URLSearchParams({ content_type: 'siteContent', limit: 50 });
         const r = await fetch(
           'https://cdn.contentful.com/spaces/fejt7dmbrv9e/environments/master/entries?' + qs,
           { headers: { Authorization: 'Bearer tOHgPb2AaW4raBzCEnxzs5QhFMnNdyOGJDF3sTKGAgc' } }
         );
         const data = await r.json();
-        if (data.items && data.items[0]) {
-          const sc = data.items[0].fields;
+        const mainItem = (data.items || []).find(item => item?.fields?.key === 'main') || (data.items && data.items[0]);
+        if (mainItem) {
+          const sc = mainItem.fields;
           const el = document.getElementById('photoBioText');
           if (el && sc.photoIntro) el.innerHTML = sc.photoIntro.replace(/\n/g, '<br>');
           /* Apply typography settings */
