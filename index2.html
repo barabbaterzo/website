@@ -519,10 +519,25 @@
       width: 100%;
       max-width: 100%;
     }
+    .intro-s-name-row {
+      display: flex;
+      align-items: baseline;
+      gap: clamp(0.4rem, 0.9vw, 0.75rem);
+      width: 100%;
+      min-width: 0;
+    }
+    .intro-s-mark {
+      width: calc(clamp(1.8rem,3vw,3.4rem) * var(--sz-banner-title,1) * 0.5);
+      height: auto;
+      flex: 0 0 auto;
+      display: block;
+      transform: translateY(-0.02em);
+    }
     body.ly-s .intro-s .i-name {
-      margin-bottom: 1.1rem;
+      margin-bottom: 1.35rem;
       font-size: calc(clamp(1.8rem,3vw,3.4rem) * var(--sz-banner-title,1));
       line-height: 0.94;
+      white-space: nowrap;
     }
     body.ly-s .intro-s .i-role {
       margin-top: 0;
@@ -605,6 +620,9 @@
       body.ly-s .intro-s{padding:1.2rem;gap:0.9rem}
       body.ly-s .intro-s-head{grid-template-columns:1fr}
       body.ly-s .intro-s-panels{gap:1.2rem}
+      .intro-s-name-row{gap:0.45rem}
+      .intro-s-mark{width: calc(clamp(1.45rem,6vw,2.2rem) * var(--sz-banner-title,1) * 0.48)}
+      body.ly-s .intro-s .i-name{font-size: calc(clamp(1.45rem,6vw,2.2rem) * var(--sz-banner-title,1));}
       .contact-wrap{grid-template-columns:1fr}
       .nav-links{gap:1.2rem}
       .nav-links a{font-size:.5rem;letter-spacing:.12em}
@@ -633,7 +651,10 @@
   <div class="intro-s" id="about-s" style="display:none">
     <div class="intro-s-head">
       <div class="intro-s-title-wrap">
-        <h1 class="i-name">Tomaso<br>Pignocchi</h1>
+        <div class="intro-s-name-row">
+          <img class="intro-s-mark" src="assets/asterisco-black.svg" alt="" aria-hidden="true" />
+          <h1 class="i-name">Tomaso Pignocchi</h1>
+        </div>
         <div class="home-subrow">
         <p class="i-role" id="nameplateSubtitleS"><span>Philosophy &middot; Paris &middot; Kyoto</span></p>
         <a href="#contact" onclick="showTab('contact'); scrollToContactForm(); return false" class="home-contact-link">Contact</a>
@@ -797,9 +818,13 @@
         root.style.setProperty('--page-rule','rgb('+mix(r2,br,.18)+','+mix(g,bg2,.18)+','+mix(b,bb,.18)+')');
       }
       if (sc.logoVariant) {
-        document.querySelectorAll('.logo-mark').forEach(img =>
-          img.style.filter = sc.logoVariant === 'dark' ? 'invert(1) brightness(0)' : 'none'
-        );
+        const logoSrc = sc.logoVariant === 'light'
+          ? 'assets/asterisco-white.svg'
+          : 'assets/asterisco-black.svg';
+        document.querySelectorAll('.logo-mark, .intro-s-mark').forEach(img => {
+          img.src = logoSrc;
+          img.style.filter = 'none';
+        });
       }
       if (sc.nameplateSubtitle) {
         ['nameplateSubtitle', 'nameplateSubtitleS'].forEach(id => {
@@ -866,11 +891,10 @@
 
       try {
         const items = await cfGet('siteContent');
-        const mainContent = (items && items.find(item => item && item.key === 'main')) || (items && items.length ? items[0] : null);
-        if (mainContent) applySettings(mainContent);
+        if (items && items.length) applySettings(items[0]);
         const settings = await cfGet('siteSettings');
         if (settings && settings.length) {
-          const ss = settings.find(item => item && item.key === 'main') || settings[0];
+          const ss = settings[0];
           const pick = (...keys) => {
             for (const key of keys) {
               if (ss[key] != null && ss[key] !== '') return ss[key];
