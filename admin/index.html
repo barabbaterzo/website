@@ -2351,7 +2351,7 @@
         bindLayoutSCropDrag('s1');
         bindLayoutSCropDrag('s2');
         if (!ss||!ss.length) return;
-        const s = ss[0];
+        const s = ss.find(item => item && item.key === 'main') || ss[0];
         const set=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null)el.value=v;};
         const setN=(id,vid,v)=>{set(id,v);const l=document.getElementById(vid);if(l&&v!=null)l.textContent=v;};
         const banner1Url = s.banner1url ?? s.banner1Url;
