@@ -588,16 +588,24 @@
       font-family: var(--font-label-s1, var(--font-primary));
       font-weight: var(--wt-label-s1, var(--wt-label-s, var(--wt-primary)));
       font-size: calc(clamp(1.8rem, 3.5vw, 3.6rem) * var(--sz-label-s1, 1));
-      color: var(--color-label-s1, #fff);
+      color: #fff;
       letter-spacing: -0.02em;
       line-height: 1;
-      text-shadow: 0 1px 12px rgba(0,0,0,0.4);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      padding: clamp(0.38rem, 0.9vw, 0.62rem) clamp(0.7rem, 1.4vw, 1.1rem);
+      border-radius: 0;
+      text-shadow: none;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
     }
     #panel-s-2 .panel-s-label {
       font-family: var(--font-label-s2, var(--font-primary));
       font-weight: var(--wt-label-s2, var(--wt-label-s, var(--wt-primary)));
       font-size: calc(clamp(1.8rem, 3.5vw, 3.6rem) * var(--sz-label-s2, 1));
-      color: var(--color-label-s2, #fff);
+      color: #fff;
     }
 
     /* RESPONSIVE */
