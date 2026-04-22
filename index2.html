@@ -495,12 +495,13 @@
 
     .intro-s {
       --s-frame: clamp(1.6rem, 3vw, 2.8rem);
+      --s-vgap: clamp(1rem, 2vw, 1.4rem);
       display: none;
       flex-direction: column;
       max-width: 1200px;
       margin: 0 auto;
       padding: clamp(2rem, 4vw, 3.2rem) var(--s-frame) var(--s-frame);
-      gap: var(--s-frame);
+      gap: var(--s-vgap);
       border-bottom: 0.5px solid var(--page-rule);
       box-sizing: border-box;
     }
@@ -519,9 +520,9 @@
       max-width: 100%;
     }
     body.ly-s .intro-s .i-name {
-      margin-bottom: 0.85rem;
+      margin-bottom: 1.1rem;
       font-size: calc(clamp(1.8rem,3vw,3.4rem) * var(--sz-banner-title,1));
-      line-height: 0.92;
+      line-height: 0.94;
     }
     body.ly-s .intro-s .i-role {
       margin-top: 0;
@@ -532,6 +533,7 @@
       flex-direction: column;
       gap: var(--s-frame);
       width: 100%;
+      margin-top: -0.15rem;
     }
 
     .panel-s {
@@ -600,7 +602,7 @@
       body.ly-q .intro{grid-template-columns:1fr;min-height:auto}
       body.ly-q .i-photo{aspect-ratio:3/2!important;height:auto!important}
       body.ly-r .i-photo{max-width:100%}
-      body.ly-s .intro-s{padding:1.2rem;gap:1.2rem}
+      body.ly-s .intro-s{padding:1.2rem;gap:0.9rem}
       body.ly-s .intro-s-head{grid-template-columns:1fr}
       body.ly-s .intro-s-panels{gap:1.2rem}
       .contact-wrap{grid-template-columns:1fr}
