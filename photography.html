@@ -110,13 +110,14 @@
     .gallery-wrap {
       width: 100%;
       max-width: none;
-      padding-left: 0;
-      padding-right: 0;
+      padding-left: var(--gallery-gap, 6px);
+      padding-right: var(--gallery-gap, 6px);
     }
 
     .photo-grid {
       columns: 3;
       column-gap: 6px;
+      --gallery-gap: 6px;
     }
 
     @media (max-width: 800px) { .photo-grid { columns: 2; } }
