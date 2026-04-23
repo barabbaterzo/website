@@ -940,7 +940,8 @@
       </div>
     </div>
 
-    <p class="section-title">Manage publications</p>
+    <p class="section-title">Edit existing publications</p>
+    <p style="font-size:0.56rem;color:var(--ink3);line-height:1.7;margin:-0.35rem 0 1rem">All publications already published on the site are editable here. Change any field, then click Save on that row.</p>
     <div id="pubList" class="pub-admin-list"></div>
   </div>
 
@@ -1178,7 +1179,7 @@
     <p class="section-title">Elsewhere, ORCID & contact colors</p>
     <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1.8rem">
       <div style="margin-bottom:0.9rem;font-size:0.56rem;line-height:1.7;color:var(--ink3)">
-        Order on the site: Academia, PhilPeople, ORCID, Instagram, ResearchGate, Google Scholar.
+        Order on the site: Academia, PhilPeople, ResearchGate, Google Scholar, ORCID, Instagram.
         The contact form text color is separate from the Elsewhere links color.
       </div>
       <div class="form-grid">
@@ -1744,6 +1745,17 @@
       return new Set((ct.fields || []).map(f => f.id));
     }
 
+    async function ensureContentTypeFields(contentTypeId, fieldIds = []) {
+      let allowedFieldIds = await getContentTypeFieldIds(contentTypeId);
+      const missing = fieldIds.filter(id => !allowedFieldIds.has(id));
+      if (!missing.length) return allowedFieldIds;
+      await CF.createContentTypes();
+      allowedFieldIds = await getContentTypeFieldIds(contentTypeId);
+      const stillMissing = fieldIds.filter(id => !allowedFieldIds.has(id));
+      if (stillMissing.length) throw new Error(`${contentTypeId} is still missing field(s): ${stillMissing.join(', ')}`);
+      return allowedFieldIds;
+    }
+
     function pickExistingFieldId(fieldIds, candidates) {
       for (const id of candidates) if (fieldIds.has(id)) return id;
       return null;
@@ -1802,8 +1814,7 @@
 
 
     async function savePhilosophyPortraitToSiteSettings(url) {
-      const allowedFieldIds = await getContentTypeFieldIds('siteSettings');
-      if (!allowedFieldIds.has('philosophyPortraitUrl')) throw new Error('Site Settings is missing the philosophyPortraitUrl field');
+      await ensureContentTypeFields('siteSettings', ['philosophyPortraitUrl']);
       await upsertMainEntry('siteSettings', {
         key: 'main',
         philosophyPortraitUrl: (url || '').trim()
@@ -1811,17 +1822,13 @@
     }
 
     async function saveTitleAndLogoToSiteSettings(title, logoSize, secondaryTitleSize) {
-      const allowedFieldIds = await getContentTypeFieldIds('siteSettings');
-      const missing = [];
-      if (!allowedFieldIds.has('siteTitle')) missing.push('siteTitle');
-      if (!allowedFieldIds.has('logoSize')) missing.push('logoSize');
-      if (missing.length) throw new Error('Site Settings is missing field(s): ' + missing.join(', '));
+      await ensureContentTypeFields('siteSettings', ['siteTitle', 'logoSize', 'secondaryTitleSize']);
       const payload = {
         key: 'main',
         siteTitle: (title || 'Tomaso Pignocchi').trim(),
         logoSize: parseInt(logoSize || 100, 10) || 100,
+        secondaryTitleSize: parseInt(secondaryTitleSize || 100, 10) || 100,
       };
-      if (allowedFieldIds.has('secondaryTitleSize')) payload.secondaryTitleSize = parseInt(secondaryTitleSize || 100, 10) || 100;
       await upsertMainEntry('siteSettings', payload);
     }
 
@@ -2335,21 +2342,18 @@
     async function saveElsewhere() {
       if (!CF.hasWriteAccess()) { alert('Connect Contentful first and add the Management Token (Settings tab)'); return; }
       try {
-        const allowedFieldIds = await getContentTypeFieldIds('siteSettings');
-        const required = ['academiaUrl','philpeopleUrl','orcidUrl','instagramUrl','researchGateUrl','googleScholarUrl'];
-        const missing = required.filter(id => !allowedFieldIds.has(id));
-        if (missing.length) throw new Error('Site Settings is missing field(s): ' + missing.join(', '));
+        const allowedFieldIds = await ensureContentTypeFields('siteSettings', ['academiaUrl','philpeopleUrl','researchGateUrl','googleScholarUrl','orcidUrl','instagramUrl','contactFormTextColor','elsewhereLinkColor']);
         const payload = {
           key: 'main',
           academiaUrl: document.getElementById('else-academia').value.trim(),
           philpeopleUrl: document.getElementById('else-philpeople').value.trim(),
-          orcidUrl: document.getElementById('else-orcid').value.trim(),
-          instagramUrl: document.getElementById('else-instagram').value.trim(),
           researchGateUrl: document.getElementById('else-researchgate').value.trim(),
           googleScholarUrl: document.getElementById('else-googlescholar').value.trim(),
+          orcidUrl: document.getElementById('else-orcid').value.trim(),
+          instagramUrl: document.getElementById('else-instagram').value.trim(),
+          contactFormTextColor: document.getElementById('hex-contact-form-text').value.trim(),
+          elsewhereLinkColor: document.getElementById('hex-elsewhere-links').value.trim(),
         };
-        if (allowedFieldIds.has('contactFormTextColor')) payload.contactFormTextColor = document.getElementById('hex-contact-form-text').value.trim();
-        if (allowedFieldIds.has('elsewhereLinkColor')) payload.elsewhereLinkColor = document.getElementById('hex-elsewhere-links').value.trim();
         await upsertMainEntry('siteSettings', payload);
         const msg = document.getElementById('elsewhereSaveMsg');
         if (msg) { msg.style.display = 'block'; setTimeout(() => msg.style.display = 'none', 2500); }
@@ -2401,6 +2405,7 @@
         if (!fields.title) throw new Error('Title is required');
         await updatePublication(id, fields);
         await loadPubs();
+        alert('Publication updated');
       } catch(e) { alert('Save error: ' + e.message); }
     }
 
