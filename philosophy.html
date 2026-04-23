@@ -366,9 +366,8 @@
         }
 
         /* Load siteSettings for nav name styling + philosophy portrait */
-        const ss = await cfGet('siteSettings');
-        if (ss && ss.length) {
-          const s = ss.find(item => item && item.key === 'main') || ss[0];
+        if (settings && settings.length) {
+          const s = settings.find(item => item && item.key === 'main') || settings[0];
           const root = document.documentElement;
           if (s.navNameFont) {
             const el = document.querySelector('.nav-site-name');
