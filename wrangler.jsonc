@@ -7,5 +7,11 @@
     "binding": "ASSETS",
     "not_found_handling": "none"
   },
-  "workers_dev": true
+  "workers_dev": true,
+  "send_email": [
+    {
+      "name": "CONTACT_EMAIL",
+      "destination_address": "tomaso.pignocchi@gmail.com"
+    }
+  ]
 }
