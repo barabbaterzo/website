@@ -102,7 +102,16 @@
 
     /* ── GRID ── */
     .grid-wrap {
+      width: 100%;
+      max-width: none;
       padding: 1.5rem 0 4rem;
+    }
+
+    .gallery-wrap {
+      width: 100%;
+      max-width: none;
+      padding-left: 0;
+      padding-right: 0;
     }
 
     .photo-grid {
@@ -290,10 +299,12 @@
   </nav></div>
 
   <main>
-    <div class="wrap"><div class="grid-wrap">
-            <div class="photo-bio-section">
+    <div class="wrap">
+      <div class="photo-bio-section">
         <p id="photoBioText"></p>
       </div>
+    </div>
+    <div class="grid-wrap gallery-wrap">
       <div class="photo-grid" id="photoGrid">
         <!-- photos loaded dynamically -->
       </div>
@@ -302,7 +313,7 @@
           <a href="admin/index.html">Open admin panel to add photos →</a>
         </p>
       </div>
-    </div></div>
+    </div>
   </main>
 
   <!-- LIGHTBOX -->
