@@ -557,8 +557,12 @@
           </div>
           <div class="ty-row">
             <div class="ty-field" style="flex:1">
-              <label>Dimensione <span id="v-sz-banner-title">100</span>%</label>
+              <label>Dimensione homepage <span id="v-sz-banner-title">100</span>%</label>
               <input type="range" min="60" max="320" value="100" step="1" id="sz-banner-title" oninput="syncSize('banner-title')" style="width:100%" />
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione pagine secondarie <span id="v-sz-secondary-title">100</span>%</label>
+              <input type="range" min="60" max="180" value="100" step="1" id="sz-secondary-title" oninput="syncSize('secondary-title')" style="width:100%" />
             </div>
           </div>
         </div>
@@ -1182,6 +1186,10 @@
           <input type="text" id="else-philpeople" placeholder="https://…" />
         </div>
         <div class="form-group full">
+          <label>ORCID URL</label>
+          <input type="text" id="else-orcid" placeholder="https://orcid.org/..." />
+        </div>
+        <div class="form-group full">
           <label>Instagram URL</label>
           <input type="text" id="else-instagram" placeholder="https://…" />
         </div>
@@ -1192,6 +1200,20 @@
         <div class="form-group full">
           <label>Google Scholar URL</label>
           <input type="text" id="else-googlescholar" placeholder="https://…" />
+        </div>
+        <div class="form-group">
+          <label>Contact form text color</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="color" id="cp-contact-form-text" value="#1a1814" style="width:40px;height:32px;padding:2px;border:1px solid var(--rule);cursor:pointer" oninput="document.getElementById('hex-contact-form-text').value=this.value" />
+            <input type="text" id="hex-contact-form-text" placeholder="#1a1814" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:90px" oninput="var p=document.getElementById('cp-contact-form-text');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Elsewhere links color</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="color" id="cp-elsewhere-links" value="#1a1814" style="width:40px;height:32px;padding:2px;border:1px solid var(--rule);cursor:pointer" oninput="document.getElementById('hex-elsewhere-links').value=this.value" />
+            <input type="text" id="hex-elsewhere-links" placeholder="#1a1814" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:90px" oninput="var p=document.getElementById('cp-elsewhere-links');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+          </div>
         </div>
       </div>
       <div class="form-actions" style="margin-top:1rem">
@@ -1782,17 +1804,19 @@
       });
     }
 
-    async function saveTitleAndLogoToSiteSettings(title, logoSize) {
+    async function saveTitleAndLogoToSiteSettings(title, logoSize, secondaryTitleSize) {
       const allowedFieldIds = await getContentTypeFieldIds('siteSettings');
       const missing = [];
       if (!allowedFieldIds.has('siteTitle')) missing.push('siteTitle');
       if (!allowedFieldIds.has('logoSize')) missing.push('logoSize');
       if (missing.length) throw new Error('Site Settings is missing field(s): ' + missing.join(', '));
-      await upsertMainEntry('siteSettings', {
+      const payload = {
         key: 'main',
         siteTitle: (title || 'Tomaso Pignocchi').trim(),
         logoSize: parseInt(logoSize || 100, 10) || 100,
-      });
+      };
+      if (allowedFieldIds.has('secondaryTitleSize')) payload.secondaryTitleSize = parseInt(secondaryTitleSize || 100, 10) || 100;
+      await upsertMainEntry('siteSettings', payload);
     }
 
     /* ── Portrait crop tool (reusing heroPosX / heroPosY) ── */
@@ -1925,6 +1949,7 @@
         'venue':        sc.sizeVenue,
         'footer':       sc.sizeFooter,
         'logo':         sc.logoSize,
+        'secondary-title': sc.secondaryTitleSize,
       };
       Object.entries(sizeMap).forEach(([k, v]) => {
         if (!v) return;
@@ -2040,7 +2065,7 @@
         if (sc.contactInfo)       document.getElementById('sc-contact').value = sc.contactInfo;
         if (sc.heroPosX !== undefined) { cropX = sc.heroPosX; cropY = sc.heroPosY || 38; updateCrop(); }
         if (sc.heroStyle) setLayout(String(sc.heroStyle).toLowerCase());
-        loadTypographyToAdmin(contentUi);
+        loadTypographyToAdmin({ ...(contentUi || {}), secondaryTitleSize: (ss && ss.secondaryTitleSize) || undefined, logoSize: (ss && ss.logoSize) || (contentUi && contentUi.logoSize) });
         loadColorsToAdmin(contentUi);
         setPhilosophyPortrait((ss && ss.philosophyPortraitUrl) || '', false);
       } catch(e) { console.warn('loadContent error', e); }
@@ -2104,10 +2129,11 @@
       };
       const siteTitleValue = document.getElementById('sc-title')?.value?.trim() || 'Tomaso Pignocchi';
       const logoSizeValue = parseInt(document.getElementById('sz-logo')?.value || 100, 10) || 100;
+      const secondaryTitleSizeValue = parseInt(document.getElementById('sz-secondary-title')?.value || 100, 10) || 100;
       try {
         console.log('[DEBUG] Saving fields:', JSON.stringify(fields));
         await upsertMainEntry('siteContent', fields);
-        await saveTitleAndLogoToSiteSettings(siteTitleValue, logoSizeValue);
+        await saveTitleAndLogoToSiteSettings(siteTitleValue, logoSizeValue, secondaryTitleSizeValue);
         await savePhilosophyPortraitToSiteSettings(document.getElementById('sc-philo-url')?.value?.trim() || '');
         const msg = document.getElementById('contentSaveMsg');
         msg.style.display = 'block';
@@ -2282,6 +2308,7 @@
         const map = {
           'else-academia': 'academiaUrl',
           'else-philpeople': 'philpeopleUrl',
+          'else-orcid': 'orcidUrl',
           'else-instagram': 'instagramUrl',
           'else-researchgate': 'researchGateUrl',
           'else-googlescholar': 'googleScholarUrl'
@@ -2290,6 +2317,16 @@
           const el = document.getElementById(id);
           if (el) el.value = s[key] || '';
         });
+        const contactColor = s.contactFormTextColor || '';
+        const elsewhereColor = s.elsewhereLinkColor || '';
+        const contactHex = document.getElementById('hex-contact-form-text');
+        const contactPick = document.getElementById('cp-contact-form-text');
+        const elsewhereHex = document.getElementById('hex-elsewhere-links');
+        const elsewherePick = document.getElementById('cp-elsewhere-links');
+        if (contactHex) contactHex.value = contactColor;
+        if (contactPick && /^#[0-9a-fA-F]{6}$/.test(contactColor)) contactPick.value = contactColor;
+        if (elsewhereHex) elsewhereHex.value = elsewhereColor;
+        if (elsewherePick && /^#[0-9a-fA-F]{6}$/.test(elsewhereColor)) elsewherePick.value = elsewhereColor;
       } catch (e) { console.warn('loadElsewhere', e); }
     }
 
@@ -2297,17 +2334,21 @@
       if (!CF.hasWriteAccess()) { alert('Connect Contentful first and add the Management Token (Settings tab)'); return; }
       try {
         const allowedFieldIds = await getContentTypeFieldIds('siteSettings');
-        const required = ['academiaUrl','philpeopleUrl','instagramUrl','researchGateUrl','googleScholarUrl'];
+        const required = ['academiaUrl','philpeopleUrl','orcidUrl','instagramUrl','researchGateUrl','googleScholarUrl'];
         const missing = required.filter(id => !allowedFieldIds.has(id));
         if (missing.length) throw new Error('Site Settings is missing field(s): ' + missing.join(', '));
-        await upsertMainEntry('siteSettings', {
+        const payload = {
           key: 'main',
           academiaUrl: document.getElementById('else-academia').value.trim(),
           philpeopleUrl: document.getElementById('else-philpeople').value.trim(),
+          orcidUrl: document.getElementById('else-orcid').value.trim(),
           instagramUrl: document.getElementById('else-instagram').value.trim(),
           researchGateUrl: document.getElementById('else-researchgate').value.trim(),
           googleScholarUrl: document.getElementById('else-googlescholar').value.trim(),
-        });
+        };
+        if (allowedFieldIds.has('contactFormTextColor')) payload.contactFormTextColor = document.getElementById('hex-contact-form-text').value.trim();
+        if (allowedFieldIds.has('elsewhereLinkColor')) payload.elsewhereLinkColor = document.getElementById('hex-elsewhere-links').value.trim();
+        await upsertMainEntry('siteSettings', payload);
         const msg = document.getElementById('elsewhereSaveMsg');
         if (msg) { msg.style.display = 'block'; setTimeout(() => msg.style.display = 'none', 2500); }
       } catch(e) { alert('Save error: ' + e.message); }

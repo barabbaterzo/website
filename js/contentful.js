@@ -344,9 +344,13 @@ const CF = (() => {
           { id: 'logoSize',              name: 'logoSize',              type: 'Integer' },
           { id: 'academiaUrl',           name: 'academiaUrl',           type: 'Symbol' },
           { id: 'philpeopleUrl',         name: 'philpeopleUrl',         type: 'Symbol' },
+          { id: 'orcidUrl',              name: 'orcidUrl',              type: 'Symbol' },
           { id: 'instagramUrl',          name: 'instagramUrl',          type: 'Symbol' },
           { id: 'researchGateUrl',       name: 'researchGateUrl',       type: 'Symbol' },
-          { id: 'googleScholarUrl',      name: 'googleScholarUrl',      type: 'Symbol' }
+          { id: 'googleScholarUrl',      name: 'googleScholarUrl',      type: 'Symbol' },
+          { id: 'secondaryTitleSize',    name: 'secondaryTitleSize',    type: 'Integer' },
+          { id: 'contactFormTextColor',  name: 'contactFormTextColor',  type: 'Symbol' },
+          { id: 'elsewhereLinkColor',    name: 'elsewhereLinkColor',    type: 'Symbol' }
         ],
         displayField: 'key'
       },
@@ -370,23 +374,66 @@ const CF = (() => {
         const existing = await mgmt('GET', `/content_types/${t.id}`).catch(() => null);
 
         if (existing) {
-          /* exists but maybe not published — publish it */
-          if (!existing.sys.publishedVersion) {
+          const existingFields = Array.isArray(existing.fields) ? existing.fields : [];
+          const existingIds = new Set(existingFields.map(f => f.id));
+          const missingFields = t.fields.filter(f => !existingIds.has(f.id));
+
+          let nextVersion = existing.sys.version;
+          let status = 'already exists';
+
+          if (missingFields.length) {
             const c = cfg();
-            await fetch(
-              `https://api.contentful.com/spaces/${c.spaceId}/environments/master/content_types/${t.id}/published`,
+            const payload = {
+              name: existing.name || t.name,
+              displayField: existing.displayField || t.displayField,
+              fields: existingFields.concat(
+                missingFields.map(f => ({
+                  id: f.id,
+                  name: f.name,
+                  type: f.type,
+                  ...(f.linkType ? { linkType: f.linkType } : {}),
+                  ...(f.required ? { required: true } : {})
+                }))
+              )
+            };
+            const updR = await fetch(
+              `https://api.contentful.com/spaces/${c.spaceId}/environments/master/content_types/${t.id}`,
               {
                 method: 'PUT',
                 headers: {
                   Authorization: `Bearer ${c.mgmtToken}`,
                   'X-Contentful-Version': existing.sys.version,
                   'Content-Type': 'application/vnd.contentful.management.v1+json'
+                },
+                body: JSON.stringify(payload)
+              }
+            );
+            const upd = await updR.json().catch(() => ({}));
+            if (!updR.ok) throw new Error(upd.message || `Could not update content type ${t.id}`);
+            nextVersion = upd.sys.version;
+            status = 'updated';
+          }
+
+          if (!existing.sys.publishedVersion || missingFields.length) {
+            const c = cfg();
+            const pubR = await fetch(
+              `https://api.contentful.com/spaces/${c.spaceId}/environments/master/content_types/${t.id}/published`,
+              {
+                method: 'PUT',
+                headers: {
+                  Authorization: `Bearer ${c.mgmtToken}`,
+                  'X-Contentful-Version': nextVersion,
+                  'Content-Type': 'application/vnd.contentful.management.v1+json'
                 }
               }
             );
-            results.push({ id: t.id, status: 'published' });
+            if (!pubR.ok) {
+              const err = await pubR.json().catch(() => ({}));
+              throw new Error(err.message || `Could not publish content type ${t.id}`);
+            }
+            results.push({ id: t.id, status: status === 'updated' ? 'updated + published' : 'published' });
           } else {
-            results.push({ id: t.id, status: 'already exists' });
+            results.push({ id: t.id, status });
           }
           continue;
         }

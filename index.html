@@ -60,7 +60,7 @@
     /* NAV */
     .site-nav{
       position:sticky;top:0;z-index:100;background:var(--page-bg);
-      border-bottom:0.5px solid var(--page-rule);height:54px;
+      border-bottom:none;height:54px;
     }
     .site-nav .wrap{height:100%;display:flex;align-items:center;justify-content:space-between}
     .nav-logo{display:flex;align-items:center;text-decoration:none}
@@ -417,17 +417,17 @@
     .contact-elsewhere{display:flex;flex-direction:column;gap:0.4rem}
     .contact-elsewhere-label{font-size:0.5rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--color-contact-muted,var(--page-ink3))}
     .contact-elsewhere-links{display:flex;flex-direction:column;gap:0.25rem}
-    .contact-elsewhere-links a{color:var(--color-contact,var(--page-ink));text-decoration:none;border-bottom:0.5px solid transparent;width:fit-content;line-height:1.8}
+    .contact-elsewhere-links a{color:var(--color-elsewhere-links,var(--color-contact,var(--page-ink)));text-decoration:none;border-bottom:0.5px solid transparent;width:fit-content;line-height:1.8}
     .contact-elsewhere-links a:hover{border-bottom-color:currentColor}
     .contact-form{display:flex;flex-direction:column;gap:.9rem}
     .contact-form .form-group{display:flex;flex-direction:column;gap:.3rem}
-    .contact-form label{font-family:var(--font-secondary);font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;color:var(--color-contact-muted,var(--page-ink3))}
+    .contact-form label{font-family:var(--font-secondary);font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;color:var(--color-contact,var(--page-ink))}
     .contact-form input,.contact-form textarea{
       border:.5px solid var(--page-rule);background:transparent;
       padding:.6rem .75rem;font-family:var(--font-primary);
       font-size:1rem;color:var(--color-contact,var(--page-ink));outline:none;width:100%;
     }
-    .contact-form input::placeholder,.contact-form textarea::placeholder{color:var(--color-contact-muted,var(--page-ink3));opacity:1}
+    .contact-form input::placeholder,.contact-form textarea::placeholder{color:var(--color-contact,var(--page-ink));opacity:.65}
     .contact-form input:focus,.contact-form textarea:focus{border-color:var(--color-contact,var(--page-ink))}
     .contact-form textarea{min-height:120px;resize:vertical}
     .contact-form button{
@@ -437,10 +437,10 @@
       padding:.65rem 1.4rem;cursor:pointer;transition:opacity .2s;
     }
     .contact-form button:hover{opacity:.7}
-    .form-success{display:none;font-family:var(--font-primary);font-style:italic;font-size:1rem;color:var(--page-ink2);padding:.8rem 0}
+    .form-success{display:none;font-family:var(--font-primary);font-style:italic;font-size:1rem;color:var(--color-contact,var(--page-ink));padding:.8rem 0}
 
     /* FOOTER */
-    footer{border-top:.5px solid var(--page-rule)}
+    footer{border-top:none}
     footer .wrap{padding-top:1.4rem;padding-bottom:1.4rem;display:flex;justify-content:space-between;align-items:center}
     footer p{font-family:var(--font-footer,var(--font-secondary));font-weight:300;font-size:calc(.5rem*var(--sz-footer,1));letter-spacing:.14em;text-transform:uppercase;color:var(--color-footer,var(--page-ink3))}
 
@@ -457,7 +457,7 @@
     body.ly-p .i-photo::after { content: attr(data-bio); display: flex; align-items: center; padding: clamp(1.2rem,2.5vw,2rem) var(--gutter); font-family: var(--font-primary); font-weight: var(--wt-primary); font-size: calc(clamp(0.92rem,1.3vw,1.05rem)*var(--sz-bio,1)); line-height: var(--lh-bio,1.78); color: var(--page-ink2); text-align: justify; hyphens: auto; border-left: 0.5px solid var(--page-rule); background: var(--page-bg); }
 
             /* ─── R: tutto il sito con margini laterali (stile rivista) ─── */
-    body.ly-r .site-nav { border-bottom: 0.5px solid var(--page-rule); }
+    body.ly-r .site-nav { border-bottom: none; }
     body.ly-r .site-nav .wrap { max-width: 1200px; }
 
     body.ly-r .intro {
@@ -500,7 +500,7 @@
     }
     body.ly-s .nav-site-name { display: none; }
     body.ly-s .nav-links li:not(:last-child) { display: none; }
-    body.ly-s .site-nav { border-bottom: 0.5px solid var(--page-rule); }
+    body.ly-s .site-nav { border-bottom: none; }
     body.ly-s .site-nav .wrap { max-width: 1200px; }
 
     body.ly-s .intro { display: none !important; }
@@ -838,6 +838,11 @@
       ['name','sub','bio','pubs','venue','labels','sublabels','seemore','photo','footer'].forEach(p => applySection(p, sc));
       if (sc.bioColor || sc.textColor) root.style.setProperty('--color-contact', sc.bioColor || sc.textColor);
       if (sc.labelsColor || sc.textColor) root.style.setProperty('--color-contact-muted', sc.labelsColor || sc.textColor);
+      if (ss && ss.contactFormTextColor) {
+        root.style.setProperty('--color-contact', ss.contactFormTextColor);
+        root.style.setProperty('--color-contact-muted', ss.contactFormTextColor);
+      }
+      if (ss && ss.elsewhereLinkColor) root.style.setProperty('--color-elsewhere-links', ss.elsewhereLinkColor);
       if (sc.sizePhotoIntro   != null) root.style.setProperty('--sz-photo',         sc.sizePhotoIntro   / 100);
       if (sc.sizeLabels       != null) root.style.setProperty('--sz-labels',        sc.sizeLabels       / 100);
       if (sc.sizeSublabels    != null) root.style.setProperty('--sz-sublabels',     sc.sizeSublabels    / 100);
@@ -1001,8 +1006,9 @@
           if (label2Text) { const el = document.getElementById('labelS2'); if (el) el.textContent = label2Text; }
           const elsewhereLinks = [
             ['Academia', ss.academiaUrl],
-            ['Instagram', ss.instagramUrl],
             ['PhilPeople', ss.philpeopleUrl],
+            ['ORCID', ss.orcidUrl],
+            ['Instagram', ss.instagramUrl],
             ['ResearchGate', ss.researchGateUrl],
             ['Google Scholar', ss.googleScholarUrl],
           ].filter(([,url]) => !!url);
