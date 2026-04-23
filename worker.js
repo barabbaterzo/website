@@ -74,6 +74,9 @@ async function handleContact(request, env) {
     if (!emailBinding || !destination || !sender)
       return json({ ok: false, error: 'Contact form not configured.' }, { status: 503 });
 
+    const safeName = String(name).replace(/[\r\n]+/g, ' ').trim();
+    const safeEmail = String(email).replace(/[\r\n]+/g, ' ').trim();
+
     const html = `<h2>New message</h2>
       <p><strong>Name:</strong> ${escapeHtml(name)}</p>
       <p><strong>Email:</strong> ${escapeHtml(email)}</p>
@@ -81,9 +84,14 @@ async function handleContact(request, env) {
       <p>${escapeHtml(message).replace(/\n/g, '<br>')}</p>`;
 
     const raw = [
-      `From: ${sender}`, `To: ${destination}`, `Reply-To: ${email}`,
-      'Subject: Website contact form', 'MIME-Version: 1.0',
-      'Content-Type: text/html; charset=UTF-8', '', html.trim()
+      `From: Tomaso Pignocchi Website <${sender}>`,
+      `To: ${destination}`,
+      `Reply-To: ${safeName} <${safeEmail}>`,
+      `Subject: New message from tomasopignocchi.com`,
+      'MIME-Version: 1.0',
+      'Content-Type: text/html; charset=UTF-8',
+      '',
+      html.trim()
     ].join('\r\n');
 
     await emailBinding.send(new EmailMessage(sender, destination, raw));
