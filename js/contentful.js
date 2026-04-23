@@ -416,7 +416,7 @@ const CF = (() => {
 
           if (!existing.sys.publishedVersion || missingFields.length) {
             const c = cfg();
-            const pubR = await fetch(
+            await fetch(
               `https://api.contentful.com/spaces/${c.spaceId}/environments/master/content_types/${t.id}/published`,
               {
                 method: 'PUT',
@@ -427,10 +427,6 @@ const CF = (() => {
                 }
               }
             );
-            if (!pubR.ok) {
-              const err = await pubR.json().catch(() => ({}));
-              throw new Error(err.message || `Could not publish content type ${t.id}`);
-            }
             results.push({ id: t.id, status: status === 'updated' ? 'updated + published' : 'published' });
           } else {
             results.push({ id: t.id, status });

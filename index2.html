@@ -880,9 +880,10 @@
         const el = document.getElementById('bioText');
         if (el) el.innerHTML = sc.bioText.replace(/\n/g,'<br>');
       }
-      if (sc.heroPosX != null && sc.heroPosY != null)
+      if (sc.heroPosX != null && sc.heroPosY != null) {
         document.documentElement.style.setProperty('--hero-pos', sc.heroPosX+'% '+sc.heroPosY+'%');
         localStorage.setItem('tp_hero_pos', sc.heroPosX+'% '+sc.heroPosY+'%');
+      }
       if (sc.heroStyle) {
         document.body.className = document.body.className.replace(/\bly-\S+/g,'').trim();
         const ly = sc.heroStyle.toLowerCase();

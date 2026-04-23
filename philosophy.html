@@ -58,7 +58,8 @@
     .nav-right a.active{color:var(--page-ink);border-bottom:0.5px solid var(--page-ink)}
 
     /* BIO */
-    .bio-section{padding:clamp(2rem,4vw,3.6rem) 0;border-bottom:0.5px solid var(--page-rule)}
+    .bio-section{padding:clamp(2rem,4vw,3.6rem) 0}
+    .bio-grid{padding-bottom:clamp(1.6rem,3vw,2.4rem);border-bottom:0.5px solid var(--page-rule-strong,#a8a094)}
     .bio-grid{display:grid;grid-template-columns:minmax(0,1fr) clamp(160px,20vw,230px);gap:clamp(1rem,2.8vw,2rem);align-items:start}
     .bio-copy p{
       font-family:var(--font-bio,var(--font-primary));font-weight:var(--wt-bio,var(--wt-primary));font-style:var(--fs-primary);
@@ -100,8 +101,9 @@
     .pub-list{list-style:none}
     .pub-list li{
       display:grid;grid-template-columns:2.8rem 1fr;gap:0 1rem;
-      padding:0.85rem 0;border-top:none;align-items:baseline;
+      padding:0.85rem 0;align-items:baseline;
     }
+    .pub-list li + li{border-top:0.5px solid var(--page-rule-strong,#a8a094)}
     .pub-list li:last-child{border-bottom:none}
     .pub-year{font-family:var(--font-secondary);font-size:0.58rem;font-weight:300;color:var(--page-ink3)}
     .pub-title{

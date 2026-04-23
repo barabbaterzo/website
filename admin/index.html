@@ -277,19 +277,19 @@
       <div class="sub">Tomaso Pignocchi</div>
     </div>
     <div class="header-links">
-      <a href="../photography.html" target="_blank">View site ↗</a>
-      <a href="../index.html" target="_blank">Academic page ↗</a>
+      <a href="../photography.html" target="_blank">Photography page ↗</a>
+      <a href="../index.html" target="_blank">Homepage ↗</a>
       <button onclick="logout()">Log out</button>
     </div>
   </div>
 
   <div class="admin-tabs">
-    <button class="admin-tab active" data-panel="content" onclick="switchPanel('content')">Content</button>
+    <button class="admin-tab active" data-panel="content" onclick="switchPanel('content')">Homepage & Pages</button>
     <button class="admin-tab" data-panel="publications" onclick="switchPanel('publications')">Publications</button>
     <button class="admin-tab" data-panel="talks" onclick="switchPanel('talks')">Talks</button>
-    <button class="admin-tab" data-panel="photos" onclick="switchPanel('photos')">Photos & Banner</button>
+    <button class="admin-tab" data-panel="photos" onclick="switchPanel('photos')">Photos & Layout S</button>
     <button class="admin-tab" data-panel="elsewhere" onclick="switchPanel('elsewhere')">Elsewhere</button>
-    <button class="admin-tab" data-panel="settings" onclick="switchPanel('settings')">Contentful</button>
+    <button class="admin-tab" data-panel="settings" onclick="switchPanel('settings')">Settings</button>
   </div>
 
   <div class="admin-body">
@@ -297,7 +297,7 @@
   <!-- ═══ CONTENT PANEL ═══ -->
   <div class="admin-panel active" id="panel-content">
 
-    <p class="section-title">Site text</p>
+    <p class="section-title">Homepage & page text</p>
     <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1.8rem">
 
       <div class="form-group" style="margin-bottom:0.9rem">
@@ -366,7 +366,7 @@
         <label>Contact affiliations <span style="color:var(--ink3);font-size:0.48rem">(shown on the contact tab — use new lines)</span></label>
         <textarea id="sc-contact" style="min-height:90px"></textarea>
         <div style="margin-top:0.35rem;font-size:0.48rem;letter-spacing:0.04em;color:var(--ink3);line-height:1.5">
-          Contact form colors follow the Typography settings: body text, links and button use the Bio color; labels use the Labels color.
+          Contact colors are now managed in the Elsewhere tab. Use that panel to set a dedicated color for the contact form text and a separate color for Elsewhere links.
         </div>
       </div>
 
@@ -374,7 +374,7 @@
 
 
       <div style="height:1px;background:var(--rule);margin:1.6rem 0"></div>
-      <p class="section-title" style="margin-bottom:0.8rem">Layout homepage</p>
+      <p class="section-title" style="margin-bottom:0.8rem">Homepage layout</p>
 
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:1.4rem">
         <button class="layout-opt" data-layout="a" onclick="setLayout('a')"
@@ -476,7 +476,7 @@
       </div>
 
       <div style="height:1px;background:var(--rule);margin:1.6rem 0"></div>
-      <p class="section-title" style="margin-bottom:1rem">Colori & Logo</p>
+      <p class="section-title" style="margin-bottom:1rem">Colors & logo</p>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
         <div class="form-group">
@@ -523,7 +523,7 @@
       </div>
 
       <div style="height:1px;background:var(--rule);margin:1.6rem 0"></div>
-      <p class="section-title" style="margin-bottom:1rem">Tipografia</p>
+      <p class="section-title" style="margin-bottom:1rem">Typography</p>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem">
         
@@ -563,6 +563,7 @@
             <div class="ty-field" style="flex:1">
               <label>Dimensione pagine secondarie <span id="v-sz-secondary-title">100</span>%</label>
               <input type="range" min="60" max="180" value="100" step="1" id="sz-secondary-title" oninput="syncSize('secondary-title')" style="width:100%" />
+              <div style="margin-top:0.35rem;font-size:0.5rem;line-height:1.55;color:var(--ink3)">Same font, weight and color as the homepage title; size only for <code>philosophy.html</code> and <code>photography.html</code>.</div>
             </div>
           </div>
         </div>
@@ -1098,7 +1099,7 @@
   
     <!-- Layout S settings -->
     <div id="layout-s-settings" style="display:none;margin-top:2rem">
-      <p class="section-title" style="margin-bottom:1rem">Layout S &mdash; Impostazioni pannelli</p>
+      <p class="section-title" style="margin-bottom:1rem">Layout S &mdash; banner panel settings</p>
 
       <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1rem">
         <p style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem">Pannello 1 &mdash; Philosophy</p>
@@ -1174,8 +1175,12 @@
 
   <!-- ═══ ELSEWHERE PANEL ═══ -->
   <div class="admin-panel" id="panel-elsewhere">
-    <p class="section-title">Elsewhere links</p>
+    <p class="section-title">Elsewhere, ORCID & contact colors</p>
     <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1.8rem">
+      <div style="margin-bottom:0.9rem;font-size:0.56rem;line-height:1.7;color:var(--ink3)">
+        Order on the site: Academia, PhilPeople, ORCID, Instagram, ResearchGate, Google Scholar.
+        The contact form text color is separate from the Elsewhere links color.
+      </div>
       <div class="form-grid">
         <div class="form-group full">
           <label>Academia URL</label>
@@ -1217,7 +1222,7 @@
         </div>
       </div>
       <div class="form-actions" style="margin-top:1rem">
-        <button class="btn primary" onclick="saveElsewhere()">Save elsewhere →</button>
+        <button class="btn primary" onclick="saveElsewhere()">Save elsewhere settings →</button>
       </div>
       <div id="elsewhereSaveMsg" style="font-size:0.58rem;color:var(--green);margin-top:0.6rem;display:none">✓ Saved</div>
     </div>
@@ -1225,7 +1230,7 @@
 
   <!-- ═══ SETTINGS PANEL ═══ -->
   <div class="admin-panel" id="panel-settings">
-    <p class="section-title">Contentful connection</p>
+    <p class="section-title">Contentful connection & schema</p>
     <div class="cf-status" id="cfStatus2" style="margin-bottom:1.8rem">
       <span id="cfStatusText2">Checking…</span>
       <button onclick="openSetup()">Configure</button>
@@ -1234,7 +1239,8 @@
       Contentful stores all your content — photos, publications, talks, bio text —
       so it persists across devices and sessions. Without it, changes are lost on refresh.<br><br>
       Once connected, all sections of this admin panel save directly to Contentful
-      and appear live on the site immediately.
+      and appear live on the site immediately.<br><br>
+      If a new site setting does not appear yet in your space, run Setup once more: the schema updater now adds missing fields to existing content types too.
     </p>
   </div>
 
@@ -2049,10 +2055,7 @@
       if (!CF.hasReadAccess()) return;
       try {
         const items = await CF.get('siteContent');
-        console.log('[DEBUG] siteContent items:', JSON.stringify(items));
         const sc = (items && items.find(item => item && item.key === 'main')) || (items && items.length ? items[0] : null);
-        if (!sc) { console.log('[DEBUG] No siteContent entry found'); return; }
-        console.log('[DEBUG] siteContent fields:', JSON.stringify(sc));
 
         const settings = await CF.get('siteSettings');
         const ss = (settings && settings.find(item => item && item.key === 'main')) || (settings && settings.length ? settings[0] : null);
@@ -2131,7 +2134,6 @@
       const logoSizeValue = parseInt(document.getElementById('sz-logo')?.value || 100, 10) || 100;
       const secondaryTitleSizeValue = parseInt(document.getElementById('sz-secondary-title')?.value || 100, 10) || 100;
       try {
-        console.log('[DEBUG] Saving fields:', JSON.stringify(fields));
         await upsertMainEntry('siteContent', fields);
         await saveTitleAndLogoToSiteSettings(siteTitleValue, logoSizeValue, secondaryTitleSizeValue);
         await savePhilosophyPortraitToSiteSettings(document.getElementById('sc-philo-url')?.value?.trim() || '');

@@ -457,7 +457,7 @@
     body.ly-p .i-photo::after { content: attr(data-bio); display: flex; align-items: center; padding: clamp(1.2rem,2.5vw,2rem) var(--gutter); font-family: var(--font-primary); font-weight: var(--wt-primary); font-size: calc(clamp(0.92rem,1.3vw,1.05rem)*var(--sz-bio,1)); line-height: var(--lh-bio,1.78); color: var(--page-ink2); text-align: justify; hyphens: auto; border-left: 0.5px solid var(--page-rule); background: var(--page-bg); }
 
             /* ─── R: tutto il sito con margini laterali (stile rivista) ─── */
-    body.ly-r .site-nav { border-bottom: none; }
+    body.ly-r .site-nav { border-bottom: 0.5px solid var(--page-rule); }
     body.ly-r .site-nav .wrap { max-width: 1200px; }
 
     body.ly-r .intro {
@@ -500,7 +500,7 @@
     }
     body.ly-s .nav-site-name { display: none; }
     body.ly-s .nav-links li:not(:last-child) { display: none; }
-    body.ly-s .site-nav { border-bottom: none; }
+    body.ly-s .site-nav { border-bottom: 0.5px solid var(--page-rule); }
     body.ly-s .site-nav .wrap { max-width: 1200px; }
 
     body.ly-s .intro { display: none !important; }
@@ -805,7 +805,7 @@
       return clean;
     }
 
-    function applySettings(sc) {
+    function applySettings(sc, ss) {
       if (!sc) return;
       if (sc.siteTitle) setSiteTitle(sc.siteTitle); else setSiteTitle('Tomaso Pignocchi');
       const root = document.documentElement;
@@ -883,9 +883,10 @@
         const el = document.getElementById('bioText');
         if (el) el.innerHTML = sc.bioText.replace(/\n/g,'<br>');
       }
-      if (sc.heroPosX != null && sc.heroPosY != null)
+      if (sc.heroPosX != null && sc.heroPosY != null) {
         document.documentElement.style.setProperty('--hero-pos', sc.heroPosX+'% '+sc.heroPosY+'%');
         localStorage.setItem('tp_hero_pos', sc.heroPosX+'% '+sc.heroPosY+'%');
+      }
       if (sc.heroStyle) {
         document.body.className = document.body.className.replace(/\bly-\S+/g,'').trim();
         const ly = sc.heroStyle.toLowerCase();
@@ -944,7 +945,7 @@
         const sc = (items && items.find(item => item && item.key === 'main')) || (items && items.length ? items[0] : null);
         const ss = (settings && settings.find(item => item && item.key === 'main')) || (settings && settings.length ? settings[0] : null);
         if (sc || ss) {
-          applySettings({ ...(sc || {}), ...(ss || {}) });
+          applySettings({ ...(sc || {}), ...(ss || {}) }, ss);
         }
         if (ss) {
           const pick = (...keys) => {
