@@ -941,7 +941,14 @@
     </div>
 
     <p class="section-title">Edit existing publications</p>
-    <p style="font-size:0.56rem;color:var(--ink3);line-height:1.7;margin:-0.35rem 0 1rem">All publications already published on the site are editable here. Change any field, then click Save on that row.</p>
+    <p style="font-size:0.56rem;color:var(--ink3);line-height:1.7;margin:-0.35rem 0 0.6rem">All publications already published on the site are editable here. Change any field, then click Save on that row.</p>
+    <div id="pubImportNotice" style="display:none;background:#fff;border:1px solid var(--rule);border-radius:4px;padding:1rem 1.1rem;margin:0 0 1rem;font-size:0.56rem;line-height:1.7;color:var(--ink2)">
+      The publications currently visible on <code>philosophy.html</code> are still the hardcoded fallback list, not Contentful entries yet. Import them once to make them editable here.
+      <div class="form-actions" style="margin-top:0.75rem">
+        <button class="btn primary" onclick="importSeedPublications()">Import current philosophy publications →</button>
+      </div>
+      <div id="pubImportMsg" style="font-size:0.56rem;color:var(--green);margin-top:0.55rem;display:none"></div>
+    </div>
     <div id="pubList" class="pub-admin-list"></div>
   </div>
 
@@ -2151,6 +2158,30 @@
     }
 
     /* ── Publications ── */
+    const STATIC_PUBLICATIONS_SEED = [
+      { title: '«No Room for Play»: Anatomy of a Defensive Fantasy', venue: 'Pòlemos. Materiali di filosofia e critica sociale, 2/25', year: 2026, pubType: 'article', link: '', forthcoming: true, order: 1 },
+      { title: 'Question de perspectives. Images, raisons et méthodes philosophiques entre Wittgenstein et Nietzsche', venue: 'Transversalités, 179', year: 2026, pubType: 'article', link: '', forthcoming: true, order: 2 },
+      { title: 'When Rivers are Just Rivers: A Buddhist-Wittgensteinian Framework for a Non-Foundational Epistemology', venue: 'Topoi, 45/2', year: 2026, pubType: 'article', link: 'https://link.springer.com/article/10.1007/s11245-026-10398-2', forthcoming: false, order: 3 },
+      { title: '«Il serpentesco inganno»: Linguaggio, illusione e conoscenza in Hamann e Wittgenstein', venue: 'Annuario filosofico, 40, pp. 78–107', year: 2025, pubType: 'article', link: '', forthcoming: false, order: 4 },
+      { title: "Beyond Belief: Deep Disagreement and Conversion in Wittgenstein's Philosophy", venue: 'Synthese, 205, art. 39, pp. 1–25', year: 2025, pubType: 'article', link: 'https://link.springer.com/epdf/10.1007/s11229-024-04857-9?sharing_token=eWPcmhCATbF0bETTNvtLqfe4RwlQNchNByi7wbcMAY4u8QU-fGvgMQcyub6FGk_b71uQTswrL5BDaND01PIlWsqX2l1bdDHN7kGH1Wi1gxerC7FchvXAb-sIqROEfatNg7ZEZWv6GKek6RnxZ_rqDGzgd1fivCEPFaZCH9B-d0Q%3D', forthcoming: false, order: 5 },
+      { title: 'The Buddhist Quest for Valid Experience from Dignāga to Candrakīrti', venue: 'Synthesis — Journal for Philosophy, 4, pp. 115–148', year: 2024, pubType: 'article', link: 'https://synthesisonline.net/wp-content/uploads/2024/12/5.-tomaso-pignocchi-2.pdf', forthcoming: false, order: 6 },
+      { title: 'La profondità del quotidiano. Etica e senso nella poesia haiku', venue: 'Munera. Rivista europea di cultura, 1, pp. 115–123', year: 2024, pubType: 'article', link: 'https://www.cittadellaeditrice.com/munera/tutti-gli-articoli/munera-1-2024-tomaso-pignocchi-la-profondita-del-quotidiano-etica-e-senso-nella-poesia-haiku/', forthcoming: false, order: 7 },
+      { title: "Sull'uso della similitudine e del paradosso nel Tractatus di Wittgenstein e nel buddhismo", venue: 'Rivista Italiana di Filosofia del Linguaggio, 17/1, pp. 96–108', year: 2023, pubType: 'article', link: 'http://www.rifl.unical.it/index.php/rifl/article/view/747/725', forthcoming: false, order: 8 },
+      { title: 'Ordinary Aesthetics and Ethics in the Haiku Poetry of Matsuo Bashō: A Wittgensteinian Perspective', venue: 'Open Philosophy, 6/1, pp. 1–16', year: 2023, pubType: 'article', link: 'https://philpapers.org/archive/PIGOAA.pdf', forthcoming: false, order: 9 },
+      { title: 'Language and Emptiness. Toward a Non-Foundational Soteriological Epistemology', venue: 'Studium — Contemporary Humanism Open Access Annals 2025, pp. 149–156', year: 2026, pubType: 'chapter', link: '', forthcoming: false, order: 10 },
+      { title: "Language and Soteriology: Desire, Illusion and Liberation in Wittgenstein's and Buddhist Philosophies", venue: 'Studium — Contemporary Humanism Open Access Annals 2024, pp. 260–267', year: 2025, pubType: 'chapter', link: '', forthcoming: false, order: 11 }
+    ];
+
+    function normalizePubKey(pub) {
+      return `${(pub.title || '').trim().toLowerCase()}::${String(pub.year || '').trim()}`;
+    }
+
+    function updatePubImportNotice() {
+      const box = document.getElementById('pubImportNotice');
+      if (!box) return;
+      box.style.display = pubsCache.length ? 'none' : 'block';
+    }
+
     let pubsCache = [];
 
     async function loadPubs() {
@@ -2164,7 +2195,8 @@
 
     function renderPubAdminList() {
       const el = document.getElementById('pubList');
-      if (!pubsCache.length) { el.innerHTML = '<p class="pub-admin-empty">No publications yet.</p>'; return; }
+      updatePubImportNotice();
+      if (!pubsCache.length) { el.innerHTML = '<p class="pub-admin-empty">No Contentful publications yet.</p>'; return; }
       el.innerHTML = '';
       pubsCache.forEach((p, idx) => {
         const div = document.createElement('div');
@@ -2193,6 +2225,64 @@
           </div>`;
         el.appendChild(div);
       });
+    }
+
+    async function importSeedPublications() {
+      if (!CF.hasWriteAccess()) { alert('Connect Contentful first and add the Management Token (Settings tab)'); return; }
+      try {
+        const msg = document.getElementById('pubImportMsg');
+        const c = CF.cfg();
+        const existing = await CF.get('publication', { order: 'fields.order,-fields.year' }) || [];
+        const existingKeys = new Set(existing.map(normalizePubKey));
+        const missing = STATIC_PUBLICATIONS_SEED.filter(pub => !existingKeys.has(normalizePubKey(pub)));
+        if (!missing.length) {
+          if (msg) {
+            msg.textContent = '✓ All current philosophy publications are already in Contentful.';
+            msg.style.display = 'block';
+          }
+          pubsCache = existing;
+          sortPubsCache();
+          renderPubAdminList();
+          return;
+        }
+        for (const pub of missing) {
+          const fields = Object.fromEntries(
+            Object.entries(pub).filter(([,v]) => v !== '' && v !== null && v !== undefined).map(([k,v]) => [k, { 'en-US': v }])
+          );
+          const r = await fetch(
+            `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries`,
+            {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${c.mgmtToken}`,
+                'Content-Type': 'application/vnd.contentful.management.v1+json',
+                'X-Contentful-Content-Type': 'publication'
+              },
+              body: JSON.stringify({ fields })
+            }
+          );
+          const entry = await r.json();
+          if (!r.ok) throw new Error(entry.message || 'Could not import publication');
+          await fetch(
+            `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entry.sys.id}/published`,
+            {
+              method: 'PUT',
+              headers: {
+                Authorization: `Bearer ${c.mgmtToken}`,
+                'Content-Type': 'application/vnd.contentful.management.v1+json',
+                'X-Contentful-Version': entry.sys.version
+              }
+            }
+          );
+        }
+        await loadPubs();
+        if (msg) {
+          msg.textContent = `✓ Imported ${missing.length} publication${missing.length === 1 ? '' : 's'} into Contentful.`;
+          msg.style.display = 'block';
+        }
+      } catch (e) {
+        alert('Import error: ' + e.message);
+      }
     }
 
     async function savePub() {
