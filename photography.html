@@ -524,11 +524,10 @@
           const ds = await rs.json();
           const settingsItem = (ds.items || []).find(item => item?.fields?.key === 'main') || (ds.items && ds.items[0]);
           const ss = settingsItem ? settingsItem.fields : null;
-          if (ss && (ss.siteTitle || ss.sitetitle)) setSiteTitle(ss.siteTitle || ss.sitetitle);
+          if (ss && ss.siteTitle) setSiteTitle(ss.siteTitle);
         } catch (_) {}
         if (mainItem) {
           const sc = mainItem.fields;
-          if (sc.siteTitle && document.title === 'Tomaso Pignocchi — Photography') setSiteTitle(sc.siteTitle);
           const el = document.getElementById('photoBioText');
           if (el && sc.photoIntro) el.innerHTML = sc.photoIntro.replace(/\n/g, '<br>');
           /* Apply typography settings */

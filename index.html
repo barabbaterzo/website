@@ -409,7 +409,16 @@
 
     /* CONTACT */
     .contact-wrap{display:grid;grid-template-columns:1fr 1fr;gap:2.4rem;align-items:start}
-    .contact-info{font-family:var(--font-secondary);font-size:.72rem;font-weight:300;line-height:2;color:var(--page-ink3)}
+    .contact-info{font-family:var(--font-secondary);font-size:.72rem;font-weight:300;line-height:2;color:var(--page-ink3);display:flex;flex-direction:column;gap:0.9rem}
+    .contact-mark-wrap{display:flex;align-items:flex-start}
+    .contact-mark{width:18px;height:auto;display:block}
+    .contact-mark-dark{display:none}
+    .contact-note{line-height:1.8;margin:0;max-width:24rem}
+    .contact-elsewhere{display:flex;flex-direction:column;gap:0.4rem}
+    .contact-elsewhere-label{font-size:0.5rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--page-ink3)}
+    .contact-elsewhere-links{display:flex;flex-direction:column;gap:0.25rem}
+    .contact-elsewhere-links a{color:var(--page-ink);text-decoration:none;border-bottom:0.5px solid transparent;width:fit-content;line-height:1.8}
+    .contact-elsewhere-links a:hover{border-bottom-color:currentColor}
     .contact-form{display:flex;flex-direction:column;gap:.9rem}
     .contact-form .form-group{display:flex;flex-direction:column;gap:.3rem}
     .contact-form label{font-family:var(--font-secondary);font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;color:var(--page-ink3)}
@@ -696,11 +705,15 @@
 
         <!-- LEFT: affiliations only, no email -->
         <div class="contact-info" id="contactInfo">
-          Institut Catholique de Paris<br>
-          Università degli Studi La Sapienza, Roma<br>
-          Università degli Studi Roma–Lumsa<br>
-          Kyoto University<br>
-          <em style="font-size:0.82rem">(Guest Research Associate, 2026)</em>
+          <div class="contact-mark-wrap">
+            <img src="assets/asterisco-black.svg" alt="" aria-hidden="true" class="contact-mark contact-mark-light" />
+            <img src="assets/asterisco-white.svg" alt="" aria-hidden="true" class="contact-mark contact-mark-dark" />
+          </div>
+          <p class="contact-note">For inquiries, collaborations, and print requests, feel free to write.</p>
+          <div class="contact-elsewhere" id="contactElsewhere" style="display:none">
+            <div class="contact-elsewhere-label">Elsewhere</div>
+            <div class="contact-elsewhere-links" id="contactElsewhereLinks"></div>
+          </div>
         </div>
 
         <!-- RIGHT: contact form -->
@@ -793,7 +806,7 @@
 
     function applySettings(sc) {
       if (!sc) return;
-      setSiteTitle(sc.siteTitle || 'Tomaso Pignocchi');
+      if (sc.siteTitle) setSiteTitle(sc.siteTitle); else setSiteTitle('Tomaso Pignocchi');
       const root = document.documentElement;
       /* Global font fields removed — using per-section fonts */
       if (sc.sizeBannerTitle  != null) root.style.setProperty('--sz-banner-title', sc.sizeBannerTitle  / 100);
@@ -964,26 +977,48 @@
           if (banner1Url) {
             const img1 = document.getElementById('bannerS1Img');
             if (img1) img1.src = banner1Url;
-          } else if (ss.heroBanner) {
-            const img1 = document.getElementById('bannerS1Img');
-            if (img1) img1.src = ss.heroBanner;
           }
           if (banner1PosX != null && banner1PosY != null)
             root.style.setProperty('--pos-s1', banner1PosX + '% ' + banner1PosY + '%');
           if (banner2PosX != null && banner2PosY != null)
             root.style.setProperty('--pos-s2', banner2PosX + '% ' + banner2PosY + '%');
-          if (label1FontData.font)  root.style.setProperty('--font-label-s1', label1FontData.font);
-          if (label1FontData.weight) root.style.setProperty('--wt-label-s1', label1FontData.weight);
+          if (label1Font)  root.style.setProperty('--font-label-s1', label1Font);
+          if (label1Weight) root.style.setProperty('--wt-label-s1', label1Weight);
           if (label1Color) root.style.setProperty('--color-label-s1', label1Color);
           if (label1Size)  root.style.setProperty('--sz-label-s1', label1Size / 100);
-          if (label2FontData.font)  root.style.setProperty('--font-label-s2', label2FontData.font);
-          if (label2FontData.weight) root.style.setProperty('--wt-label-s2', label2FontData.weight);
+          if (label2Font)  root.style.setProperty('--font-label-s2', label2Font);
+          if (label2Weight) root.style.setProperty('--wt-label-s2', label2Weight);
           if (label2Color) root.style.setProperty('--color-label-s2', label2Color);
           if (label2Size)  root.style.setProperty('--sz-label-s2', label2Size / 100);
           if (label1Text) { const el = document.getElementById('labelS1'); if (el) el.textContent = label1Text; }
           if (label2Text) { const el = document.getElementById('labelS2'); if (el) el.textContent = label2Text; }
+          const elsewhereLinks = [
+            ['Academia', ss.academiaUrl],
+            ['PhilPeople', ss.philpeopleUrl],
+            ['Instagram', ss.instagramUrl],
+            ['ResearchGate', ss.researchGateUrl],
+            ['Google Scholar', ss.googleScholarUrl],
+          ].filter(([,url]) => !!url);
+          const elsewhereWrap = document.getElementById('contactElsewhere');
+          const elsewhereBox = document.getElementById('contactElsewhereLinks');
+          if (elsewhereWrap && elsewhereBox) {
+            if (elsewhereLinks.length) {
+              elsewhereBox.innerHTML = elsewhereLinks.map(([label,url]) => `<a href="${url}" target="_blank" rel="noopener">${label}</a>`).join('');
+              elsewhereWrap.style.display = 'flex';
+            } else {
+              elsewhereWrap.style.display = 'none';
+            }
+          }
+          const markLight = document.querySelector('.contact-mark-light');
+          const markDark = document.querySelector('.contact-mark-dark');
+          if (markLight && markDark) {
+            const useLight = (sc && sc.logoVariant === 'light') || (ss && ss.logoVariant === 'light');
+            markLight.style.display = useLight ? 'none' : 'block';
+            markDark.style.display = useLight ? 'block' : 'none';
+          }
+
         }
-        const pubs = await cfGet('publication', { order: '-fields.year' });
+        const pubs = await cfGet('publication', { order: 'fields.order,-fields.year' });
         if (pubs && pubs.length) {
           renderPubList('pubListArticles', pubs.filter(p => p.pubType !== 'chapter'));
           const ch = pubs.filter(p => p.pubType === 'chapter');
@@ -1021,8 +1056,8 @@
         var btn=document.getElementById('cfSubmit');
         btn.disabled=true; btn.textContent='Sending…';
         fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(new FormData(cf_form)).toString()})
-        .then(function(){cf_form.style.display='none';document.getElementById('formSuccess').style.display='block';})
-        .catch(function(){btn.disabled=false;btn.textContent='Send →';alert('Something went wrong.');});
+        .then(async function(res){ const data = await res.json().catch(function(){ return {}; }); if(!res.ok || !data.ok) throw new Error(data.error || 'Something went wrong.'); cf_form.style.display='none';document.getElementById('formSuccess').style.display='block'; })
+        .catch(function(err){btn.disabled=false;btn.textContent='Send →';alert(err && err.message ? err.message : 'Something went wrong.');});
       });
     }
     document.addEventListener('contextmenu', e => { if(e.target.tagName==='IMG') e.preventDefault(); });

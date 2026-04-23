@@ -331,10 +331,9 @@
         const settings = await cfGet('siteSettings');
         const sc = (items && items.find(item => item && item.key === 'main')) || (items && items.length ? items[0] : null);
         const ss = (settings && settings.find(item => item && item.key === 'main')) || (settings && settings.length ? settings[0] : null);
-        const settingsTitle = ss && (ss.siteTitle || ss.sitetitle);
+        const settingsTitle = ss && ss.siteTitle;
         if (settingsTitle) setSiteTitle(settingsTitle);
         if (sc) {
-          if (!settingsTitle && sc.siteTitle) setSiteTitle(sc.siteTitle);
           if (sc.heroPosX != null) window.__philoCropX = sc.heroPosX;
           if (sc.heroPosY != null) window.__philoCropY = sc.heroPosY;
           const root = document.documentElement;
@@ -382,7 +381,7 @@
             if (el) el.style.fontSize = (s.navNameSize/100) + 'rem';
           }
 
-          const portraitUrl = s.philosophyPortraitUrl || s.philosophyportraiturl || '';
+          const portraitUrl = s.philosophyPortraitUrl || '';
           const portraitWrap = document.getElementById('bioPortraitWrap');
           const portraitImg = document.getElementById('bioPortraitImg');
           if (portraitWrap && portraitImg) {
@@ -398,7 +397,7 @@
         }
 
         /* Load publications */
-        const pubs = await cfGet('publication', { order: '-fields.year' });
+        const pubs = await cfGet('publication', { order: 'fields.order,-fields.year' });
         if (pubs && pubs.length) {
           const articles = pubs.filter(p => p.pubType !== 'chapter');
           const chapters = pubs.filter(p => p.pubType === 'chapter');

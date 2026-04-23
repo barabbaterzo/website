@@ -228,7 +228,6 @@ const CF = (() => {
           { id: 'bioText',           name: 'Bio text',           type: 'Text' },
           { id: 'photoIntro',        name: 'Photography intro',  type: 'Text' },
           { id: 'contactInfo',       name: 'Contact info',       type: 'Text' },
-          { id: 'philosophyPortraitUrl', name: 'Philosophy portrait URL', type: 'Symbol' },
           { id: 'heroPosX',          name: 'Hero position X',    type: 'Integer' },
           { id: 'heroPosY',          name: 'Hero position Y',    type: 'Integer' },
           { id: 'bgColor',           name: 'Background color',   type: 'Symbol' },

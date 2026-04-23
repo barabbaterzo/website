@@ -212,6 +212,13 @@
     }
     .pub-admin-empty { font-size: 0.6rem; color: var(--ink3); padding: 1rem 0; }
 
+    .pub-edit-grid { display:grid; grid-template-columns: 2fr 1.4fr 0.7fr 1fr 1.4fr 0.9fr 0.8fr auto; gap: 0.55rem; align-items:end; width:100%; }
+    .pub-edit-actions { display:flex; gap:0.45rem; align-items:center; justify-content:flex-end; }
+    .pub-mini { font-family: 'DM Mono', monospace; font-size: 0.5rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.45rem 0.55rem; border: 1px solid var(--rule); border-radius: 2px; background: white; cursor: pointer; }
+    .pub-mini.danger { color: var(--red); border-color: var(--red); }
+    .pub-mini:hover { opacity: 0.75; }
+    .elsewhere-list { display:flex; flex-direction:column; gap:0.9rem; }
+
     /* ── BANNER MANAGER ── */
     .banner-manager {
       background: white; border: 1px solid var(--rule); border-radius: 4px;
@@ -281,6 +288,7 @@
     <button class="admin-tab" data-panel="publications" onclick="switchPanel('publications')">Publications</button>
     <button class="admin-tab" data-panel="talks" onclick="switchPanel('talks')">Talks</button>
     <button class="admin-tab" data-panel="photos" onclick="switchPanel('photos')">Photos & Banner</button>
+    <button class="admin-tab" data-panel="elsewhere" onclick="switchPanel('elsewhere')">Elsewhere</button>
     <button class="admin-tab" data-panel="settings" onclick="switchPanel('settings')">Contentful</button>
   </div>
 
@@ -896,7 +904,7 @@
         </div>
         <div class="form-group">
           <label>Year</label>
-          <input type="number" id="pub-year" placeholder="2025" min="2000" max="2099" />
+          <input type="number" id="pub-year" placeholder="2025" min="1900" max="2099" />
         </div>
         <div class="form-group">
           <label>Type</label>
@@ -924,7 +932,7 @@
       </div>
     </div>
 
-    <p class="section-title">All publications</p>
+    <p class="section-title">Manage publications</p>
     <div id="pubList" class="pub-admin-list"></div>
   </div>
 
@@ -1155,6 +1163,40 @@
       </div>
     </div>
   </div><!-- /panel-photos -->
+
+
+  <!-- ═══ ELSEWHERE PANEL ═══ -->
+  <div class="admin-panel" id="panel-elsewhere">
+    <p class="section-title">Elsewhere links</p>
+    <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1.8rem">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Academia URL</label>
+          <input type="text" id="else-academia" placeholder="https://…" />
+        </div>
+        <div class="form-group full">
+          <label>PhilPeople URL</label>
+          <input type="text" id="else-philpeople" placeholder="https://…" />
+        </div>
+        <div class="form-group full">
+          <label>Instagram URL</label>
+          <input type="text" id="else-instagram" placeholder="https://…" />
+        </div>
+        <div class="form-group full">
+          <label>ResearchGate URL</label>
+          <input type="text" id="else-researchgate" placeholder="https://…" />
+        </div>
+        <div class="form-group full">
+          <label>Google Scholar URL</label>
+          <input type="text" id="else-googlescholar" placeholder="https://…" />
+        </div>
+      </div>
+      <div class="form-actions" style="margin-top:1rem">
+        <button class="btn primary" onclick="saveElsewhere()">Save elsewhere →</button>
+      </div>
+      <div id="elsewhereSaveMsg" style="font-size:0.58rem;color:var(--green);margin-top:0.6rem;display:none">✓ Saved</div>
+    </div>
+  </div>
 
   <!-- ═══ SETTINGS PANEL ═══ -->
   <div class="admin-panel" id="panel-settings">
@@ -1725,27 +1767,23 @@
 
     async function savePhilosophyPortraitToSiteSettings(url) {
       const allowedFieldIds = await getContentTypeFieldIds('siteSettings');
-      const portraitFieldId = pickExistingFieldId(allowedFieldIds, ['philosophyPortraitUrl', 'philosophyportraiturl']);
-      if (!portraitFieldId) throw new Error('Site Settings is missing the philosophyPortraitUrl field');
+      if (!allowedFieldIds.has('philosophyPortraitUrl')) throw new Error('Site Settings is missing the philosophyPortraitUrl field');
       await upsertMainEntry('siteSettings', {
         key: 'main',
-        [portraitFieldId]: (url || '').trim()
+        philosophyPortraitUrl: (url || '').trim()
       });
     }
 
-
     async function saveTitleAndLogoToSiteSettings(title, logoSize) {
       const allowedFieldIds = await getContentTypeFieldIds('siteSettings');
-      const titleFieldId = pickExistingFieldId(allowedFieldIds, ['siteTitle', 'sitetitle']);
-      const logoSizeFieldId = pickExistingFieldId(allowedFieldIds, ['logoSize', 'logosize']);
       const missing = [];
-      if (!titleFieldId) missing.push('siteTitle');
-      if (!logoSizeFieldId) missing.push('logoSize');
+      if (!allowedFieldIds.has('siteTitle')) missing.push('siteTitle');
+      if (!allowedFieldIds.has('logoSize')) missing.push('logoSize');
       if (missing.length) throw new Error('Site Settings is missing field(s): ' + missing.join(', '));
       await upsertMainEntry('siteSettings', {
         key: 'main',
-        [titleFieldId]: (title || 'Tomaso Pignocchi').trim(),
-        [logoSizeFieldId]: parseInt(logoSize || 100, 10) || 100,
+        siteTitle: (title || 'Tomaso Pignocchi').trim(),
+        logoSize: parseInt(logoSize || 100, 10) || 100,
       });
     }
 
@@ -1983,7 +2021,7 @@
         const ss = (settings && settings.find(item => item && item.key === 'main')) || (settings && settings.length ? settings[0] : null);
         const contentUi = { ...(sc || {}), ...(ss || {}) };
 
-        document.getElementById('sc-title').value = contentUi.siteTitle || contentUi.sitetitle || 'Tomaso Pignocchi';
+        document.getElementById('sc-title').value = contentUi.siteTitle || 'Tomaso Pignocchi';
         if (sc.nameplateSubtitle) document.getElementById('sc-subtitle').value = sc.nameplateSubtitle;
         if (sc.bioText)           document.getElementById('sc-bio').value = sc.bioText;
         if (sc.photoIntro)        document.getElementById('sc-photo-intro').value = sc.photoIntro;
@@ -1992,7 +2030,7 @@
         if (sc.heroStyle) setLayout(String(sc.heroStyle).toLowerCase());
         loadTypographyToAdmin(contentUi);
         loadColorsToAdmin(contentUi);
-        setPhilosophyPortrait((ss && (ss.philosophyPortraitUrl || ss.philosophyportraiturl)) || '', false);
+        setPhilosophyPortrait((ss && ss.philosophyPortraitUrl) || '', false);
       } catch(e) { console.warn('loadContent error', e); }
       initCropPreview();
     }
@@ -2071,7 +2109,8 @@
     async function loadPubs() {
       if (!CF.isConnected()) return;
       try {
-        pubsCache = await CF.get('publication', { order: '-fields.year' }) || [];
+        pubsCache = await CF.get('publication', { order: 'fields.order,-fields.year' }) || [];
+        sortPubsCache();
         renderPubAdminList();
       } catch(e) { console.warn('loadPubs error', e); }
     }
@@ -2080,15 +2119,31 @@
       const el = document.getElementById('pubList');
       if (!pubsCache.length) { el.innerHTML = '<p class="pub-admin-empty">No publications yet.</p>'; return; }
       el.innerHTML = '';
-      pubsCache.forEach(p => {
+      pubsCache.forEach((p, idx) => {
         const div = document.createElement('div');
         div.className = 'pub-admin-item';
+        div.setAttribute('data-pub-id', p._id);
         div.innerHTML = `
-          <span class="pai-year">${p.year || '—'}</span>
-          <span class="pai-text">${p.title}${p.forthcoming ? ' <em style="color:var(--ink3)">(forthcoming)</em>' : ''}<br>
-            <span style="font-size:0.75rem;color:var(--ink3)">${p.venue || ''}</span>
-          </span>
-          <button class="pai-del" onclick="deletePub('${p._id}')">Delete</button>`;
+          <div class="pub-edit-grid">
+            <div class="form-group"><label>Title</label><input type="text" data-field="title" value="${(p.title || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}" /></div>
+            <div class="form-group"><label>Venue</label><input type="text" data-field="venue" value="${(p.venue || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}" /></div>
+            <div class="form-group"><label>Year</label><input type="number" min="1900" max="2099" data-field="year" value="${p.year || ''}" /></div>
+            <div class="form-group"><label>Type</label><select data-field="pubType">
+              <option value="article" ${p.pubType==='article'?'selected':''}>Article</option>
+              <option value="chapter" ${p.pubType==='chapter'?'selected':''}>Chapter</option>
+              <option value="review" ${p.pubType==='review'?'selected':''}>Review</option>
+              <option value="other" ${p.pubType==='other'?'selected':''}>Other</option>
+            </select></div>
+            <div class="form-group"><label>Link</label><input type="text" data-field="link" value="${(p.link || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}" /></div>
+            <div class="form-group"><label>Forthcoming</label><select data-field="forthcoming"><option value="false" ${p.forthcoming ? '' : 'selected'}>No</option><option value="true" ${p.forthcoming ? 'selected' : ''}>Yes</option></select></div>
+            <div class="form-group"><label>Order</label><input type="number" data-field="order" value="${p.order ?? (idx+1)}" /></div>
+            <div class="pub-edit-actions">
+              <button class="pub-mini" onclick="movePub('${p._id}', -1)">↑</button>
+              <button class="pub-mini" onclick="movePub('${p._id}', 1)">↓</button>
+              <button class="pub-mini" onclick="saveExistingPub('${p._id}')">Save</button>
+              <button class="pub-mini danger" onclick="deletePub('${p._id}')">Delete</button>
+            </div>
+          </div>`;
         el.appendChild(div);
       });
     }
@@ -2097,13 +2152,15 @@
       if (!CF.isConnected()) { alert('Connect Contentful first (Settings tab)'); return; }
       const title = document.getElementById('pub-title').value.trim();
       if (!title) { alert('Title is required'); return; }
+      const nextOrder = (pubsCache.reduce((m,p)=>Math.max(m, Number.isFinite(+p.order)?+p.order:0), 0) || 0) + 1;
       const fields = {
         title,
         venue:       document.getElementById('pub-venue').value.trim(),
-        year:        parseInt(document.getElementById('pub-year').value) || new Date().getFullYear(),
+        year:        parseInt(document.getElementById('pub-year').value, 10) || new Date().getFullYear(),
         pubType:     document.getElementById('pub-type').value,
         link:        document.getElementById('pub-link').value.trim(),
         forthcoming: document.getElementById('pub-forthcoming').value === 'true',
+        order:       nextOrder,
       };
       try {
         const c = CF.cfg();
@@ -2122,9 +2179,9 @@
           { method: 'PUT', headers: { Authorization: `Bearer ${c.mgmtToken}`,
             'Content-Type': 'application/vnd.contentful.management.v1+json',
             'X-Contentful-Version': entry.sys.version }});
-        // clear form
         ['pub-title','pub-venue','pub-year','pub-link'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('pub-forthcoming').value = 'false';
+        document.getElementById('pub-type').value = 'article';
         await loadPubs();
       } catch(e) { alert('Save error: ' + e.message); }
     }
@@ -2203,6 +2260,110 @@
       catch(e) { alert('Delete error: ' + e.message); }
     }
 
+    /* ── Elsewhere ── */
+    async function loadElsewhere() {
+      if (!CF.isConnected()) return;
+      try {
+        const settings = await CF.get('siteSettings');
+        const s = (settings && settings.find(item => item && item.key === 'main')) || (settings && settings.length ? settings[0] : null);
+        if (!s) return;
+        const map = {
+          'else-academia': 'academiaUrl',
+          'else-philpeople': 'philpeopleUrl',
+          'else-instagram': 'instagramUrl',
+          'else-researchgate': 'researchGateUrl',
+          'else-googlescholar': 'googleScholarUrl'
+        };
+        Object.entries(map).forEach(([id, key]) => {
+          const el = document.getElementById(id);
+          if (el) el.value = s[key] || '';
+        });
+      } catch (e) { console.warn('loadElsewhere', e); }
+    }
+
+    async function saveElsewhere() {
+      if (!CF.isConnected()) { alert('Connect Contentful first (Settings tab)'); return; }
+      try {
+        const allowedFieldIds = await getContentTypeFieldIds('siteSettings');
+        const required = ['academiaUrl','philpeopleUrl','instagramUrl','researchGateUrl','googleScholarUrl'];
+        const missing = required.filter(id => !allowedFieldIds.has(id));
+        if (missing.length) throw new Error('Site Settings is missing field(s): ' + missing.join(', '));
+        await upsertMainEntry('siteSettings', {
+          key: 'main',
+          academiaUrl: document.getElementById('else-academia').value.trim(),
+          philpeopleUrl: document.getElementById('else-philpeople').value.trim(),
+          instagramUrl: document.getElementById('else-instagram').value.trim(),
+          researchGateUrl: document.getElementById('else-researchgate').value.trim(),
+          googleScholarUrl: document.getElementById('else-googlescholar').value.trim(),
+        });
+        const msg = document.getElementById('elsewhereSaveMsg');
+        if (msg) { msg.style.display = 'block'; setTimeout(() => msg.style.display = 'none', 2500); }
+      } catch(e) { alert('Save error: ' + e.message); }
+    }
+
+    function sortPubsCache() {
+      pubsCache.sort((a,b) => {
+        const ao = Number.isFinite(+a.order) ? +a.order : Number.MAX_SAFE_INTEGER;
+        const bo = Number.isFinite(+b.order) ? +b.order : Number.MAX_SAFE_INTEGER;
+        if (ao !== bo) return ao - bo;
+        return (+b.year || 0) - (+a.year || 0);
+      });
+    }
+
+    function pubTypeLabel(v) {
+      return ({article:'Article', chapter:'Chapter', review:'Review', other:'Other'})[v] || 'Other';
+    }
+
+    async function updatePublication(id, fields) {
+      const c = CF.cfg();
+      const existing = await CF.mgmt('GET', `/entries/${id}`);
+      const mergedFields = { ...(existing.fields || {}) };
+      Object.entries(fields).forEach(([k,v]) => { mergedFields[k] = { 'en-US': v }; });
+      const updR = await fetch(`https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${id}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${c.mgmtToken}`, 'Content-Type': 'application/vnd.contentful.management.v1+json', 'X-Contentful-Version': existing.sys.version },
+        body: JSON.stringify({ fields: mergedFields })
+      });
+      const upd = await updR.json();
+      if (!updR.ok) throw new Error(upd.message || 'Could not update publication');
+      await CF.publishEntry(id, upd.sys.version);
+      return upd;
+    }
+
+    async function saveExistingPub(id) {
+      try {
+        const row = document.querySelector(`[data-pub-id="${id}"]`);
+        if (!row) return;
+        const fields = {
+          title: row.querySelector('[data-field="title"]').value.trim(),
+          venue: row.querySelector('[data-field="venue"]').value.trim(),
+          year: parseInt(row.querySelector('[data-field="year"]').value, 10) || '',
+          link: row.querySelector('[data-field="link"]').value.trim(),
+          pubType: row.querySelector('[data-field="pubType"]').value,
+          forthcoming: row.querySelector('[data-field="forthcoming"]').value === 'true',
+          order: parseInt(row.querySelector('[data-field="order"]').value, 10) || 0,
+        };
+        if (!fields.title) throw new Error('Title is required');
+        await updatePublication(id, fields);
+        await loadPubs();
+      } catch(e) { alert('Save error: ' + e.message); }
+    }
+
+    async function movePub(id, delta) {
+      sortPubsCache();
+      pubsCache.forEach((p, idx) => { if (!Number.isFinite(+p.order)) p.order = idx + 1; });
+      const idx = pubsCache.findIndex(p => p._id === id);
+      const swapIdx = idx + delta;
+      if (idx < 0 || swapIdx < 0 || swapIdx >= pubsCache.length) return;
+      const a = pubsCache[idx], b = pubsCache[swapIdx];
+      const temp = +a.order; a.order = +b.order; b.order = temp;
+      try {
+        await updatePublication(a._id, { order: a.order });
+        await updatePublication(b._id, { order: b.order });
+        await loadPubs();
+      } catch(e) { alert('Reorder error: ' + e.message); }
+    }
+
     /* ── Init ── */
     updateCFStatus();
     updateCFStatus2();
@@ -2212,6 +2373,7 @@
     loadPubs();
     loadTalks();
     loadLayoutS();
+    loadElsewhere();
     initCropPreview();
     loadLayoutS();
 
@@ -2354,30 +2516,28 @@
         const s = ss.find(item => item && item.key === 'main') || ss[0];
         const set=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null)el.value=v;};
         const setN=(id,vid,v)=>{set(id,v);const l=document.getElementById(vid);if(l&&v!=null)l.textContent=v;};
-        const banner1Url = s.banner1url ?? s.banner1Url;
-        const banner2Url = s.banner2url ?? s.banner2Url;
-        const banner1PosX = s.banner1posX ?? s.banner1PosX;
-        const banner1PosY = s.banner1posY ?? s.banner1PosY;
-        const banner2PosX = s.banner2posX ?? s.banner2PosX;
-        const banner2PosY = s.banner2posY ?? s.banner2PosY;
-        const label1Text = s.label1text ?? s.label1Text;
-        const label1FontRaw = s.label1font ?? s.label1Font;
-        const label1WeightRaw = s.label1weight ?? s.label1Weight;
-        const label1Color = s.label1color ?? s.label1Color;
-        const label1Size = s.label1size ?? s.label1Size;
-        const label2Text = s.label2text ?? s.label2Text;
-        const label2FontRaw = s.label2font ?? s.label2Font;
-        const label2WeightRaw = s.label2weight ?? s.label2Weight;
-        const label2Color = s.label2color ?? s.label2Color;
-        const label2Size = s.label2size ?? s.label2Size;
-        const label1FontData = decodePackedLabelFont(label1FontRaw, label1WeightRaw);
-        const label2FontData = decodePackedLabelFont(label2FontRaw, label2WeightRaw);
+        const banner1Url = s.banner1url;
+        const banner2Url = s.banner2url;
+        const banner1PosX = s.banner1posX;
+        const banner1PosY = s.banner1posY;
+        const banner2PosX = s.banner2posX;
+        const banner2PosY = s.banner2posY;
+        const label1Text = s.label1text;
+        const label1Font = s.label1font;
+        const label1Weight = s.label1weight;
+        const label1Color = s.label1color;
+        const label1Size = s.label1size;
+        const label2Text = s.label2text;
+        const label2Font = s.label2font;
+        const label2Weight = s.label2weight;
+        const label2Color = s.label2color;
+        const label2Size = s.label2size;
         if (banner1Url) { set('s1-url',banner1Url); const p=document.getElementById('s1-preview'); if(p){p.src=banner1Url;p.style.display='block';} }
         if (banner2Url) { set('s2-url',banner2Url); const p=document.getElementById('s2-preview'); if(p){p.src=banner2Url;p.style.display='block';} }
         setN('s1-pos-x','v-s1-x',banner1PosX); setN('s1-pos-y','v-s1-y',banner1PosY);
         setN('s2-pos-x','v-s2-x',banner2PosX); setN('s2-pos-y','v-s2-y',banner2PosY);
-        set('s1-text',label1Text); set('s1-font',label1FontData.font); set('s1-weight', label1FontData.weight || '');
-        set('s2-text',label2Text); set('s2-font',label2FontData.font); set('s2-weight', label2FontData.weight || '');
+        set('s1-text',label1Text); set('s1-font',label1Font); set('s1-weight', label1Weight || '');
+        set('s2-text',label2Text); set('s2-font',label2Font); set('s2-weight', label2Weight || '');
         setN('s1-size','v-s1-size',label1Size); setN('s2-size','v-s2-size',label2Size);
         if(label1Color){set('hex-s1',label1Color);set('cp-s1',label1Color);}
         if(label2Color){set('hex-s2',label2Color);set('cp-s2',label2Color);}
