@@ -1269,17 +1269,22 @@
 
     /* ── Contentful status ── */
     function updateCFStatus() {
-      const connected = CF.isConnected();
+      const canRead = CF.hasReadAccess();
+      const canWrite = CF.hasWriteAccess();
       const bar  = document.getElementById('cfStatus');
       const text = document.getElementById('cfStatusText');
       const btn  = document.getElementById('cfSetupBtn');
-      if (connected) {
+      if (canWrite) {
         bar.className = 'cf-status connected';
-        text.textContent = '✓ Connected to Contentful — photos are saved to the cloud';
+        text.textContent = '✓ Connected to Contentful — read and write are enabled';
+        btn.textContent = 'Settings';
+      } else if (canRead) {
+        bar.className = 'cf-status connected';
+        text.textContent = '✓ Contentful read is enabled, but write is missing — homepage can load, admin cannot save';
         btn.textContent = 'Settings';
       } else {
         bar.className = 'cf-status disconnected';
-        text.textContent = '⚠ Contentful not connected — photos will be lost on refresh. Configure to save permanently.';
+        text.textContent = '⚠ Contentful not connected — homepage data will fall back and admin saves will fail.';
         btn.textContent = 'Configure Contentful';
       }
     }
@@ -1404,7 +1409,7 @@
       ind.classList.add('visible');
 
       try {
-        if (CF.isConnected()) {
+        if (CF.hasWriteAccess()) {
           /* upload image to Contentful assets */
           indText.textContent = 'Uploading image to Contentful…';
           const assetId = await CF.uploadAsset(pendingFile);
@@ -1486,7 +1491,7 @@
     /* ── Load & render photos ── */
     async function loadPhotos() {
       let list = [];
-      if (CF.isConnected()) {
+      if (CF.hasReadAccess()) {
         try { list = await CF.get('photo') || []; } catch {}
       } else {
         list = JSON.parse(sessionStorage.getItem('tp_local_photos') || '[]');
@@ -1526,7 +1531,7 @@
       e.stopPropagation();
       if (!confirm('Delete this photo? This cannot be undone.')) return;
       try {
-        if (CF.isConnected()) {
+        if (CF.hasWriteAccess()) {
           await CF.deleteEntry(id);
           await loadPhotos();
         } else {
@@ -1544,7 +1549,7 @@
     async function loadBanner() {
       let url = localStorage.getItem('tp_banner_url') || '';
 
-      if (!url && CF.isConnected()) {
+      if (!url && CF.hasReadAccess()) {
         try {
           const s = await getMainEntry('siteSettings');
           if (s && s.heroBanner) url = s.heroBanner;
@@ -1571,7 +1576,7 @@
       if (cropImg) cropImg.src = url;
 
       /* save to Contentful if connected */
-      if (CF.isConnected()) {
+      if (CF.hasWriteAccess()) {
         try {
           await upsertMainEntry('siteSettings', { key: 'main', heroBanner: url });
         } catch (e) {
@@ -1591,7 +1596,7 @@
       indText.textContent = 'Uploading banner…';
 
       try {
-        if (CF.isConnected()) {
+        if (CF.hasWriteAccess()) {
           const assetId = await CF.uploadAsset(file);
           /* fetch resolved URL */
           const asset = await CF.mgmt('GET', `/assets/${assetId}`);
@@ -1687,7 +1692,7 @@
       ind.classList.add('visible');
       indText.textContent = 'Uploading portrait…';
       try {
-        if (CF.isConnected()) {
+        if (CF.hasWriteAccess()) {
           const assetId = await CF.uploadAsset(file);
           const asset = await CF.mgmt('GET', `/assets/${assetId}`);
           const url = 'https:' + asset.fields.file['en-US'].url;
@@ -1994,13 +1999,17 @@
 
     /* ── Contentful status (second instance in settings tab) ── */
     function updateCFStatus2() {
-      const connected = CF.isConnected();
+      const canRead = CF.hasReadAccess();
+      const canWrite = CF.hasWriteAccess();
       const bar  = document.getElementById('cfStatus2');
       const text = document.getElementById('cfStatusText2');
       if (!bar) return;
-      if (connected) {
+      if (canWrite) {
         bar.className = 'cf-status connected';
-        text.textContent = '✓ Connected to Contentful';
+        text.textContent = '✓ Connected to Contentful — write enabled';
+      } else if (canRead) {
+        bar.className = 'cf-status connected';
+        text.textContent = '✓ Read-only connection — add Management Token to save';
       } else {
         bar.className = 'cf-status disconnected';
         text.textContent = '⚠ Not connected';
@@ -2009,7 +2018,7 @@
 
     /* ── Site Content ── */
     async function loadContent() {
-      if (!CF.isConnected()) return;
+      if (!CF.hasReadAccess()) return;
       try {
         const items = await CF.get('siteContent');
         console.log('[DEBUG] siteContent items:', JSON.stringify(items));
@@ -2036,7 +2045,7 @@
     }
 
     async function saveContent() {
-      if (!CF.isConnected()) { alert('Connect Contentful first (Settings tab)'); return; }
+      if (!CF.hasWriteAccess()) { alert('Connect Contentful first and add the Management Token (Settings tab)'); return; }
       const fields = {
         key: 'main',
         nameplateSubtitle: document.getElementById('sc-subtitle').value.trim(),
@@ -2107,7 +2116,7 @@
     let pubsCache = [];
 
     async function loadPubs() {
-      if (!CF.isConnected()) return;
+      if (!CF.hasReadAccess()) return;
       try {
         pubsCache = await CF.get('publication', { order: 'fields.order,-fields.year' }) || [];
         sortPubsCache();
@@ -2149,7 +2158,7 @@
     }
 
     async function savePub() {
-      if (!CF.isConnected()) { alert('Connect Contentful first (Settings tab)'); return; }
+      if (!CF.hasWriteAccess()) { alert('Connect Contentful first and add the Management Token (Settings tab)'); return; }
       const title = document.getElementById('pub-title').value.trim();
       if (!title) { alert('Title is required'); return; }
       const nextOrder = (pubsCache.reduce((m,p)=>Math.max(m, Number.isFinite(+p.order)?+p.order:0), 0) || 0) + 1;
@@ -2196,7 +2205,7 @@
     let talksCache = [];
 
     async function loadTalks() {
-      if (!CF.isConnected()) return;
+      if (!CF.hasReadAccess()) return;
       try {
         talksCache = await CF.get('talk', { order: '-fields.year' }) || [];
         renderTalkAdminList();
@@ -2221,7 +2230,7 @@
     }
 
     async function saveTalk() {
-      if (!CF.isConnected()) { alert('Connect Contentful first (Settings tab)'); return; }
+      if (!CF.hasWriteAccess()) { alert('Connect Contentful first and add the Management Token (Settings tab)'); return; }
       const title = document.getElementById('talk-title').value.trim();
       if (!title) { alert('Title is required'); return; }
       const fields = {
@@ -2262,7 +2271,7 @@
 
     /* ── Elsewhere ── */
     async function loadElsewhere() {
-      if (!CF.isConnected()) return;
+      if (!CF.hasReadAccess()) return;
       try {
         const settings = await CF.get('siteSettings');
         const s = (settings && settings.find(item => item && item.key === 'main')) || (settings && settings.length ? settings[0] : null);
@@ -2282,7 +2291,7 @@
     }
 
     async function saveElsewhere() {
-      if (!CF.isConnected()) { alert('Connect Contentful first (Settings tab)'); return; }
+      if (!CF.hasWriteAccess()) { alert('Connect Contentful first and add the Management Token (Settings tab)'); return; }
       try {
         const allowedFieldIds = await getContentTypeFieldIds('siteSettings');
         const required = ['academiaUrl','philpeopleUrl','instagramUrl','researchGateUrl','googleScholarUrl'];
@@ -2397,7 +2406,7 @@
     }
 
     async function saveLayoutS() {
-      if (!CF.isConnected()) { alert('Connect Contentful first'); return; }
+      if (!CF.hasWriteAccess()) { alert('Connect Contentful first and add the Management Token'); return; }
       const c = CF.cfg();
       setLayout('s');
       try {
@@ -2406,25 +2415,23 @@
         const label2FontValue = document.getElementById('s2-font')?.value || '';
         const label2WeightValue = parseInt(document.getElementById('s2-weight')?.value) || 0;
         const fields = {
-          banner1posX: parseInt(document.getElementById('s1-pos-x')?.value)||50,
-          banner1posY: parseInt(document.getElementById('s1-pos-y')?.value)||38,
-          banner1url:  document.getElementById('s1-url')?.value?.trim()||'',
-          banner2url:  document.getElementById('s2-url')?.value?.trim()||'',
-          banner2posX: parseInt(document.getElementById('s2-pos-x')?.value)||50,
-          banner2posY: parseInt(document.getElementById('s2-pos-y')?.value)||38,
-          label1text:  document.getElementById('s1-text')?.value?.trim()||'Philosophy',
-          label1font:  encodePackedLabelFont(label1FontValue, label1WeightValue),
-          label1color: document.getElementById('hex-s1')?.value?.trim()||'#ffffff',
-          label1size:  parseInt(document.getElementById('s1-size')?.value)||100,
-          label2text:  document.getElementById('s2-text')?.value?.trim()||'Photography',
-          label2font:  encodePackedLabelFont(label2FontValue, label2WeightValue),
-          label2color: document.getElementById('hex-s2')?.value?.trim()||'#ffffff',
-          label2size:  parseInt(document.getElementById('s2-size')?.value)||100,
+          banner1PosX: parseInt(document.getElementById('s1-pos-x')?.value)||50,
+          banner1PosY: parseInt(document.getElementById('s1-pos-y')?.value)||38,
+          banner1Url:  document.getElementById('s1-url')?.value?.trim()||'',
+          banner2Url:  document.getElementById('s2-url')?.value?.trim()||'',
+          banner2PosX: parseInt(document.getElementById('s2-pos-x')?.value)||50,
+          banner2PosY: parseInt(document.getElementById('s2-pos-y')?.value)||38,
+          label1Text:  document.getElementById('s1-text')?.value?.trim()||'Philosophy',
+          label1Font:  label1FontValue,
+          label1Color: document.getElementById('hex-s1')?.value?.trim()||'#ffffff',
+          label1Size:  parseInt(document.getElementById('s1-size')?.value)||100,
+          label1Weight: label1WeightValue,
+          label2Text:  document.getElementById('s2-text')?.value?.trim()||'Photography',
+          label2Font:  label2FontValue,
+          label2Color: document.getElementById('hex-s2')?.value?.trim()||'#ffffff',
+          label2Size:  parseInt(document.getElementById('s2-size')?.value)||100,
+          label2Weight: label2WeightValue,
         };
-        fields.label1font = label1FontValue;
-        fields.label1weight = label1WeightValue;
-        fields.label2font = label2FontValue;
-        fields.label2weight = label2WeightValue;
         await upsertMainEntry('siteSettings', { key: 'main', ...fields });
 
         /* Make Layout S go live immediately on the homepage */
@@ -2477,17 +2484,17 @@
     }
 
     async function uploadS1(file) {
-      if (!file||!CF.isConnected()) return;
+      if (!file||!CF.hasWriteAccess()) return;
       try { const assetId=await CF.uploadAsset(file); const asset=await CF.mgmt('GET','/assets/'+assetId); document.getElementById('s1-url').value='https:'+asset.fields.file['en-US'].url; const p=document.getElementById('s1-preview'); if(p){ p.src='https:'+asset.fields.file['en-US'].url; p.style.display='block'; updateLayoutSPreview('s1'); } } catch(e) { alert('Upload error: '+e.message); }
     }
     async function uploadS2(file) {
-      if (!file||!CF.isConnected()) return;
+      if (!file||!CF.hasWriteAccess()) return;
       try { const assetId=await CF.uploadAsset(file); const asset=await CF.mgmt('GET','/assets/'+assetId); document.getElementById('s2-url').value='https:'+asset.fields.file['en-US'].url; const p=document.getElementById('s2-preview'); if(p){ p.src='https:'+asset.fields.file['en-US'].url; p.style.display='block'; updateLayoutSPreview('s2'); } } catch(e) { alert('Upload error: '+e.message); }
     }
     bindLayoutSCropDrag('s1');
     bindLayoutSCropDrag('s2');
     async function loadLayoutS() {
-      if (!CF.isConnected()) return;
+      if (!CF.hasReadAccess()) return;
       try {
         const [ss, photoList] = await Promise.all([CF.get('siteSettings'), CF.get('photo')]);
         /* Populate photo picker grids */
@@ -2516,22 +2523,22 @@
         const s = ss.find(item => item && item.key === 'main') || ss[0];
         const set=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null)el.value=v;};
         const setN=(id,vid,v)=>{set(id,v);const l=document.getElementById(vid);if(l&&v!=null)l.textContent=v;};
-        const banner1Url = s.banner1url;
-        const banner2Url = s.banner2url;
-        const banner1PosX = s.banner1posX;
-        const banner1PosY = s.banner1posY;
-        const banner2PosX = s.banner2posX;
-        const banner2PosY = s.banner2posY;
-        const label1Text = s.label1text;
-        const label1Font = s.label1font;
-        const label1Weight = s.label1weight;
-        const label1Color = s.label1color;
-        const label1Size = s.label1size;
-        const label2Text = s.label2text;
-        const label2Font = s.label2font;
-        const label2Weight = s.label2weight;
-        const label2Color = s.label2color;
-        const label2Size = s.label2size;
+        const banner1Url = s.banner1Url || s.banner1url;
+        const banner2Url = s.banner2Url || s.banner2url;
+        const banner1PosX = s.banner1PosX ?? s.banner1posX;
+        const banner1PosY = s.banner1PosY ?? s.banner1posY;
+        const banner2PosX = s.banner2PosX ?? s.banner2posX;
+        const banner2PosY = s.banner2PosY ?? s.banner2posY;
+        const label1Text = s.label1Text || s.label1text;
+        const label1Font = s.label1Font || s.label1font;
+        const label1Weight = s.label1Weight ?? s.label1weight;
+        const label1Color = s.label1Color || s.label1color;
+        const label1Size = s.label1Size ?? s.label1size;
+        const label2Text = s.label2Text || s.label2text;
+        const label2Font = s.label2Font || s.label2font;
+        const label2Weight = s.label2Weight ?? s.label2weight;
+        const label2Color = s.label2Color || s.label2color;
+        const label2Size = s.label2Size ?? s.label2size;
         if (banner1Url) { set('s1-url',banner1Url); const p=document.getElementById('s1-preview'); if(p){p.src=banner1Url;p.style.display='block';} }
         if (banner2Url) { set('s2-url',banner2Url); const p=document.getElementById('s2-preview'); if(p){p.src=banner2Url;p.style.display='block';} }
         setN('s1-pos-x','v-s1-x',banner1PosX); setN('s1-pos-y','v-s1-y',banner1PosY);

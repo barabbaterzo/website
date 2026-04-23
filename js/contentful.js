@@ -18,9 +18,18 @@ const CF = (() => {
   }
   function saveCfg(obj) { localStorage.setItem(KEY, JSON.stringify(obj)); }
 
-  function isConnected() {
+  function hasReadAccess() {
     const c = cfg();
     return !!(c.spaceId && c.deliveryToken);
+  }
+
+  function hasWriteAccess() {
+    const c = cfg();
+    return !!(c.spaceId && c.deliveryToken && c.mgmtToken);
+  }
+
+  function isConnected() {
+    return hasReadAccess();
   }
 
   /* ── Delivery API (public read) ── */
@@ -223,16 +232,56 @@ const CF = (() => {
         id: 'siteContent',
         name: 'Site Content',
         fields: [
-          { id: 'key',               name: 'Key',                type: 'Symbol', required: true },
-          { id: 'nameplateSubtitle', name: 'Nameplate subtitle', type: 'Symbol' },
-          { id: 'bioText',           name: 'Bio text',           type: 'Text' },
-          { id: 'photoIntro',        name: 'Photography intro',  type: 'Text' },
-          { id: 'contactInfo',       name: 'Contact info',       type: 'Text' },
-          { id: 'heroPosX',          name: 'Hero position X',    type: 'Integer' },
-          { id: 'heroPosY',          name: 'Hero position Y',    type: 'Integer' },
-          { id: 'bgColor',           name: 'Background color',   type: 'Symbol' },
-          { id: 'textColor',         name: 'Text color',         type: 'Symbol' },
-          { id: 'logoVariant',       name: 'Logo variant',       type: 'Symbol' },
+          { id: 'key',                name: 'Key',                 type: 'Symbol', required: true },
+          { id: 'nameplateSubtitle',  name: 'Entry title',         type: 'Symbol' },
+          { id: 'bioText',            name: 'Bio text',            type: 'Text' },
+          { id: 'photoIntro',         name: 'Photography intro',   type: 'Text' },
+          { id: 'contactInfo',        name: 'Contact info',        type: 'Text' },
+          { id: 'heroPosX',           name: 'Hero Position X',     type: 'Integer' },
+          { id: 'heroPosY',           name: 'Hero Position Y',     type: 'Integer' },
+          { id: 'heroStyle',          name: 'heroStyle',           type: 'Symbol' },
+          { id: 'sizeBannerTitle',    name: 'sizeBannerTitle',     type: 'Integer' },
+          { id: 'sizeBannerSubtitle', name: 'sizeBannerSubtitle',  type: 'Integer' },
+          { id: 'sizeBio',            name: 'sizeBio',             type: 'Integer' },
+          { id: 'sizePubs',           name: 'sizePubs',            type: 'Integer' },
+          { id: 'sizePhotoIntro',     name: 'sizePhotoIntro',      type: 'Integer' },
+          { id: 'sizeLabels',         name: 'sizeLabels',          type: 'Integer' },
+          { id: 'sizeFooter',         name: 'sizeFooter',          type: 'Integer' },
+          { id: 'bioLineHeight',      name: 'Bio Line Height',     type: 'Integer' },
+          { id: 'bgColor',            name: 'bgColor',             type: 'Symbol' },
+          { id: 'textColor',          name: 'textColor',           type: 'Symbol' },
+          { id: 'logoVariant',        name: 'logoVariant',         type: 'Symbol' },
+          { id: 'sizeVenue',          name: 'sizeVenue',           type: 'Integer' },
+          { id: 'venueColor',         name: 'venueColor',          type: 'Symbol' },
+          { id: 'sizeSublabels',      name: 'sizeSublabels',       type: 'Integer' },
+          { id: 'sizeSeemore',        name: 'sizeSeemore',         type: 'Integer' },
+          { id: 'nameFont',           name: 'nameFont',            type: 'Symbol' },
+          { id: 'nameFontWeight',     name: 'nameFontWeight',      type: 'Integer' },
+          { id: 'nameColor',          name: 'nameColor',           type: 'Symbol' },
+          { id: 'subFont',            name: 'subFont',             type: 'Symbol' },
+          { id: 'subFontWeight',      name: 'subFontWeight',       type: 'Integer' },
+          { id: 'subColor',           name: 'subColor',            type: 'Symbol' },
+          { id: 'bioFont',            name: 'bioFont',             type: 'Symbol' },
+          { id: 'bioFontWeight',      name: 'bioFontWeight',       type: 'Integer' },
+          { id: 'bioColor',           name: 'bioColor',            type: 'Symbol' },
+          { id: 'pubsFont',           name: 'pubsFont',            type: 'Symbol' },
+          { id: 'pubsFontWeight',     name: 'pubsFontWeight',      type: 'Integer' },
+          { id: 'pubsColor',          name: 'pubsColor',           type: 'Symbol' },
+          { id: 'venueFont',          name: 'venueFont',           type: 'Symbol' },
+          { id: 'venueFontWeight',    name: 'venueFontWeight',     type: 'Integer' },
+          { id: 'labelsFont',         name: 'labelsFont',          type: 'Symbol' },
+          { id: 'labelsFontWeight',   name: 'labelsFontWeight',    type: 'Integer' },
+          { id: 'labelsColor',        name: 'labelsColor',         type: 'Symbol' },
+          { id: 'sublabelsFont',      name: 'sublabelsFont',       type: 'Symbol' },
+          { id: 'sublabelsFontWeight',name: 'sublabelsFontWeight', type: 'Integer' },
+          { id: 'sublabelsColor',     name: 'sublabelsColor',      type: 'Symbol' },
+          { id: 'seemoreFont',        name: 'seemoreFont',         type: 'Symbol' },
+          { id: 'seemoreColor',       name: 'seemoreColor',        type: 'Symbol' },
+          { id: 'photoFont',          name: 'photoFont',           type: 'Symbol' },
+          { id: 'photoFontWeight',    name: 'photoFontWeight',     type: 'Integer' },
+          { id: 'photoColor',         name: 'photoColor',          type: 'Symbol' },
+          { id: 'footerFont',         name: 'footerFont',          type: 'Symbol' },
+          { id: 'footerColor',        name: 'footerColor',         type: 'Symbol' }
         ],
         displayField: 'key'
       },
@@ -267,24 +316,37 @@ const CF = (() => {
         id: 'siteSettings',
         name: 'Site Settings',
         fields: [
-          { id: 'key',         name: 'Key',         type: 'Symbol',  required: true },
-          { id: 'heroBanner',  name: 'Hero Banner', type: 'Link', linkType: 'Asset' },
-          { id: 'banner1url',  name: 'banner1Url',  type: 'Symbol' },
-          { id: 'banner1posX', name: 'banner1PosX', type: 'Integer' },
-          { id: 'banner1posY', name: 'banner1PosY', type: 'Integer' },
-          { id: 'banner2url',  name: 'banner2Url',  type: 'Symbol' },
-          { id: 'banner2posX', name: 'banner2PosX', type: 'Integer' },
-          { id: 'banner2posY', name: 'banner2PosY', type: 'Integer' },
-          { id: 'label1text',  name: 'label1Text',  type: 'Symbol' },
-          { id: 'label1font',  name: 'label1Font',  type: 'Symbol' },
-          { id: 'label1weight',name: 'label1Weight',type: 'Integer' },
-          { id: 'label1color', name: 'label1Color', type: 'Symbol' },
-          { id: 'label1size',  name: 'label1Size',  type: 'Integer' },
-          { id: 'label2text',  name: 'label2Text',  type: 'Symbol' },
-          { id: 'label2font',  name: 'label2Font',  type: 'Symbol' },
-          { id: 'label2weight',name: 'label2Weight',type: 'Integer' },
-          { id: 'label2color', name: 'label2Color', type: 'Symbol' },
-          { id: 'label2size',  name: 'label2Size',  type: 'Integer' }
+          { id: 'key',                   name: 'Key',                   type: 'Symbol', required: true },
+          { id: 'backgroundColor',       name: 'backgroundColor',       type: 'Symbol' },
+          { id: 'textColor',             name: 'textColor',             type: 'Symbol' },
+          { id: 'fontPrimary',           name: 'fontPrimary',           type: 'Symbol' },
+          { id: 'fontSizeBio',           name: 'fontSizeBio',           type: 'Integer' },
+          { id: 'fontSizePubs',          name: 'fontSizePubs',          type: 'Integer' },
+          { id: 'heroBanner',            name: 'heroBanner',            type: 'Symbol' },
+          { id: 'banner1Url',            name: 'banner1Url',            type: 'Symbol' },
+          { id: 'banner1PosX',           name: 'banner1PosX',           type: 'Integer' },
+          { id: 'banner1PosY',           name: 'banner1PosY',           type: 'Integer' },
+          { id: 'banner2Url',            name: 'banner2Url',            type: 'Symbol' },
+          { id: 'banner2PosX',           name: 'banner2PosX',           type: 'Integer' },
+          { id: 'banner2PosY',           name: 'banner2PosY',           type: 'Integer' },
+          { id: 'label1Text',            name: 'label1Text',            type: 'Symbol' },
+          { id: 'label1Font',            name: 'label1Font',            type: 'Symbol' },
+          { id: 'label1Color',           name: 'label1Color',           type: 'Symbol' },
+          { id: 'label1Size',            name: 'label1Size',            type: 'Integer' },
+          { id: 'label2Text',            name: 'label2Text',            type: 'Symbol' },
+          { id: 'label2Font',            name: 'label2Font',            type: 'Symbol' },
+          { id: 'label2Color',           name: 'label2Color',           type: 'Symbol' },
+          { id: 'label2Size',            name: 'label2Size',            type: 'Integer' },
+          { id: 'label1Weight',          name: 'label1Weight',          type: 'Integer' },
+          { id: 'label2Weight',          name: 'label2Weight',          type: 'Integer' },
+          { id: 'philosophyPortraitUrl', name: 'philosophyPortraitUrl', type: 'Symbol' },
+          { id: 'siteTitle',             name: 'siteTitle',             type: 'Symbol' },
+          { id: 'logoSize',              name: 'logoSize',              type: 'Integer' },
+          { id: 'academiaUrl',           name: 'academiaUrl',           type: 'Symbol' },
+          { id: 'philpeopleUrl',         name: 'philpeopleUrl',         type: 'Symbol' },
+          { id: 'instagramUrl',          name: 'instagramUrl',          type: 'Symbol' },
+          { id: 'researchGateUrl',       name: 'researchGateUrl',       type: 'Symbol' },
+          { id: 'googleScholarUrl',      name: 'googleScholarUrl',      type: 'Symbol' }
         ],
         displayField: 'key'
       },
@@ -360,5 +422,5 @@ const CF = (() => {
     return results;
   }
 
-  return { cfg, saveCfg, isConnected, get, mgmt, publishEntry, uploadAsset, createEntry, updateEntry, deleteEntry, createContentTypes };
+  return { cfg, saveCfg, hasReadAccess, hasWriteAccess, isConnected, get, mgmt, publishEntry, uploadAsset, createEntry, updateEntry, deleteEntry, createContentTypes };
 })();

@@ -963,6 +963,10 @@
           const label2Size = pick('label2size', 'label2Size');
           const label1FontData = decodePackedLabelFont(label1FontRaw, label1WeightRaw);
           const label2FontData = decodePackedLabelFont(label2FontRaw, label2WeightRaw);
+          const label1Font = label1FontData.font;
+          const label1Weight = label1FontData.weight;
+          const label2Font = label2FontData.font;
+          const label2Weight = label2FontData.weight;
           /* Banner 1 (hero) */
           if (ss.heroBanner) {
             const img = document.getElementById('heroBannerImg');
@@ -1012,7 +1016,7 @@
           const markLight = document.querySelector('.contact-mark-light');
           const markDark = document.querySelector('.contact-mark-dark');
           if (markLight && markDark) {
-            const useLight = (sc && sc.logoVariant === 'light') || (ss && ss.logoVariant === 'light');
+            const useLight = !!(sc && sc.logoVariant === 'light');
             markLight.style.display = useLight ? 'none' : 'block';
             markDark.style.display = useLight ? 'block' : 'none';
           }

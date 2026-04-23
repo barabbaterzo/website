@@ -27,7 +27,7 @@ async function getLayout(env) {
   /* Fetch from Contentful */
   try {
     const r = await fetch(
-      `https://cdn.contentful.com/spaces/${CF_SPACE}/environments/master/entries?content_type=siteContent&limit=1`,
+      `https://cdn.contentful.com/spaces/${CF_SPACE}/environments/master/entries?content_type=siteContent&fields.key=main&limit=1`,
       { headers: { Authorization: `Bearer ${CF_DELIVERY}` } }
     );
     if (!r.ok) return 'a';
