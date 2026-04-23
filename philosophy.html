@@ -45,8 +45,8 @@
     .nav-logo{display:flex;align-items:center;text-decoration:none;gap:0.8rem}
     .logo-mark{height:20px;width:auto;display:block}
     .nav-site-name{
-      font-family:var(--font-primary);font-weight:var(--wt-primary);
-      font-size:1rem;color:var(--page-ink);letter-spacing:-0.01em;
+      font-family:var(--font-name,var(--font-primary));font-weight:var(--wt-name,var(--wt-primary));
+      font-size:1rem;color:var(--color-name,var(--page-ink));letter-spacing:-0.01em;
     }
     .nav-right{display:flex;gap:2rem}
     .nav-right a{
@@ -338,15 +338,13 @@
           if (sc.heroPosY != null) window.__philoCropY = sc.heroPosY;
           const root = document.documentElement;
           if (sc.bioText) { const el = document.getElementById('bioText'); if (el) el.innerHTML = sc.bioText.replace(/\n/g,'<br>'); }
-          if (sc.fontPrimary || sc.bioFont) root.style.setProperty('--font-primary', FONT_CSS[sc.bioFont||sc.fontPrimary] || sc.bioFont || sc.fontPrimary);
-          if (sc.sizeBio != null) root.style.setProperty('--sz-bio', sc.sizeBio/100);
+                    if (sc.sizeBio != null) root.style.setProperty('--sz-bio', sc.sizeBio/100);
           if (sc.sizePubs != null) root.style.setProperty('--sz-pubs', sc.sizePubs/100);
           if (sc.sizeVenue != null) root.style.setProperty('--sz-venue', sc.sizeVenue/100);
           if (sc.sizeLabels != null) root.style.setProperty('--sz-labels', sc.sizeLabels/100);
           if (sc.sizeSublabels != null) root.style.setProperty('--sz-sublabels', sc.sizeSublabels/100);
           if (sc.sizeSeemore != null) root.style.setProperty('--sz-seemore', sc.sizeSeemore/100);
           if (sc.bioLineHeight != null) root.style.setProperty('--lh-bio', sc.bioLineHeight/100);
-          if (sc.pubsLineHeight != null) root.style.setProperty('--lh-pubs', sc.pubsLineHeight/100);
           if (sc.bgColor) { root.style.setProperty('--page-bg', sc.bgColor); document.body.style.background = sc.bgColor; }
           if (sc.textColor) { root.style.setProperty('--page-ink', sc.textColor); }
           if (sc.venueColor) root.style.setProperty('--color-venue', sc.venueColor);
@@ -361,26 +359,12 @@
             if (sc[colorKey]) root.style.setProperty('--color-' + prefix, sc[colorKey]);
             if (sc[lhKey]) root.style.setProperty('--lh-' + prefix, sc[lhKey] / 100);
           }
-          ['bio','pubs','venue','labels','sublabels','seemore'].forEach(applySection);
+          ['name','bio','pubs','venue','labels','sublabels','seemore','footer'].forEach(applySection);
         }
 
-        /* Load siteSettings for nav name styling + philosophy portrait */
+        /* Load philosophy portrait from siteSettings */
         if (settings && settings.length) {
           const s = settings.find(item => item && item.key === 'main') || settings[0];
-          const root = document.documentElement;
-          if (s.navNameFont) {
-            const el = document.querySelector('.nav-site-name');
-            if (el) el.style.fontFamily = FONT_CSS[s.navNameFont] || s.navNameFont;
-          }
-          if (s.navNameColor) {
-            const el = document.querySelector('.nav-site-name');
-            if (el) el.style.color = s.navNameColor;
-          }
-          if (s.navNameSize) {
-            const el = document.querySelector('.nav-site-name');
-            if (el) el.style.fontSize = (s.navNameSize/100) + 'rem';
-          }
-
           const portraitUrl = s.philosophyPortraitUrl || '';
           const portraitWrap = document.getElementById('bioPortraitWrap');
           const portraitImg = document.getElementById('bioPortraitImg');

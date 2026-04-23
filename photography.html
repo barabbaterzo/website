@@ -61,10 +61,11 @@
     }
 
     .site-id .name {
-      font-family: 'EB Garamond', serif;
+      font-family: var(--font-name, 'EB Garamond', serif);
+      font-weight: var(--wt-name, 400);
       font-size: 1rem;
       letter-spacing: 0.04em;
-      color: var(--text);
+      color: var(--color-name, var(--text));
     }
 
     .site-id .logo-mark {
@@ -499,6 +500,18 @@
     /* ── Load photo bio + settings from Contentful ── */
     (async function() {
       try {
+        const FONT_CSS = {
+          'EB Garamond': "'EB Garamond', serif",
+          'New Computer Modern': "'New Computer Modern', serif",
+          'Libre Baskerville': "'Libre Baskerville', serif",
+          'Playfair Display': "'Playfair Display', serif",
+          'Cormorant Garant': "'Cormorant Garant', serif",
+          'Spectral': "'Spectral', serif",
+          'Lato': "'Lato', sans-serif",
+          'Inter': "'Inter', sans-serif",
+          'Source Sans Pro': "'Source Sans 3', sans-serif",
+          'DM Mono': "'DM Mono', monospace"
+        };
         function setSiteTitle(name) {
           const clean = (name || 'Tomaso Pignocchi').trim();
           const nav = document.getElementById('photoSiteName');
@@ -533,11 +546,19 @@
           /* Apply typography settings */
           const root = document.documentElement;
           if (sc.sizePhotoIntro != null) root.style.setProperty('--sz-photo', sc.sizePhotoIntro / 100);
-          if (sc.photoFont)      root.style.setProperty('--font-photo', sc.photoFont);
+          if (sc.photoFont)      root.style.setProperty('--font-photo', FONT_CSS[sc.photoFont] || sc.photoFont);
+          if (sc.photoFontWeight)root.style.setProperty('--wt-photo', sc.photoFontWeight);
           if (sc.photoColor)     root.style.setProperty('--color-photo', sc.photoColor);
+          if (sc.nameFont)       root.style.setProperty('--font-name', FONT_CSS[sc.nameFont] || sc.nameFont);
+          if (sc.nameFontWeight) root.style.setProperty('--wt-name', sc.nameFontWeight);
+          if (sc.nameColor)      root.style.setProperty('--color-name', sc.nameColor);
           /* Apply colors */
           if (sc.bgColor)    root.style.setProperty('--bg', sc.bgColor);
           if (sc.textColor)  root.style.setProperty('--text', sc.textColor);
+          if (sc.logoVariant) {
+            const logo = document.querySelector('.logo-mark');
+            if (logo) logo.src = sc.logoVariant === 'light' ? 'assets/asterisco-white.svg' : 'assets/asterisco-black.svg';
+          }
         }
       } catch(e) { console.warn('Bio load error', e); }
     })();
