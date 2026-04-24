@@ -3,11 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" href="assets/favicon-asterisk-black.svg" type="image/svg+xml" media="(prefers-color-scheme: light)" />
-  <link rel="icon" href="assets/favicon-asterisk-white.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)" />
-  <link rel="icon" href="assets/favicon-asterisk-black.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any" />
+  <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
+  <link rel="shortcut icon" href="/favicon-48.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+  <meta name="description" content="Tomaso Pignocchi is a philosopher and photographer. Explore publications, philosophy, photography, and contact information." />
+  <meta name="robots" content="max-snippet:160" />
 
-  <title>Tomaso Pignocchi</title>
+  <title>Tomaso Pignocchi — Philosophy, Photography, Publications</title>
   <script>
     /* ── Apply saved layout instantly + hide body to prevent flash ── */
     (function() {
@@ -411,9 +414,9 @@
     .contact-wrap{display:grid;grid-template-columns:1fr 1fr;gap:2.4rem;align-items:start}
     .contact-info{font-family:var(--font-secondary);font-size:.72rem;font-weight:300;line-height:2;color:var(--color-contact-muted,var(--page-ink3));display:flex;flex-direction:column;gap:0.9rem}
     .contact-mark-wrap{display:flex;align-items:flex-start}
-    .contact-mark{width:18px;height:auto;display:block}
+    .contact-mark{width:34px;height:auto;display:block}
     .contact-mark-dark{display:none}
-    .contact-note{line-height:1.8;margin:0;max-width:24rem;color:var(--color-contact,var(--page-ink))}
+    .contact-note{font-family:'Inter',sans-serif;font-size:1rem;line-height:1.8;margin:0;max-width:28rem;color:var(--color-contact,var(--page-ink))}
     .contact-elsewhere{display:flex;flex-direction:column;gap:0.4rem}
     .contact-elsewhere-label{font-size:0.5rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--color-contact-muted,var(--page-ink3))}
     .contact-elsewhere-links{display:flex;flex-direction:column;gap:0.25rem}
@@ -421,23 +424,23 @@
     .contact-elsewhere-links a:hover{border-bottom-color:currentColor}
     .contact-form{display:flex;flex-direction:column;gap:.9rem}
     .contact-form .form-group{display:flex;flex-direction:column;gap:.3rem}
-    .contact-form label{font-family:var(--font-secondary);font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;color:var(--color-contact,var(--page-ink))}
+    .contact-form label{font-family:'Inter',sans-serif;font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;color:var(--color-contact,var(--page-ink))}
     .contact-form input,.contact-form textarea{
       border:.5px solid var(--page-rule);background:transparent;
-      padding:.6rem .75rem;font-family:var(--font-primary);
+      padding:.6rem .75rem;font-family:'Inter',sans-serif;
       font-size:1rem;color:var(--color-contact,var(--page-ink));outline:none;width:100%;
     }
     .contact-form input::placeholder,.contact-form textarea::placeholder{color:var(--color-contact,var(--page-ink));opacity:.65}
     .contact-form input:focus,.contact-form textarea:focus{border-color:var(--color-contact,var(--page-ink))}
     .contact-form textarea{min-height:120px;resize:vertical}
     .contact-form button{
-      align-self:flex-start;font-family:var(--font-secondary);font-size:.52rem;
+      align-self:flex-start;font-family:'Inter',sans-serif;font-size:.52rem;
       font-weight:300;letter-spacing:.2em;text-transform:uppercase;
       background:var(--color-contact,var(--page-ink));color:var(--page-bg);border:none;
       padding:.65rem 1.4rem;cursor:pointer;transition:opacity .2s;
     }
     .contact-form button:hover{opacity:.7}
-    .form-success{display:none;font-family:var(--font-primary);font-style:italic;font-size:1rem;color:var(--color-contact,var(--page-ink));padding:.8rem 0}
+    .form-success{display:none;font-family:'Inter',sans-serif;font-size:1rem;color:var(--color-contact,var(--page-ink));padding:.8rem 0}
 
     /* FOOTER */
     footer{border-top:none}
@@ -658,7 +661,7 @@
           <a href="#contact" onclick="showTab('contact'); scrollToContactForm(); return false" class="home-contact-link">Contact</a>
         </div>
       </div>
-      <div class="i-bio">
+      <div class="i-bio" data-nosnippet>
         <p id="bioText">I am a Ph.D. candidate in philosophy at the Institut Catholique de Paris and Universit&agrave; degli Studi La Sapienza, Roma. My research investigates the intersection of Wittgenstein&rsquo;s later philosophy and Madhyamaka Buddhism.</p>
       </div>
     </div>
