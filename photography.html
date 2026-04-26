@@ -56,18 +56,18 @@
       background:var(--bg);border-bottom:none;
       height:54px;
     }
-    .site-nav .wrap{height:100%;display:flex;align-items:center;justify-content:space-between}
+    .site-nav .wrap{min-height:54px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;padding-top:0.5rem;padding-bottom:0.5rem}
     .nav-logo{display:flex;align-items:center;text-decoration:none;gap:0.8rem}
     .logo-mark{height:20px;width:auto;display:block;object-fit:contain;flex-shrink:0}
-    .nav-site-name{
+    .nav-site-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40vw;
       font-family:var(--font-name, 'EB Garamond', serif);font-weight:var(--wt-name, 400);
       font-size:calc(1rem * var(--sz-secondary-title,1));color:var(--color-name, var(--text));letter-spacing:-0.01em;
     }
-    .nav-right{display:flex;gap:2rem}
+    .nav-right{display:flex;gap:clamp(0.8rem,2.5vw,2rem);flex-wrap:wrap;align-items:center}
     .nav-right a{
-      font-family:'Inter', sans-serif;font-weight:300;font-size:0.6rem;
-      letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);
-      text-decoration:none;transition:color 0.2s;
+      font-family:'Inter', sans-serif;font-weight:300;font-size:clamp(0.48rem,1.2vw,0.6rem);
+      letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);
+      text-decoration:none;transition:color 0.2s;white-space:nowrap;
     }
     .nav-right a:hover{color:var(--text)}
     .nav-right a.active{color:var(--text);border-bottom:0.5px solid var(--text)}
@@ -117,17 +117,16 @@
 
     .photo-grid {
       columns: 3;
-      column-gap: 6px;
-      --gallery-gap: 6px;
-      --gallery-side-pad: 16px;
+      column-gap: clamp(12px, 2vw, 20px);
+      padding: clamp(1.2rem, 3vw, 2.4rem) clamp(1rem, 4vw, 3rem);
     }
 
-    @media (max-width: 800px) { .photo-grid { columns: 2; } }
-    @media (max-width: 480px) { .photo-grid { columns: 1; } }
+    @media (max-width: 900px) { .photo-grid { columns: 2; } }
+    @media (max-width: 500px) { .photo-grid { columns: 1; } }
 
     .photo-item {
       break-inside: avoid;
-      margin-bottom: 6px;
+      margin-bottom: clamp(12px, 2vw, 20px);
       cursor: pointer;
       position: relative;
       overflow: hidden;
@@ -274,7 +273,8 @@
     footer p{font-family:'Inter', sans-serif;font-weight:300;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted)}
 
     @media (max-width: 580px) {
-      .nav-right{gap:1rem}
+      .nav-right{gap:0.8rem}
+      .nav-right a{font-size:0.5rem;letter-spacing:0.14em}
       .grid-wrap { padding: 1rem 0 3rem; }
       footer .wrap{padding:1rem 0;}
     }

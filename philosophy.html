@@ -42,18 +42,18 @@
       background:var(--page-bg);border-bottom:none;
       height:54px;
     }
-    .site-nav .wrap{height:100%;display:flex;align-items:center;justify-content:space-between}
+    .site-nav .wrap{min-height:54px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;padding-top:0.5rem;padding-bottom:0.5rem}
     .nav-logo{display:flex;align-items:center;text-decoration:none;gap:0.8rem}
     .logo-mark{height:20px;width:auto;display:block}
-    .nav-site-name{
+    .nav-site-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40vw;
       font-family:var(--font-name,var(--font-primary));font-weight:var(--wt-name,var(--wt-primary));
       font-size:calc(1rem * var(--sz-secondary-title,1));color:var(--color-name,var(--page-ink));letter-spacing:-0.01em;
     }
-    .nav-right{display:flex;gap:2rem}
+    .nav-right{display:flex;gap:clamp(0.8rem,2.5vw,2rem);flex-wrap:wrap;align-items:center}
     .nav-right a{
-      font-family:var(--font-secondary);font-weight:300;font-size:0.6rem;
-      letter-spacing:0.22em;text-transform:uppercase;color:var(--page-ink3);
-      text-decoration:none;transition:color 0.2s;
+      font-family:var(--font-secondary);font-weight:300;font-size:clamp(0.48rem,1.2vw,0.6rem);
+      letter-spacing:0.18em;text-transform:uppercase;color:var(--page-ink3);
+      text-decoration:none;transition:color 0.2s;white-space:nowrap;
     }
     .nav-right a:hover{color:var(--page-ink)}
     .nav-right a.active{color:var(--page-ink);border-bottom:0.5px solid var(--page-ink)}
