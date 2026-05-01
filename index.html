@@ -1042,14 +1042,22 @@
           if (label3Color)  root.style.setProperty('--color-label-s3', label3Color);
           if (label3Size != null) root.style.setProperty('--sz-label-s3', label3Size / 100);
           if (label3Text)   { const el3 = document.getElementById('labelS3'); if (el3) el3.textContent = label3Text; }
-          const elsewhereLinks = [
-            ['Academia', ss.academiaUrl],
-            ['PhilPeople', ss.philpeopleUrl],
-            ['ResearchGate', ss.researchGateUrl],
-            ['Google Scholar', ss.googleScholarUrl],
-            ['ORCID', ss.orcidUrl],
-            ['Instagram', ss.instagramUrl],
-          ].filter(([,url]) => !!url);
+          const elsewhereLinks = [];
+          for (let i = 1; i <= 20; i++) {
+            const label = ss['link' + i + 'Label'];
+            const url = ss['link' + i + 'Url'];
+            if (label && url) elsewhereLinks.push([label, url]);
+          }
+          if (!elsewhereLinks.length) {
+            elsewhereLinks.push(...[
+              ['Academia', ss.academiaUrl],
+              ['PhilPeople', ss.philpeopleUrl],
+              ['ResearchGate', ss.researchGateUrl],
+              ['Google Scholar', ss.googleScholarUrl],
+              ['ORCID', ss.orcidUrl],
+              ['Instagram', ss.instagramUrl],
+            ].filter(([,url]) => !!url));
+          }
           const elsewhereWrap = document.getElementById('contactElsewhere');
           const elsewhereBox = document.getElementById('contactElsewhereLinks');
           if (elsewhereWrap && elsewhereBox) {

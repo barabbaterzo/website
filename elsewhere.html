@@ -29,8 +29,18 @@
       --lh-bio:1.78; --lh-pubs:1.45;
       --gutter:clamp(1.5rem,4vw,3.2rem);
       --max-w:1200px;
+      --elsewhere-intro-font:var(--font-primary);
+      --elsewhere-intro-weight:var(--wt-primary);
+      --elsewhere-intro-color:var(--page-ink2);
+      --elsewhere-intro-size:1;
+      --elsewhere-link-font:var(--font-primary);
+      --elsewhere-link-weight:var(--wt-primary);
       --elsewhere-link-color:var(--page-ink);
+      --elsewhere-link-size:1;
+      --elsewhere-meta-font:var(--font-secondary);
+      --elsewhere-meta-weight:300;
       --elsewhere-meta-color:var(--page-ink3);
+      --elsewhere-meta-size:1;
     }
     html{scroll-behavior:smooth}
     body{background:var(--page-bg);color:var(--page-ink);font-family:var(--font-primary)}
@@ -126,25 +136,56 @@
     footer .wrap{padding:1.4rem 0;display:flex;justify-content:space-between}
     footer p{font-family:var(--font-secondary);font-weight:300;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--page-ink3)}
   
+
     /* ── Elsewhere specific ── */
-    .elsewhere-section { padding: clamp(2.4rem, 5vw, 4.8rem) 0; }
-    .links-list { list-style: none; border-top: 0.5px solid var(--page-rule); }
-    .links-list li { border-bottom: 0.5px solid var(--page-rule); }
+    .elsewhere-intro{padding:clamp(2rem,4vw,3.6rem) 0 0}
+    .elsewhere-intro-grid{
+      padding-bottom:clamp(1.6rem,3vw,2.4rem);
+      border-bottom:0.5px solid var(--page-rule-strong,#a8a094);
+    }
+    .elsewhere-intro-copy p{
+      font-family:var(--elsewhere-intro-font,var(--font-primary));
+      font-weight:var(--elsewhere-intro-weight,var(--wt-primary));
+      font-size:calc(clamp(0.95rem,1.4vw,1.08rem)*var(--elsewhere-intro-size,1));
+      line-height:var(--lh-bio,1.78);
+      color:var(--elsewhere-intro-color,var(--page-ink2));
+      text-align:justify;
+      hyphens:auto;
+      max-width:72ch;
+    }
+    .elsewhere-section { padding: clamp(2rem, 4vw, 3.2rem) 0; }
+    .links-list { list-style: none; }
+    .links-list li + li { border-top: 0.5px solid rgba(168,160,148,0.42); }
     .link-item {
-      display: flex; align-items: baseline; justify-content: space-between;
-      padding: clamp(0.9rem, 1.8vw, 1.4rem) 0;
-      text-decoration: none; color: inherit; transition: opacity 0.2s;
+      display: flex; align-items: baseline; justify-content: space-between; gap:1.25rem;
+      padding: 0.85rem 0; text-decoration: none; color: inherit; transition: opacity 0.2s;
     }
     .link-item:hover { opacity: 0.55; }
     .link-label {
-      font-family: var(--font-primary); font-weight: var(--wt-primary);
-      font-size: clamp(1.1rem, 2vw, 1.6rem);
-      color: var(--elsewhere-link-color); letter-spacing: -0.01em;
+      font-family: var(--elsewhere-link-font,var(--font-primary));
+      font-weight: var(--elsewhere-link-weight,var(--wt-primary));
+      font-size: calc(0.95rem * var(--elsewhere-link-size,1));
+      line-height: 1.45;
+      color: var(--elsewhere-link-color,var(--page-ink));
+      letter-spacing: -0.01em;
     }
-    .link-meta { display: flex; align-items: center; gap: 0.5rem; }
-    .link-url { font-family: var(--font-secondary); font-weight: 300; font-size: 0.58rem; letter-spacing: 0.08em; color: var(--elsewhere-meta-color); }
-    .link-arrow { color: var(--elsewhere-meta-color); font-size: 0.75rem; }
+    .link-meta { display: flex; align-items: center; gap: 0.5rem; flex-shrink:0; }
+    .link-url {
+      font-family: var(--elsewhere-meta-font,var(--font-secondary));
+      font-weight: var(--elsewhere-meta-weight,300);
+      font-size: calc(0.63rem * var(--elsewhere-meta-size,1));
+      letter-spacing: 0.08em;
+      color: var(--elsewhere-meta-color,var(--page-ink3));
+      text-align:right;
+    }
+    .link-arrow { color: var(--elsewhere-meta-color,var(--page-ink3)); font-size: calc(0.75rem * var(--elsewhere-meta-size,1)); }
     .empty-msg { font-family: var(--font-secondary); font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--page-ink3); padding: 2rem 0; display: block; }
+    @media (max-width: 760px){
+      .elsewhere-intro-copy p{max-width:none}
+      .link-item{display:block}
+      .link-meta{margin-top:0.35rem;justify-content:flex-start}
+      .link-url{text-align:left}
+    }
   </style>
 </head>
 <body>
@@ -162,6 +203,16 @@
       </nav>
     </div>
   </header>
+
+  <section class="elsewhere-intro">
+    <div class="wrap">
+      <div class="elsewhere-intro-grid">
+        <div class="elsewhere-intro-copy">
+          <p id="elsewhereIntroText">A selection of external profiles, institutional pages, and online platforms.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <section class="elsewhere-section">
     <div class="wrap">
@@ -254,19 +305,36 @@
           }
         }
 
-        if (ss && ss.elsewhereLinkColor) {
-          root.style.setProperty('--elsewhere-link-color', ss.elsewhereLinkColor);
+        if (ss) {
+          if (ss.elsewhereIntroText) {
+            const intro = document.getElementById('elsewhereIntroText');
+            if (intro) intro.textContent = ss.elsewhereIntroText;
+          }
+          if (ss.elsewhereIntroFont) root.style.setProperty('--elsewhere-intro-font', FONT_CSS[ss.elsewhereIntroFont] || ss.elsewhereIntroFont);
+          if (ss.elsewhereIntroWeight) root.style.setProperty('--elsewhere-intro-weight', ss.elsewhereIntroWeight);
+          if (ss.elsewhereIntroColor) root.style.setProperty('--elsewhere-intro-color', ss.elsewhereIntroColor);
+          if (ss.elsewhereIntroSize != null) root.style.setProperty('--elsewhere-intro-size', ss.elsewhereIntroSize / 100);
+          if (ss.elsewhereLinkFont) root.style.setProperty('--elsewhere-link-font', FONT_CSS[ss.elsewhereLinkFont] || ss.elsewhereLinkFont);
+          if (ss.elsewhereLinkWeight) root.style.setProperty('--elsewhere-link-weight', ss.elsewhereLinkWeight);
+          if (ss.elsewhereLinkColor) root.style.setProperty('--elsewhere-link-color', ss.elsewhereLinkColor);
+          if (ss.elsewhereLinkSize != null) root.style.setProperty('--elsewhere-link-size', ss.elsewhereLinkSize / 100);
+          if (ss.elsewhereMetaFont) root.style.setProperty('--elsewhere-meta-font', FONT_CSS[ss.elsewhereMetaFont] || ss.elsewhereMetaFont);
+          if (ss.elsewhereMetaWeight) root.style.setProperty('--elsewhere-meta-weight', ss.elsewhereMetaWeight);
+          if (ss.elsewhereMetaColor) root.style.setProperty('--elsewhere-meta-color', ss.elsewhereMetaColor);
+          if (ss.elsewhereMetaSize != null) root.style.setProperty('--elsewhere-meta-size', ss.elsewhereMetaSize / 100);
         }
 
         const links = [];
         if (ss) {
-          ['academiaUrl','philpeopleUrl','researchGateUrl','googleScholarUrl','orcidUrl','instagramUrl']
-            .forEach(f => { if (ss[f]) links.push({ label: FIELD_LABELS[f], url: ss[f] }); });
           for (let i = 1; i <= 20; i++) {
             const lbl = ss['link' + i + 'Label'];
             const url = ss['link' + i + 'Url'];
             const sub = ss['link' + i + 'Meta'];
             if (lbl && url) links.push({ label: lbl, url: url, meta: sub || '' });
+          }
+          if (!links.length) {
+            ['academiaUrl','philpeopleUrl','researchGateUrl','googleScholarUrl','orcidUrl','instagramUrl']
+              .forEach(f => { if (ss[f]) links.push({ label: FIELD_LABELS[f], url: ss[f] }); });
           }
         }
 

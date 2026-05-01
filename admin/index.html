@@ -1216,53 +1216,57 @@
 
   <!-- ═══ ELSEWHERE PANEL ═══ -->
   <div class="admin-panel" id="panel-elsewhere">
-    <p class="section-title">Elsewhere, ORCID & contact colors</p>
+    <p class="section-title">Elsewhere page</p>
     <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1.8rem">
       <div style="margin-bottom:0.9rem;font-size:0.56rem;line-height:1.7;color:var(--ink3)">
-        Order on the site: Academia, PhilPeople, ResearchGate, Google Scholar, ORCID, Instagram.
-        The contact form text color is separate from the Elsewhere links color.
+        Configure the Elsewhere page intro, the typography of the links list, and the links themselves.
+        The dividers on the site are now matched to the thin publication separators used on philosophy.html.
       </div>
-      <div class="form-grid">
-        <div class="form-group full">
-          <label>Academia URL</label>
-          <input type="text" id="else-academia" placeholder="https://…" />
-        </div>
-        <div class="form-group full">
-          <label>PhilPeople URL</label>
-          <input type="text" id="else-philpeople" placeholder="https://…" />
-        </div>
-        <div class="form-group full">
-          <label>ORCID URL</label>
-          <input type="text" id="else-orcid" placeholder="https://orcid.org/..." />
-        </div>
-        <div class="form-group full">
-          <label>Instagram URL</label>
-          <input type="text" id="else-instagram" placeholder="https://…" />
-        </div>
-        <div class="form-group full">
-          <label>ResearchGate URL</label>
-          <input type="text" id="else-researchgate" placeholder="https://…" />
-        </div>
-        <div class="form-group full">
-          <label>Google Scholar URL</label>
-          <input type="text" id="else-googlescholar" placeholder="https://…" />
-        </div>
-        <div class="form-group">
-          <label>Contact form text color</label>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input type="color" id="cp-contact-form-text" value="#1a1814" style="width:40px;height:32px;padding:2px;border:1px solid var(--rule);cursor:pointer" oninput="document.getElementById('hex-contact-form-text').value=this.value" />
-            <input type="text" id="hex-contact-form-text" placeholder="#1a1814" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:90px" oninput="var p=document.getElementById('cp-contact-form-text');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Elsewhere links color</label>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input type="color" id="cp-elsewhere-links" value="#1a1814" style="width:40px;height:32px;padding:2px;border:1px solid var(--rule);cursor:pointer" oninput="document.getElementById('hex-elsewhere-links').value=this.value" />
-            <input type="text" id="hex-elsewhere-links" placeholder="#1a1814" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:90px" oninput="var p=document.getElementById('cp-elsewhere-links');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
-          </div>
+
+      <p style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem">Intro text</p>
+      <div class="form-group full" style="margin-bottom:0.9rem">
+        <label>Intro text</label>
+        <textarea id="elsewhere-intro-text" rows="4" placeholder="A selection of external profiles, institutional pages, and online platforms."></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1.1fr 0.9fr 1fr 1fr;gap:0.8rem;margin-bottom:1.25rem">
+        <div><label>Intro font</label><select id="elsewhere-intro-font" style="width:100%;font-size:0.62rem"><option value="">Default</option><option>EB Garamond</option><option>Cormorant Garant</option><option>Playfair Display</option><option>Spectral</option><option>Libre Baskerville</option><option>Inter</option><option>Lato</option><option>DM Mono</option><option>Source Sans 3</option><option>New Computer Modern</option></select></div>
+        <div><label>Intro weight</label><select id="elsewhere-intro-weight" style="width:100%;font-size:0.62rem"><option value="">Default</option><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option></select></div>
+        <div><label>Intro color</label><div style="display:flex;gap:8px;align-items:center"><input type="color" id="cp-elsewhere-intro-color" value="#3e3b36" style="width:40px;height:32px;padding:2px;border:1px solid var(--rule);cursor:pointer" oninput="document.getElementById('hex-elsewhere-intro-color').value=this.value" /><input type="text" id="hex-elsewhere-intro-color" placeholder="#3e3b36" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:90px" oninput="var p=document.getElementById('cp-elsewhere-intro-color');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" /></div></div>
+        <div><label>Intro size <span id="v-elsewhere-intro-size">100</span>%</label><input type="range" min="60" max="180" value="100" id="elsewhere-intro-size" oninput="document.getElementById('v-elsewhere-intro-size').textContent=this.value" style="width:100%" /></div>
+      </div>
+
+      <p style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem">Links style</p>
+      <div style="display:grid;grid-template-columns:1.1fr 0.9fr 1fr 1fr;gap:0.8rem;margin-bottom:1.25rem">
+        <div><label>Link font</label><select id="elsewhere-link-font" style="width:100%;font-size:0.62rem"><option value="">Default</option><option>EB Garamond</option><option>Cormorant Garant</option><option>Playfair Display</option><option>Spectral</option><option>Libre Baskerville</option><option>Inter</option><option>Lato</option><option>DM Mono</option><option>Source Sans 3</option><option>New Computer Modern</option></select></div>
+        <div><label>Link weight</label><select id="elsewhere-link-weight" style="width:100%;font-size:0.62rem"><option value="">Default</option><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option></select></div>
+        <div><label>Link color</label><div style="display:flex;gap:8px;align-items:center"><input type="color" id="cp-elsewhere-links" value="#1a1814" style="width:40px;height:32px;padding:2px;border:1px solid var(--rule);cursor:pointer" oninput="document.getElementById('hex-elsewhere-links').value=this.value" /><input type="text" id="hex-elsewhere-links" placeholder="#1a1814" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:90px" oninput="var p=document.getElementById('cp-elsewhere-links');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" /></div></div>
+        <div><label>Link size <span id="v-elsewhere-link-size">100</span>%</label><input type="range" min="60" max="180" value="100" id="elsewhere-link-size" oninput="document.getElementById('v-elsewhere-link-size').textContent=this.value" style="width:100%" /></div>
+      </div>
+
+      <p style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem">Meta style</p>
+      <div style="display:grid;grid-template-columns:1.1fr 0.9fr 1fr 1fr;gap:0.8rem;margin-bottom:1.25rem">
+        <div><label>Meta font</label><select id="elsewhere-meta-font" style="width:100%;font-size:0.62rem"><option value="">Default</option><option>EB Garamond</option><option>Cormorant Garant</option><option>Playfair Display</option><option>Spectral</option><option>Libre Baskerville</option><option>Inter</option><option>Lato</option><option>DM Mono</option><option>Source Sans 3</option><option>New Computer Modern</option></select></div>
+        <div><label>Meta weight</label><select id="elsewhere-meta-weight" style="width:100%;font-size:0.62rem"><option value="">Default</option><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option></select></div>
+        <div><label>Meta color</label><div style="display:flex;gap:8px;align-items:center"><input type="color" id="cp-elsewhere-meta-color" value="#8a8480" style="width:40px;height:32px;padding:2px;border:1px solid var(--rule);cursor:pointer" oninput="document.getElementById('hex-elsewhere-meta-color').value=this.value" /><input type="text" id="hex-elsewhere-meta-color" placeholder="#8a8480" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:90px" oninput="var p=document.getElementById('cp-elsewhere-meta-color');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" /></div></div>
+        <div><label>Meta size <span id="v-elsewhere-meta-size">100</span>%</label><input type="range" min="60" max="180" value="100" id="elsewhere-meta-size" oninput="document.getElementById('v-elsewhere-meta-size').textContent=this.value" style="width:100%" /></div>
+      </div>
+
+      <div class="form-group" style="max-width:320px;margin-bottom:1.2rem">
+        <label>Contact form text color</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="color" id="cp-contact-form-text" value="#1a1814" style="width:40px;height:32px;padding:2px;border:1px solid var(--rule);cursor:pointer" oninput="document.getElementById('hex-contact-form-text').value=this.value" />
+          <input type="text" id="hex-contact-form-text" placeholder="#1a1814" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:90px" oninput="var p=document.getElementById('cp-contact-form-text');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
         </div>
       </div>
-      <div class="form-actions" style="margin-top:1rem">
+
+      <p style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem">Links list</p>
+      <div id="elsewhere-links-editor" style="display:grid;gap:0.75rem;margin-bottom:1rem"></div>
+      <div style="display:flex;gap:0.7rem;flex-wrap:wrap;align-items:center">
+        <button class="btn" type="button" onclick="addElsewhereLink()">Add link</button>
+        <span style="font-size:0.56rem;color:var(--ink3)">You can add up to 20 links. Dragging is not required: use ↑ and ↓ to reorder them.</span>
+      </div>
+
+      <div class="form-actions" style="margin-top:1.25rem">
         <button class="btn primary" onclick="saveElsewhere()">Save elsewhere settings →</button>
       </div>
       <div id="elsewhereSaveMsg" style="font-size:0.58rem;color:var(--green);margin-top:0.6rem;display:none">✓ Saved</div>
@@ -2431,53 +2435,181 @@
     }
 
     /* ── Elsewhere ── */
+    let elsewhereLinksState = [];
+
+    function normalizeElsewhereLinks(list) {
+      return (list || []).map(item => ({
+        label: (item && item.label ? String(item.label) : '').trim(),
+        url: (item && item.url ? String(item.url) : '').trim(),
+        meta: (item && item.meta ? String(item.meta) : '').trim(),
+      })).filter(item => item.label || item.url || item.meta);
+    }
+
+    function renderElsewhereLinksEditor() {
+      const box = document.getElementById('elsewhere-links-editor');
+      if (!box) return;
+      if (!elsewhereLinksState.length) {
+        box.innerHTML = '<div style="font-size:0.58rem;color:var(--ink3);padding:0.9rem 0;border-top:0.5px solid rgba(168,160,148,0.42)">No links yet.</div>';
+        return;
+      }
+      box.innerHTML = elsewhereLinksState.map((item, index) => `
+        <div style="border-top:0.5px solid rgba(168,160,148,0.42);padding-top:0.75rem;display:grid;gap:0.65rem">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap">
+            <div style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3)">Link ${index + 1}</div>
+            <div style="display:flex;gap:0.45rem;flex-wrap:wrap">
+              <button class="btn" type="button" onclick="moveElsewhereLink(${index}, -1)" ${index === 0 ? 'disabled' : ''}>↑</button>
+              <button class="btn" type="button" onclick="moveElsewhereLink(${index}, 1)" ${index === elsewhereLinksState.length - 1 ? 'disabled' : ''}>↓</button>
+              <button class="btn danger" type="button" onclick="removeElsewhereLink(${index})">Delete</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:0.75rem">
+            <div class="form-group" style="margin:0"><label>Label</label><input type="text" value="${escapeHtml(item.label)}" oninput="updateElsewhereLinkField(${index}, 'label', this.value)" placeholder="Academia.edu" /></div>
+            <div class="form-group" style="margin:0"><label>URL</label><input type="text" value="${escapeHtml(item.url)}" oninput="updateElsewhereLinkField(${index}, 'url', this.value)" placeholder="https://..." /></div>
+            <div class="form-group" style="margin:0"><label>Meta / subtitle</label><input type="text" value="${escapeHtml(item.meta)}" oninput="updateElsewhereLinkField(${index}, 'meta', this.value)" placeholder="academia.edu" /></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function addElsewhereLink() {
+      if (elsewhereLinksState.length >= 20) { alert('Maximum 20 links'); return; }
+      elsewhereLinksState.push({ label: '', url: '', meta: '' });
+      renderElsewhereLinksEditor();
+    }
+
+    function updateElsewhereLinkField(index, field, value) {
+      if (!elsewhereLinksState[index]) return;
+      elsewhereLinksState[index][field] = value;
+    }
+
+    function removeElsewhereLink(index) {
+      elsewhereLinksState.splice(index, 1);
+      renderElsewhereLinksEditor();
+    }
+
+    function moveElsewhereLink(index, delta) {
+      const next = index + delta;
+      if (next < 0 || next >= elsewhereLinksState.length) return;
+      const temp = elsewhereLinksState[index];
+      elsewhereLinksState[index] = elsewhereLinksState[next];
+      elsewhereLinksState[next] = temp;
+      renderElsewhereLinksEditor();
+    }
+
     async function loadElsewhere() {
       if (!CF.hasReadAccess()) return;
       try {
         const settings = await CF.get('siteSettings');
         const s = (settings && settings.find(item => item && item.key === 'main')) || (settings && settings.length ? settings[0] : null);
-        if (!s) return;
-        const map = {
-          'else-academia': 'academiaUrl',
-          'else-philpeople': 'philpeopleUrl',
-          'else-orcid': 'orcidUrl',
-          'else-instagram': 'instagramUrl',
-          'else-researchgate': 'researchGateUrl',
-          'else-googlescholar': 'googleScholarUrl'
+        if (!s) { elsewhereLinksState = []; renderElsewhereLinksEditor(); return; }
+
+        const setVal = (id, value) => { const el = document.getElementById(id); if (el) el.value = value ?? ''; };
+        const setColor = (hexId, pickerId, value) => {
+          const hex = document.getElementById(hexId);
+          const picker = document.getElementById(pickerId);
+          if (hex) hex.value = value || '';
+          if (picker && /^#[0-9a-fA-F]{6}$/.test(value || '')) picker.value = value;
         };
-        Object.entries(map).forEach(([id, key]) => {
+        const setRange = (id, labelId, value, fallback = 100) => {
           const el = document.getElementById(id);
-          if (el) el.value = s[key] || '';
-        });
-        const contactColor = s.contactFormTextColor || '';
-        const elsewhereColor = s.elsewhereLinkColor || '';
-        const contactHex = document.getElementById('hex-contact-form-text');
-        const contactPick = document.getElementById('cp-contact-form-text');
-        const elsewhereHex = document.getElementById('hex-elsewhere-links');
-        const elsewherePick = document.getElementById('cp-elsewhere-links');
-        if (contactHex) contactHex.value = contactColor;
-        if (contactPick && /^#[0-9a-fA-F]{6}$/.test(contactColor)) contactPick.value = contactColor;
-        if (elsewhereHex) elsewhereHex.value = elsewhereColor;
-        if (elsewherePick && /^#[0-9a-fA-F]{6}$/.test(elsewhereColor)) elsewherePick.value = elsewhereColor;
+          const label = document.getElementById(labelId);
+          const finalValue = (value == null || value === '') ? fallback : value;
+          if (el) el.value = finalValue;
+          if (label) label.textContent = finalValue;
+        };
+
+        setVal('elsewhere-intro-text', s.elsewhereIntroText || '');
+        setVal('elsewhere-intro-font', s.elsewhereIntroFont || '');
+        setVal('elsewhere-intro-weight', s.elsewhereIntroWeight || '');
+        setColor('hex-elsewhere-intro-color', 'cp-elsewhere-intro-color', s.elsewhereIntroColor || '');
+        setRange('elsewhere-intro-size', 'v-elsewhere-intro-size', s.elsewhereIntroSize, 100);
+
+        setVal('elsewhere-link-font', s.elsewhereLinkFont || '');
+        setVal('elsewhere-link-weight', s.elsewhereLinkWeight || '');
+        setColor('hex-elsewhere-links', 'cp-elsewhere-links', s.elsewhereLinkColor || '');
+        setRange('elsewhere-link-size', 'v-elsewhere-link-size', s.elsewhereLinkSize, 100);
+
+        setVal('elsewhere-meta-font', s.elsewhereMetaFont || '');
+        setVal('elsewhere-meta-weight', s.elsewhereMetaWeight || '');
+        setColor('hex-elsewhere-meta-color', 'cp-elsewhere-meta-color', s.elsewhereMetaColor || '');
+        setRange('elsewhere-meta-size', 'v-elsewhere-meta-size', s.elsewhereMetaSize, 100);
+
+        setColor('hex-contact-form-text', 'cp-contact-form-text', s.contactFormTextColor || '');
+
+        const dynamic = [];
+        for (let i = 1; i <= 20; i++) {
+          const label = s['link' + i + 'Label'];
+          const url = s['link' + i + 'Url'];
+          const meta = s['link' + i + 'Meta'];
+          if (label || url || meta) dynamic.push({ label: label || '', url: url || '', meta: meta || '' });
+        }
+        if (dynamic.length) {
+          elsewhereLinksState = normalizeElsewhereLinks(dynamic);
+        } else {
+          elsewhereLinksState = normalizeElsewhereLinks([
+            { label: 'Academia.edu', url: s.academiaUrl || '', meta: '' },
+            { label: 'PhilPeople', url: s.philpeopleUrl || '', meta: '' },
+            { label: 'ResearchGate', url: s.researchGateUrl || '', meta: '' },
+            { label: 'Google Scholar', url: s.googleScholarUrl || '', meta: '' },
+            { label: 'ORCID', url: s.orcidUrl || '', meta: '' },
+            { label: 'Instagram', url: s.instagramUrl || '', meta: '' },
+          ]);
+        }
+        renderElsewhereLinksEditor();
       } catch (e) { console.warn('loadElsewhere', e); }
     }
 
     async function saveElsewhere() {
       if (!CF.hasWriteAccess()) { alert('Connect Contentful first and add the Management Token (Settings tab)'); return; }
       try {
-        const allowedFieldIds = await ensureContentTypeFields('siteSettings', ['academiaUrl','philpeopleUrl','researchGateUrl','googleScholarUrl','orcidUrl','instagramUrl','contactFormTextColor','elsewhereLinkColor']);
+        const fieldIds = ['academiaUrl','philpeopleUrl','researchGateUrl','googleScholarUrl','orcidUrl','instagramUrl','contactFormTextColor','elsewhereIntroText','elsewhereIntroFont','elsewhereIntroWeight','elsewhereIntroColor','elsewhereIntroSize','elsewhereLinkFont','elsewhereLinkWeight','elsewhereLinkColor','elsewhereLinkSize','elsewhereMetaFont','elsewhereMetaWeight','elsewhereMetaColor','elsewhereMetaSize'];
+        for (let i = 1; i <= 20; i++) fieldIds.push(`link${i}Label`, `link${i}Url`, `link${i}Meta`);
+        await ensureContentTypeFields('siteSettings', fieldIds);
+
+        const links = normalizeElsewhereLinks(elsewhereLinksState).filter(item => item.label && item.url).slice(0, 20);
         const payload = {
           key: 'main',
-          academiaUrl: document.getElementById('else-academia').value.trim(),
-          philpeopleUrl: document.getElementById('else-philpeople').value.trim(),
-          researchGateUrl: document.getElementById('else-researchgate').value.trim(),
-          googleScholarUrl: document.getElementById('else-googlescholar').value.trim(),
-          orcidUrl: document.getElementById('else-orcid').value.trim(),
-          instagramUrl: document.getElementById('else-instagram').value.trim(),
+          academiaUrl: '', philpeopleUrl: '', researchGateUrl: '', googleScholarUrl: '', orcidUrl: '', instagramUrl: '',
           contactFormTextColor: document.getElementById('hex-contact-form-text').value.trim(),
+          elsewhereIntroText: document.getElementById('elsewhere-intro-text').value.trim(),
+          elsewhereIntroFont: document.getElementById('elsewhere-intro-font').value,
+          elsewhereIntroWeight: parseInt(document.getElementById('elsewhere-intro-weight').value) || null,
+          elsewhereIntroColor: document.getElementById('hex-elsewhere-intro-color').value.trim(),
+          elsewhereIntroSize: parseInt(document.getElementById('elsewhere-intro-size').value) || 100,
+          elsewhereLinkFont: document.getElementById('elsewhere-link-font').value,
+          elsewhereLinkWeight: parseInt(document.getElementById('elsewhere-link-weight').value) || null,
           elsewhereLinkColor: document.getElementById('hex-elsewhere-links').value.trim(),
+          elsewhereLinkSize: parseInt(document.getElementById('elsewhere-link-size').value) || 100,
+          elsewhereMetaFont: document.getElementById('elsewhere-meta-font').value,
+          elsewhereMetaWeight: parseInt(document.getElementById('elsewhere-meta-weight').value) || null,
+          elsewhereMetaColor: document.getElementById('hex-elsewhere-meta-color').value.trim(),
+          elsewhereMetaSize: parseInt(document.getElementById('elsewhere-meta-size').value) || 100,
         };
+        for (let i = 1; i <= 20; i++) {
+          const item = links[i - 1] || { label: '', url: '', meta: '' };
+          payload[`link${i}Label`] = item.label;
+          payload[`link${i}Url`] = item.url;
+          payload[`link${i}Meta`] = item.meta;
+        }
+        if (!links.length) {
+          payload.academiaUrl = '';
+          payload.philpeopleUrl = '';
+          payload.researchGateUrl = '';
+          payload.googleScholarUrl = '';
+          payload.orcidUrl = '';
+          payload.instagramUrl = '';
+        }
         await upsertMainEntry('siteSettings', payload);
+        elsewhereLinksState = links;
+        renderElsewhereLinksEditor();
         const msg = document.getElementById('elsewhereSaveMsg');
         if (msg) { msg.style.display = 'block'; setTimeout(() => msg.style.display = 'none', 2500); }
       } catch(e) { alert('Save error: ' + e.message); }
