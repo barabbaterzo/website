@@ -68,7 +68,7 @@
     .site-nav .wrap{height:100%;display:flex;align-items:center;justify-content:space-between}
     .nav-logo{display:flex;align-items:center;text-decoration:none}
     .logo-mark{height:20px;width:auto;display:block}
-    .nav-links{display:flex;gap:clamp(0.8rem,2.5vw,2.2rem);list-style:none;flex-wrap:wrap}
+    .nav-links{display:flex;gap:2.2rem;list-style:none}
     .nav-links a{
       font-family:var(--font-secondary);font-weight:300;font-size:0.6rem;
       letter-spacing:0.22em;text-transform:uppercase;color:var(--page-ink3);
@@ -588,6 +588,9 @@
     #panel-s-2 img {
       object-position: var(--pos-s2, center 38%);
     }
+    #panel-s-3 img {
+      object-position: var(--pos-s3, center 38%);
+    }
     .panel-s:hover img {
       filter: grayscale(0%) brightness(0.88);
       transform: scale(1.03);
@@ -619,6 +622,12 @@
       font-weight: var(--wt-label-s2, var(--wt-label-s, var(--wt-primary)));
       font-size: calc(clamp(1.8rem, 3.5vw, 3.6rem) * var(--sz-label-s2, 1));
       color: var(--color-label-s2, #fff);
+    }
+    #panel-s-3 .panel-s-label {
+      font-family: var(--font-label-s3, var(--font-primary));
+      font-weight: var(--wt-label-s3, var(--wt-label-s, var(--wt-primary)));
+      font-size: calc(clamp(1.8rem, 3.5vw, 3.6rem) * var(--sz-label-s3, 1));
+      color: var(--color-label-s3, #fff);
     }
 
     /* RESPONSIVE */
@@ -692,6 +701,12 @@
         <img id="bannerS2Img" src="" alt="" />
         <div class="panel-s-overlay">
           <span class="panel-s-label" id="labelS2">Photography</span>
+        </div>
+      </a>
+      <a href="elsewhere.html" class="panel-s" id="panel-s-3">
+        <img id="bannerS3Img" src="" alt="" />
+        <div class="panel-s-overlay">
+          <span class="panel-s-label" id="labelS3">Elsewhere</span>
         </div>
       </a>
     </div>
@@ -973,12 +988,23 @@
           const label2WeightRaw = pick('label2weight', 'label2Weight');
           const label2Color = pick('label2color', 'label2Color');
           const label2Size = pick('label2size', 'label2Size');
+          const banner3Url = pick('banner3url', 'banner3Url');
+          const banner3PosX = pick('banner3posX', 'banner3PosX');
+          const banner3PosY = pick('banner3posY', 'banner3PosY');
+          const label3Text = pick('label3text', 'label3Text');
+          const label3FontRaw = pick('label3font', 'label3Font');
+          const label3WeightRaw = pick('label3weight', 'label3Weight');
+          const label3Color = pick('label3color', 'label3Color');
+          const label3Size = pick('label3size', 'label3Size');
           const label1FontData = decodePackedLabelFont(label1FontRaw, label1WeightRaw);
           const label2FontData = decodePackedLabelFont(label2FontRaw, label2WeightRaw);
+          const label3FontData = decodePackedLabelFont(label3FontRaw, label3WeightRaw);
           const label1Font = label1FontData.font;
           const label1Weight = label1FontData.weight;
           const label2Font = label2FontData.font;
           const label2Weight = label2FontData.weight;
+          const label3Font = label3FontData.font;
+          const label3Weight = label3FontData.weight;
           /* Banner 1 (hero) */
           if (ss.heroBanner) {
             const img = document.getElementById('heroBannerImg');
@@ -1008,6 +1034,14 @@
           if (label2Size)  root.style.setProperty('--sz-label-s2', label2Size / 100);
           if (label1Text) { const el = document.getElementById('labelS1'); if (el) el.textContent = label1Text; }
           if (label2Text) { const el = document.getElementById('labelS2'); if (el) el.textContent = label2Text; }
+          /* Banner 3 */
+          if (banner3Url) { const img3 = document.getElementById('bannerS3Img'); if (img3) img3.src = banner3Url; }
+          if (banner3PosX != null && banner3PosY != null) root.style.setProperty('--pos-s3', banner3PosX + '% ' + banner3PosY + '%');
+          if (label3Font)   root.style.setProperty('--font-label-s3', label3Font);
+          if (label3Weight) root.style.setProperty('--wt-label-s3', label3Weight);
+          if (label3Color)  root.style.setProperty('--color-label-s3', label3Color);
+          if (label3Size != null) root.style.setProperty('--sz-label-s3', label3Size / 100);
+          if (label3Text)   { const el3 = document.getElementById('labelS3'); if (el3) el3.textContent = label3Text; }
           const elsewhereLinks = [
             ['Academia', ss.academiaUrl],
             ['PhilPeople', ss.philpeopleUrl],

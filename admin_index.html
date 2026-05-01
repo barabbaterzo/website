@@ -1,0 +1,2852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any" />
+  <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
+  <link rel="shortcut icon" href="/favicon-48.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+  <title>Admin — Photos</title>
+  <script src="../js/contentful.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=New+Computer+Modern:ital,wght@0,400;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Cormorant+Garant:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Source+Sans+3:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:   #1a1814;
+      --ink2:  #3e3b36;
+      --ink3:  #888;
+      --paper: #f5f2ec;
+      --rule:  #d8d4cc;
+      --green: #2a6040;
+      --red:   #8b2020;
+      --amber: #8b5a00;
+    }
+
+    body { background: var(--paper); color: var(--ink);
+      font-family: 'DM Mono', monospace; font-size: 0.82rem; }
+
+    /* ── HEADER ── */
+    .admin-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2rem; border-bottom: 1px solid var(--rule); background: white;
+      position: sticky; top: 0; z-index: 100;
+    }
+
+    .admin-header h1 { font-family: 'EB Garamond', serif; font-weight: 400;
+      font-size: 1.1rem; letter-spacing: 0.02em; }
+
+    .admin-header .sub { font-size: 0.5rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--ink3); margin-top: 0.15rem; }
+
+    .header-links { display: flex; gap: 1.2rem; align-items: center; }
+
+    .header-links a, .header-links button {
+      font-size: 0.52rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--ink3); text-decoration: none; background: none; border: none;
+      cursor: pointer; transition: color 0.2s;
+    }
+    .header-links a:hover, .header-links button:hover { color: var(--ink); }
+
+    /* ── LAYOUT ── */
+    .admin-body { max-width: 960px; margin: 0 auto; padding: 0 2rem 2rem; }
+
+    /* ── ADMIN TABS ── */
+    .admin-tabs {
+      display: flex; border-bottom: 1px solid var(--rule);
+      background: white; padding: 0 2rem; position: sticky; top: 57px; z-index: 99;
+    }
+    .admin-tab {
+      font-size: 0.52rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--ink3); background: none; border: none;
+      border-bottom: 2px solid transparent; padding: 0.9rem 1.2rem 0.8rem;
+      cursor: pointer; transition: color 0.2s, border-color 0.2s;
+      margin-bottom: -1px;
+    }
+    .admin-tab:hover { color: var(--ink2); }
+    .admin-tab.active { color: var(--ink); border-bottom-color: var(--ink); }
+
+    .admin-panel { display: none; padding-top: 2rem; }
+    .admin-panel.active { display: block; }
+
+    /* ── STATUS BAR ── */
+    .cf-status {
+      padding: 0.7rem 1rem; border-radius: 3px; margin-bottom: 1.8rem;
+      font-size: 0.58rem; letter-spacing: 0.1em;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 1rem;
+    }
+    .cf-status.connected { background: #e8f5ef; color: var(--green); border: 1px solid #b8ddc9; }
+    .cf-status.disconnected { background: #fdf3e3; color: var(--amber); border: 1px solid #e8d5a8; }
+
+    .cf-status button {
+      font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.14em;
+      text-transform: uppercase; background: none; border: 1px solid currentColor;
+      border-radius: 2px; padding: 0.3rem 0.7rem; cursor: pointer; color: inherit;
+      transition: opacity 0.2s;
+    }
+    .cf-status button:hover { opacity: 0.7; }
+
+    /* ── SECTIONS ── */
+    .section-title {
+      font-size: 0.54rem; letter-spacing: 0.24em; text-transform: uppercase;
+      color: var(--ink3); margin-bottom: 1.2rem;
+    }
+
+    /* ── UPLOAD AREA ── */
+    .upload-zone {
+      border: 2px dashed var(--rule); border-radius: 4px; padding: 2rem;
+      text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 1.8rem;
+    }
+    .upload-zone:hover, .upload-zone.drag { border-color: var(--ink); background: white; }
+    .upload-zone p { color: var(--ink3); font-size: 0.6rem; letter-spacing: 0.08em; }
+    .upload-zone strong { display: block; font-size: 0.7rem; color: var(--ink2);
+      margin-bottom: 0.4rem; }
+    #fileInput { display: none; }
+
+    /* ── PHOTO METADATA FORM ── */
+    .meta-form { background: white; border: 1px solid var(--rule); border-radius: 4px;
+      padding: 1.4rem; margin-bottom: 1.8rem; display: none; }
+    .meta-form.visible { display: block; }
+
+    .form-preview { display: flex; gap: 1.2rem; align-items: flex-start; margin-bottom: 1.2rem; }
+    .form-preview img { width: 120px; height: 90px; object-fit: cover; border-radius: 2px; flex-shrink: 0; }
+    .form-preview-info { flex: 1; }
+    .form-preview-info .filename { font-size: 0.6rem; color: var(--ink3); word-break: break-all; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem 1.2rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 0.5rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--ink3); }
+    input[type=text], input[type=number], textarea, select {
+      border: 1px solid var(--rule); padding: 0.5rem 0.6rem; font-family: 'DM Mono', monospace;
+      font-size: 0.75rem; color: var(--ink); border-radius: 2px; background: var(--paper);
+      width: 100%; outline: none;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--ink); background: white; }
+    textarea { resize: vertical; min-height: 60px; }
+
+    .form-actions { display: flex; gap: 0.6rem; margin-top: 1rem; flex-wrap: wrap; }
+
+    .btn { font-family: 'DM Mono', monospace; font-size: 0.54rem; letter-spacing: 0.18em;
+      text-transform: uppercase; padding: 0.55rem 1rem; border-radius: 2px;
+      cursor: pointer; transition: opacity 0.2s; border: 1px solid; }
+    .btn:hover { opacity: 0.75; }
+    .btn.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .btn.danger  { background: none; color: var(--red); border-color: var(--red); }
+    .btn.ghost   { background: none; color: var(--ink3); border-color: var(--rule); }
+
+    /* ── PHOTO LIST ── */
+    .photo-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
+
+    .photo-card {
+      position: relative; border-radius: 3px; overflow: hidden; cursor: pointer;
+      border: 2px solid transparent; transition: border-color 0.2s;
+    }
+    .photo-card:hover { border-color: var(--ink); }
+    .photo-card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block;
+      filter: grayscale(30%); }
+    .photo-card .card-info {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(10,10,10,0.75); padding: 0.4rem 0.5rem;
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .photo-card:hover .card-info { opacity: 1; }
+    .photo-card .card-info p { font-size: 0.45rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: #ddd; white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis; }
+    .photo-card .card-del {
+      position: absolute; top: 0.3rem; right: 0.3rem; background: rgba(0,0,0,0.6);
+      border: none; color: #fff; width: 20px; height: 20px; border-radius: 50%;
+      cursor: pointer; font-size: 0.7rem; display: none; align-items: center;
+      justify-content: center; line-height: 1;
+    }
+    .photo-card:hover .card-del { display: flex; }
+
+    .list-empty { padding: 2rem; text-align: center; color: var(--ink3);
+      font-size: 0.6rem; letter-spacing: 0.1em; border: 1px solid var(--rule);
+      border-radius: 4px; }
+
+    /* ── CONTENTFUL SETUP MODAL ── */
+    .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-bg.open { display: flex; }
+
+    .modal { background: white; border-radius: 6px; padding: 2rem; max-width: 500px;
+      width: 100%; max-height: 90vh; overflow-y: auto; }
+    .modal h2 { font-family: 'EB Garamond', serif; font-weight: 400; font-size: 1.3rem;
+      margin-bottom: 0.3rem; }
+    .modal .modal-sub { font-size: 0.52rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--ink3); margin-bottom: 1.6rem; }
+    .modal .guide { background: #f8f7f4; border: 1px solid var(--rule); border-radius: 3px;
+      padding: 0.9rem 1rem; font-size: 0.6rem; line-height: 1.8; color: var(--ink2);
+      margin-bottom: 1.2rem; }
+    .modal .guide a { color: var(--ink); }
+    .modal .guide ol { padding-left: 1.2rem; }
+    .modal .modal-actions { display: flex; gap: 0.6rem; margin-top: 1.4rem; flex-wrap: wrap; }
+
+    .log { background: #111; color: #8f8; font-size: 0.6rem; border-radius: 3px;
+      padding: 0.8rem; margin-top: 1rem; max-height: 140px; overflow-y: auto;
+      display: none; letter-spacing: 0.04em; line-height: 1.8; }
+    .log.visible { display: block; }
+
+    /* ── PUB/TALK ADMIN LIST ── */
+    .pub-admin-list { }
+    .pub-admin-item {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 1rem; padding: 0.7rem 0; border-top: 1px solid var(--rule);
+      font-size: 0.82rem; line-height: 1.4;
+    }
+    .pub-admin-item:last-child { border-bottom: 1px solid var(--rule); }
+    .pub-admin-item .pai-text { flex: 1; }
+    .pub-admin-item .pai-year {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      color: var(--ink3); flex-shrink: 0; min-width: 2.4rem;
+    }
+    .pub-admin-item .pai-del {
+      font-family: 'DM Mono', monospace; font-size: 0.5rem;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--red);
+      background: none; border: none; cursor: pointer; flex-shrink: 0;
+    }
+    .pub-admin-empty { font-size: 0.6rem; color: var(--ink3); padding: 1rem 0; }
+
+    .pub-edit-grid { display:grid; grid-template-columns: 2fr 1.4fr 0.7fr 1fr 1.4fr 0.9fr 0.8fr auto; gap: 0.55rem; align-items:end; width:100%; }
+    .pub-edit-actions { display:flex; gap:0.45rem; align-items:center; justify-content:flex-end; }
+    .pub-mini { font-family: 'DM Mono', monospace; font-size: 0.5rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.45rem 0.55rem; border: 1px solid var(--rule); border-radius: 2px; background: white; cursor: pointer; }
+    .pub-mini.danger { color: var(--red); border-color: var(--red); }
+    .pub-mini:hover { opacity: 0.75; }
+    .elsewhere-list { display:flex; flex-direction:column; gap:0.9rem; }
+
+    /* ── BANNER MANAGER ── */
+    .banner-manager {
+      background: white; border: 1px solid var(--rule); border-radius: 4px;
+      padding: 1.2rem; margin-bottom: 1.8rem;
+    }
+
+    .banner-current {
+      display: flex; gap: 1.4rem; align-items: flex-start;
+    }
+
+    .banner-current img {
+      width: 200px; height: 110px; object-fit: cover; border-radius: 3px;
+      flex-shrink: 0; border: 1px solid var(--rule);
+      background: #eee;
+    }
+
+    .banner-label {
+      font-size: 0.58rem; color: var(--ink3); letter-spacing: 0.06em;
+    }
+
+    @media (max-width: 580px) {
+      .banner-current { flex-direction: column; }
+      .banner-current img { width: 100%; height: 140px; }
+    }
+
+    /* ── BANNER MANAGER ── */
+    .uploading-indicator {
+      display: none; align-items: center; gap: 0.6rem; padding: 0.7rem 1rem;
+      background: #e8f5ef; border: 1px solid #b8ddc9; border-radius: 3px;
+      font-size: 0.58rem; color: var(--green); margin-bottom: 1rem;
+    }
+    .uploading-indicator.visible { display: flex; }
+
+    @media (max-width: 580px) {
+      .admin-body { padding: 1rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-preview { flex-direction: column; }
+      .photo-list { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+    }
+
+    .ty-section { border-bottom: 0.5px solid var(--rule); padding: 0.8rem 0; }
+    .ty-section:last-child { border-bottom: none; }
+    .ty-label { font-size: 0.48rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink3); margin-bottom: 0.5rem; font-family: 'DM Mono', monospace; }
+    .ty-controls { display: flex; flex-direction: column; gap: 0.5rem; }
+    .ty-row { display: flex; gap: 0.8rem; align-items: flex-end; }
+    .ty-field { display: flex; flex-direction: column; gap: 2px; }
+    .ty-field label { font-size: 0.48rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink3); }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="admin-header">
+    <div>
+      <h1>Photo Admin</h1>
+      <div class="sub">Tomaso Pignocchi</div>
+    </div>
+    <div class="header-links">
+      <a href="../photography.html" target="_blank">Photography page ↗</a>
+      <a href="../index.html" target="_blank">Homepage ↗</a>
+      <button onclick="logout()">Log out</button>
+    </div>
+  </div>
+
+  <div class="admin-tabs">
+    <button class="admin-tab active" data-panel="content" onclick="switchPanel('content')">Homepage & Pages</button>
+    <button class="admin-tab" data-panel="publications" onclick="switchPanel('publications')">Publications</button>
+    <button class="admin-tab" data-panel="talks" onclick="switchPanel('talks')">Talks</button>
+    <button class="admin-tab" data-panel="photos" onclick="switchPanel('photos')">Photos & Layout S</button>
+    <button class="admin-tab" data-panel="elsewhere" onclick="switchPanel('elsewhere')">Elsewhere</button>
+    <button class="admin-tab" data-panel="settings" onclick="switchPanel('settings')">Settings</button>
+  </div>
+
+  <div class="admin-body">
+
+  <!-- ═══ CONTENT PANEL ═══ -->
+  <div class="admin-panel active" id="panel-content">
+
+    <p class="section-title">Homepage & page text</p>
+    <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1.8rem">
+
+      <div class="form-group" style="margin-bottom:0.9rem">
+        <label>Site title <span style="color:var(--ink3);font-size:0.48rem">(your name shown on the homepage)</span></label>
+        <input type="text" id="sc-title" placeholder="e.g. Tomaso Pignocchi" />
+      </div>
+
+      <div class="form-group" style="margin-bottom:0.9rem">
+        <label>Nameplate subtitle <span style="color:var(--ink3);font-size:0.48rem">(under your name in the hero)</span></label>
+        <input type="text" id="sc-subtitle" placeholder="e.g. Philosophy · Paris · Kyoto" />
+      </div>
+
+      <div class="form-group" style="margin-bottom:0.9rem">
+        <label>Bio <span style="color:var(--ink3);font-size:0.48rem">(homepage — use new lines for line breaks)</span></label>
+        <textarea id="sc-bio" style="min-height:120px" placeholder="I am a Ph.D. candidate…"></textarea>
+      </div>
+
+      <div class="form-group" style="margin-bottom:1rem">
+        <label>Philosophy portrait <span style="color:var(--ink3);font-size:0.48rem">(shown to the right of the bio on philosophy.html)</span></label>
+        <div style="display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap;margin-top:0.45rem">
+          <div style="width:150px;flex-shrink:0">
+            <img id="sc-philo-preview" src="" alt="" style="width:100%;aspect-ratio:3 / 4;object-fit:cover;border:1px solid var(--rule);border-radius:3px;display:none;background:#ece8e1" />
+            <div id="sc-philo-empty" style="width:100%;aspect-ratio:3 / 4;border:1px dashed var(--rule);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:0.52rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);background:#faf8f4">No photo</div>
+          </div>
+          <div style="flex:1;min-width:260px">
+            <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.6rem">
+              <button type="button" class="btn primary" onclick="document.getElementById('philoPortraitInput').click()">Upload portrait →</button>
+              <button type="button" class="btn ghost" onclick="openPhiloPortraitPicker()">Pick from photos</button>
+              <button type="button" class="btn ghost" onclick="clearPhilosophyPortrait()">Remove</button>
+            </div>
+            <input type="file" id="philoPortraitInput" accept="image/*" style="display:none" />
+            <input type="text" id="sc-philo-url" placeholder="https://..." style="font-family:'DM Mono',monospace;font-size:0.72rem" oninput="setPhilosophyPortrait(this.value.trim(), false)" />
+            <p style="font-size:0.56rem;line-height:1.6;color:var(--ink3);margin-top:0.45rem">You can upload a new image directly here, or upload it in Photos and then pick it from the library.</p>
+
+            <div style="margin-top:1rem">
+              <label>Portrait crop position <span style="color:var(--ink3);font-size:0.48rem">(drag on the image or use the sliders)</span></label>
+              <div id="cropTool" style="position:relative;width:min(210px,100%);aspect-ratio:3 / 4;background:#111;border-radius:3px;overflow:hidden;cursor:crosshair;border:1px solid var(--rule);margin-top:0.45rem;user-select:none">
+                <img id="cropPreview" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 38%;pointer-events:none;filter:grayscale(15%) brightness(0.92)" />
+                <div id="cropCross" style="position:absolute;transform:translate(-50%,-50%);pointer-events:none;left:50%;top:38%">
+                  <div style="position:absolute;top:50%;left:-12px;width:24px;height:1px;background:rgba(255,255,255,0.9)"></div>
+                  <div style="position:absolute;left:50%;top:-12px;width:1px;height:24px;background:rgba(255,255,255,0.9)"></div>
+                  <div style="position:absolute;top:-5px;left:-5px;width:10px;height:10px;border:1.5px solid rgba(255,255,255,0.9);border-radius:50%"></div>
+                </div>
+              </div>
+              <div style="display:flex;gap:1.2rem;margin-top:0.7rem;align-items:center">
+                <div style="flex:1">
+                  <label style="margin-bottom:0.25rem;display:block">Horizontal — <span id="posXVal">50</span>%</label>
+                  <input type="range" id="posX" min="0" max="100" value="50" style="width:100%" oninput="updateCrop()" />
+                </div>
+                <div style="flex:1">
+                  <label style="margin-bottom:0.25rem;display:block">Vertical — <span id="posYVal">38</span>%</label>
+                  <input type="range" id="posY" min="0" max="100" value="38" style="width:100%" oninput="updateCrop()" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0.9rem">
+        <label>Photography intro <span style="color:var(--ink3);font-size:0.48rem">(shown on the photography tab)</span></label>
+        <textarea id="sc-photo-intro" style="min-height:60px"></textarea>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0.9rem">
+        <label>Contact affiliations <span style="color:var(--ink3);font-size:0.48rem">(shown on the contact tab — use new lines)</span></label>
+        <textarea id="sc-contact" style="min-height:90px"></textarea>
+        <div style="margin-top:0.35rem;font-size:0.48rem;letter-spacing:0.04em;color:var(--ink3);line-height:1.5">
+          Contact colors are now managed in the Elsewhere tab. Use that panel to set a dedicated color for the contact form text and a separate color for Elsewhere links.
+        </div>
+      </div>
+
+      
+
+
+      <div style="height:1px;background:var(--rule);margin:1.6rem 0"></div>
+      <p class="section-title" style="margin-bottom:0.8rem">Homepage layout</p>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:1.4rem">
+        <button class="layout-opt" data-layout="a" onclick="setLayout('a')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="display:grid;grid-template-columns:1fr 1fr;height:40px;margin-bottom:3px;gap:2px"><div style="background:#888;border-radius:2px"></div><div style="background:#ddd;border-radius:2px"></div></div>
+          A — Split 50/50
+        </button>
+        <button class="layout-opt" data-layout="b" onclick="setLayout('b')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;margin-bottom:3px"><div style="background:#ddd;height:12px;border-radius:1px;margin-bottom:2px"></div><div style="display:grid;grid-template-columns:1fr 1fr;height:24px;gap:2px"><div style="background:#888;border-radius:1px"></div><div style="background:#ddd;border-radius:1px"></div></div></div>
+          B — Nome + Foto + Bio
+        </button>
+        <button class="layout-opt" data-layout="c" onclick="setLayout('c')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="display:grid;grid-template-columns:38% 1fr;height:40px;margin-bottom:3px;gap:2px"><div style="background:#888;border-radius:2px"></div><div style="background:#ddd;border-radius:2px"></div></div>
+          C — Foto 38% + testo
+        </button>
+        <button class="layout-opt" data-layout="e" onclick="setLayout('e')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;background:#666;border-radius:2px;margin-bottom:3px;display:flex;align-items:flex-end;padding:4px"><div style="font-size:5px;color:rgba(255,255,255,0.8);letter-spacing:0.1em">T.PIGNOCCHI</div></div>
+          E — Full photo overlay
+        </button>
+        <button class="layout-opt" data-layout="f" onclick="setLayout('f')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;margin-bottom:3px"><div style="background:#ddd;height:12px;border-radius:1px;margin-bottom:2px"></div><div style="display:grid;grid-template-columns:1fr 2fr;height:24px;gap:2px"><div style="background:#888;border-radius:1px"></div><div style="background:#ddd;border-radius:1px"></div></div></div>
+          F — Editoriale
+        </button>
+        <button class="layout-opt" data-layout="g" onclick="setLayout('g')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;margin-bottom:3px"><div style="background:#888;height:28px;border-radius:1px;margin-bottom:2px"></div><div style="background:#ddd;height:8px;border-radius:1px"></div></div>
+          G — Panorama + barra
+        </button>
+        <button class="layout-opt" data-layout="h" onclick="setLayout('h')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="display:grid;grid-template-columns:1fr 2fr;height:40px;margin-bottom:3px;gap:2px"><div style="background:#888;border-radius:2px"></div><div style="background:#ddd;border-radius:2px"></div></div>
+          H — Asimm. 1/3 · 2/3
+        </button>
+        <button class="layout-opt" data-layout="i" onclick="setLayout('i')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;margin-bottom:3px"><div style="display:grid;grid-template-columns:24px 1fr;gap:2px;margin-bottom:2px"><div style="background:#ddd;border-radius:1px"></div><div style="background:#888;border-radius:1px"></div></div><div style="display:grid;grid-template-columns:24px 1fr;gap:2px;margin-bottom:2px"><div style="background:#ddd;border-radius:1px"></div><div style="background:#ddd;border-radius:1px"></div></div><div style="display:grid;grid-template-columns:24px 1fr;gap:2px;margin-bottom:2px"><div style="background:#ddd;border-radius:1px"></div><div style="background:#ddd;border-radius:1px"></div></div></div>
+          I — Archivio / righe
+        </button>
+        <button class="layout-opt" data-layout="j" onclick="setLayout('j')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;margin-bottom:3px"><div style="background:#888;height:20px;border-radius:1px;margin-bottom:2px"></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;height:16px;gap:2px"><div style="background:#ddd;border-radius:1px"></div><div style="background:#ddd;border-radius:1px"></div><div style="background:#ddd;border-radius:1px"></div></div></div>
+          J — Foto + 3 col
+        </button>
+        <button class="layout-opt" data-layout="k" onclick="setLayout('k')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;margin-bottom:3px"><div style="background:#ddd;height:12px;border-radius:1px;margin-bottom:2px;overflow:hidden"><div style="font-family:serif;font-size:9px;color:#888;padding:0 2px;white-space:nowrap">Tomaso Pignocchi</div></div><div style="display:grid;grid-template-columns:1fr 1fr;height:24px;gap:2px"><div style="background:#ddd;border-radius:1px"></div><div style="background:#888;border-radius:1px"></div></div></div>
+          K — Magazine
+        </button>
+        <button class="layout-opt" data-layout="l" onclick="setLayout('l')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;background:#555;border-radius:2px;margin-bottom:3px;display:flex;align-items:center;justify-content:center"><div style="font-size:5px;color:rgba(255,255,255,0.8);letter-spacing:0.1em;text-align:center">T.PIGNOCCHI<br><span style="opacity:0.5">PHILOSOPHY</span></div></div>
+          L — Centrato overlay
+        </button>
+        <button class="layout-opt" data-layout="m" onclick="setLayout('m')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;display:grid;grid-template-columns:6px 1fr;gap:2px;margin-bottom:3px"><div style="background:#333;border-radius:1px"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:2px"><div style="background:#ddd;border-radius:1px"></div><div style="background:#888;border-radius:1px"></div></div></div>
+          M — Sidebar verticale
+        </button>
+        <button class="layout-opt" data-layout="n" onclick="setLayout('n')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="display:grid;grid-template-columns:65% 35%;height:40px;margin-bottom:3px;gap:2px"><div style="background:#888;border-radius:2px"></div><div style="background:#ddd;border-radius:2px"></div></div>
+          N — Testo + foto stretta
+        </button>
+        <button class="layout-opt" data-layout="o" onclick="setLayout('o')"
+          style="padding:6px 4px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center">
+          <div style="height:40px;margin-bottom:3px"><div style="background:#888;height:30px;border-radius:1px;margin-bottom:2px"></div><div style="background:#ddd;height:6px;border-radius:1px"></div></div>
+          O — Full bleed + barra
+        </button>
+        <button class="layout-opt" data-layout="p" onclick="setLayout('p')"
+          style="padding:8px 6px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center;line-height:1.3">
+          <div style="height:38px;margin-bottom:3px;border:0.5px solid var(--rule);border-radius:2px;overflow:hidden;background:#f0ede8"><div style="height:8px;background:#1a1814;display:flex;align-items:center;padding:0 3px;gap:3px"><div style="width:6px;height:6px;background:#f0ede8;border-radius:1px"></div><div style="font-size:5px;color:#f0ede8;font-family:serif">T. Pignocchi</div></div><div style="padding:3px 4px"><div style="font-size:6px;color:#8a8480;font-family:sans-serif">Philosophy</div><div style="font-size:6px;color:#8a8480;font-family:sans-serif">Paris · Kyoto</div></div><div style="display:grid;grid-template-columns:1fr 1fr;height:16px"><div style="background:#b8b4ac"></div><div style="background:#f0ede8"></div></div></div>
+          P — Nome in nav
+        </button>
+        <button class="layout-opt" data-layout="q" onclick="setLayout('q')"
+          style="padding:8px 6px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center;line-height:1.3">
+          <div style="height:38px;margin-bottom:3px;border:0.5px solid var(--rule);border-radius:2px;overflow:hidden;background:#f0ede8"><div style="display:grid;grid-template-columns:2fr 3fr;height:100%"><div style="background:#b8b4ac"></div><div style="background:#f0ede8;padding:4px"><div style="font-family:serif;font-size:9px;color:#1a1814">Tomaso<br>Pignocchi</div></div></div></div>
+          Q — Foto verticale
+        </button>
+        <button class="layout-opt" data-layout="r" onclick="setLayout('r')"
+          style="padding:8px 6px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center;line-height:1.3">
+          <div style="height:38px;margin-bottom:3px;border:0.5px solid var(--rule);border-radius:2px;overflow:hidden;background:#f0ede8"><div style="display:flex;justify-content:center;height:100%;background:#f0ede8"><div style="width:60%;border-left:0.5px solid #d0ccc4;border-right:0.5px solid #d0ccc4;padding:4px 6px"><div style="font-family:serif;font-size:10px;color:#1a1814;margin-bottom:2px">Tomaso Pignocchi</div><div style="background:#b8b4ac;height:14px;margin:0 -6px"></div></div></div></div>
+          R — Margini rivista
+        </button>
+        <button class="layout-opt" data-layout="s" onclick="setLayout('s')"
+          style="padding:8px 6px;font-size:0.44rem;letter-spacing:0.08em;text-transform:uppercase;border:1px solid var(--rule);border-radius:3px;background:var(--paper);cursor:pointer;text-align:center;line-height:1.3">
+          <div style="height:38px;margin-bottom:3px;border:0.5px solid var(--rule);border-radius:2px;overflow:hidden;background:#f0ede8">
+            <div style="height:8px;background:#f0ede8;border-bottom:0.5px solid #d0ccc4;display:flex;align-items:center;padding:0 3px;font-size:5px;font-family:serif">* Tomaso Pignocchi</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;height:30px">
+              <div style="background:#888;border-right:0.5px solid #d0ccc4;display:flex;align-items:flex-end;padding:2px;font-size:5px;color:rgba(255,255,255,0.9);font-family:serif">Philosophy</div>
+              <div style="background:#aaa;display:flex;align-items:flex-end;padding:2px;font-size:5px;color:rgba(255,255,255,0.9);font-family:serif">Photography</div>
+            </div>
+          </div>
+          S — Due pannelli
+        </button>
+      </div>
+
+      <div style="height:1px;background:var(--rule);margin:1.6rem 0"></div>
+      <p class="section-title" style="margin-bottom:1rem">Colors & logo</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+        <div class="form-group">
+          <label>Colore sfondo</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="color" id="cp-bg-picker" value="#f5f2ec"
+              oninput="document.getElementById('cp-bg').value=this.value;updateSwatch('bg')"
+              style="width:36px;height:36px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" />
+            <input type="text" id="cp-bg" value="#f5f2ec" placeholder="#f5f2ec" maxlength="7"
+              oninput="updateSwatch('bg');var p=document.getElementById('cp-bg-picker');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value"
+              style="font-family:'DM Mono',monospace;font-size:0.75rem" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Colore testo</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="color" id="cp-ink-picker" value="#1a1814"
+              oninput="document.getElementById('cp-ink').value=this.value;updateSwatch('ink')"
+              style="width:36px;height:36px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" />
+            <input type="text" id="cp-ink" value="#1a1814" placeholder="#1a1814" maxlength="7"
+              oninput="updateSwatch('ink');var p=document.getElementById('cp-ink-picker');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value"
+              style="font-family:'DM Mono',monospace;font-size:0.75rem" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0.9rem">
+        <label>Variante logo</label>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="logo-opt" data-variant="light" onclick="setLogoVariant('light')"
+            style="padding:8px 16px;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;border-radius:2px">
+            ✦ Chiaro (su sfondo scuro)
+          </button>
+          <button class="logo-opt" data-variant="dark" onclick="setLogoVariant('dark')"
+            style="padding:8px 16px;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;border:1px solid var(--rule);background:var(--paper);color:var(--ink);cursor:pointer;border-radius:2px">
+            ✦ Scuro (su sfondo chiaro)
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0.9rem">
+        <label>Dimensione logo <span id="v-sz-logo">100</span>%</label>
+        <input type="range" min="40" max="220" value="100" step="1" id="sz-logo" oninput="syncSize('logo')" style="width:100%;margin-top:0.45rem" />
+      </div>
+
+      <div style="height:1px;background:var(--rule);margin:1.6rem 0"></div>
+      <p class="section-title" style="margin-bottom:1rem">Typography</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem">
+        
+
+
+      <div class="ty-section">
+        <div class="ty-label">Nome (Tomaso Pignocchi)</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-name" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-name" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-color-name" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-color-name').value=this.value" />
+                <input type="text" id="hex-color-name" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-color-name');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione homepage <span id="v-sz-banner-title">100</span>%</label>
+              <input type="range" min="60" max="320" value="100" step="1" id="sz-banner-title" oninput="syncSize('banner-title')" style="width:100%" />
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione pagine secondarie <span id="v-sz-secondary-title">100</span>%</label>
+              <input type="range" min="60" max="180" value="100" step="1" id="sz-secondary-title" oninput="syncSize('secondary-title')" style="width:100%" />
+              <div style="margin-top:0.35rem;font-size:0.5rem;line-height:1.55;color:var(--ink3)">Same font, weight and color as the homepage title; size only for <code>philosophy.html</code> and <code>photography.html</code>.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ty-section">
+        <div class="ty-label">Sottotitolo (Philosophy · Paris · Kyoto)</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-sub" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-sub" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-color-sub" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-color-sub').value=this.value" />
+                <input type="text" id="hex-color-sub" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-color-sub');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-banner-sub">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-banner-sub" oninput="syncSize('banner-sub')" style="width:100%" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ty-section">
+        <div class="ty-label">Bio</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-bio" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-bio" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-color-bio" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-color-bio').value=this.value" />
+                <input type="text" id="hex-color-bio" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-color-bio');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-bio">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-bio" oninput="syncSize('bio')" style="width:100%" />
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Interlinea <span id="v-sz-lh-bio">178</span>%</label>
+              <input type="range" min="100" max="300" value="178" step="1" id="sz-lh-bio" oninput="syncSize('sz-bio-lh')" style="width:100%" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ty-section">
+        <div class="ty-label">Titolo pubblicazione</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-pubs" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-pubs" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-color-pubs" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-color-pubs').value=this.value" />
+                <input type="text" id="hex-color-pubs" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-color-pubs');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-pubs">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-pubs" oninput="syncSize('pubs')" style="width:100%" />
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Interlinea <span id="v-lh-pubs">178</span>%</label>
+              <input type="range" min="100" max="300" value="178" step="1" id="lh-pubs" oninput="syncSize('pubs-lh')" style="width:100%" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ty-section">
+        <div class="ty-label">Rivista / venue</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-venue" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-venue" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-venue" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-venue').value=this.value" />
+                <input type="text" id="hex-venue" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-venue');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-venue">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-venue" oninput="syncSize('venue')" style="width:100%" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ty-section">
+        <div class="ty-label">Label sezioni (Publications…)</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-labels" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-labels" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-color-labels" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-color-labels').value=this.value" />
+                <input type="text" id="hex-color-labels" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-color-labels');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-labels">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-labels" oninput="syncSize('labels')" style="width:100%" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ty-section">
+        <div class="ty-label">Sottolabel (Peer-reviewed…)</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-sublabels" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-sublabels" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-color-sublabels" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-color-sublabels').value=this.value" />
+                <input type="text" id="hex-color-sublabels" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-color-sublabels');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-sublabels">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-sublabels" oninput="syncSize('sublabels')" style="width:100%" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ty-section">
+        <div class="ty-label">Link sezione (Full list…)</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-seemore" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-seemore" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-color-seemore" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-color-seemore').value=this.value" />
+                <input type="text" id="hex-color-seemore" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-color-seemore');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-seemore">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-seemore" oninput="syncSize('seemore')" style="width:100%" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ty-section">
+        <div class="ty-label">Intro fotografia</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-photo" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-photo" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-color-photo" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-color-photo').value=this.value" />
+                <input type="text" id="hex-color-photo" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-color-photo');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-photo">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-photo" oninput="syncSize('photo')" style="width:100%" />
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Interlinea <span id="v-lh-photo">178</span>%</label>
+              <input type="range" min="100" max="300" value="178" step="1" id="lh-photo" oninput="syncSize('photo-lh')" style="width:100%" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ty-section">
+        <div class="ty-label">Footer</div>
+        <div class="ty-controls">
+          <div class="ty-row">
+            <div class="ty-field" style="flex:2">
+              <label>Font</label>
+              <select id="font-footer" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="EB Garamond">EB Garamond</option><option value="New Computer Modern">New Computer Modern</option><option value="Libre Baskerville">Libre Baskerville</option><option value="Playfair Display">Playfair Display</option><option value="Cormorant Garant">Cormorant Garant</option><option value="Spectral">Spectral</option><option value="Lato">Lato</option><option value="Inter">Inter</option><option value="Source Sans Pro">Source Sans Pro</option><option value="DM Mono">DM Mono</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Peso</label>
+              <select id="wt-footer" style="width:100%;font-size:0.62rem">
+                <option value="">(eredita)</option>
+                <option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option>
+              </select>
+            </div>
+            <div class="ty-field" style="flex:1">
+              <label>Colore</label>
+              <div style="display:flex;gap:4px;align-items:center">
+                <input type="color" id="cp-color-footer" value="#1a1814" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule);cursor:pointer;flex-shrink:0" oninput="document.getElementById('hex-color-footer').value=this.value" />
+                <input type="text" id="hex-color-footer" value="" placeholder="inherit" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="var p=document.getElementById('cp-color-footer');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+              </div>
+            </div>
+          </div>
+          <div class="ty-row">
+            <div class="ty-field" style="flex:1">
+              <label>Dimensione <span id="v-sz-footer">100</span>%</label>
+              <input type="range" min="60" max="200" value="100" step="1" id="sz-footer" oninput="syncSize('footer')" style="width:100%" />
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <div style="height:1px;background:var(--rule);margin:1.6rem 0"></div>
+      <div class="form-actions">
+        <button class="btn primary" onclick="saveContent()">Save content →</button>
+      </div>
+      <div id="contentSaveMsg" style="font-size:0.58rem;color:var(--green);margin-top:0.6rem;display:none">✓ Saved</div>
+    </div>
+  </div>
+
+  <!-- ═══ PUBLICATIONS PANEL ═══ -->
+  <div class="admin-panel" id="panel-publications">
+
+    <p class="section-title">Add publication</p>
+    <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1.8rem">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Title</label>
+          <input type="text" id="pub-title" placeholder="Full title of the paper" />
+        </div>
+        <div class="form-group full">
+          <label>Venue <span style="color:var(--ink3);font-size:0.48rem">(journal, pages, etc.)</span></label>
+          <input type="text" id="pub-venue" placeholder="Synthese, vol. 205, pp. 1–25" />
+        </div>
+        <div class="form-group">
+          <label>Year</label>
+          <input type="number" id="pub-year" placeholder="2025" min="1900" max="2099" />
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select id="pub-type">
+            <option value="article">Peer-reviewed article</option>
+            <option value="chapter">Book chapter</option>
+            <option value="review">Book review</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Link (optional)</label>
+          <input type="text" id="pub-link" placeholder="https://…" />
+        </div>
+        <div class="form-group">
+          <label>Forthcoming?</label>
+          <select id="pub-forthcoming">
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-actions" style="margin-top:1rem">
+        <button class="btn primary" onclick="savePub()">Add publication →</button>
+      </div>
+    </div>
+
+    <p class="section-title">Edit existing publications</p>
+    <p style="font-size:0.56rem;color:var(--ink3);line-height:1.7;margin:-0.35rem 0 0.6rem">All publications already published on the site are editable here. Change any field, then click Save on that row.</p>
+    <div id="pubImportNotice" style="display:none;background:#fff;border:1px solid var(--rule);border-radius:4px;padding:1rem 1.1rem;margin:0 0 1rem;font-size:0.56rem;line-height:1.7;color:var(--ink2)">
+      The publications currently visible on <code>philosophy.html</code> are still the hardcoded fallback list, not Contentful entries yet. Import them once to make them editable here.
+      <div class="form-actions" style="margin-top:0.75rem">
+        <button class="btn primary" onclick="importSeedPublications()">Import current philosophy publications →</button>
+      </div>
+      <div id="pubImportMsg" style="font-size:0.56rem;color:var(--green);margin-top:0.55rem;display:none"></div>
+    </div>
+    <div id="pubList" class="pub-admin-list"></div>
+  </div>
+
+  <!-- ═══ TALKS PANEL ═══ -->
+  <div class="admin-panel" id="panel-talks">
+
+    <p class="section-title">Add talk</p>
+    <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1.8rem">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Title</label>
+          <input type="text" id="talk-title" placeholder="Title of the talk" />
+        </div>
+        <div class="form-group full">
+          <label>Venue <span style="color:var(--ink3);font-size:0.48rem">(conference, university, city)</span></label>
+          <input type="text" id="talk-venue" placeholder="57th SACP — Leiden University" />
+        </div>
+        <div class="form-group">
+          <label>Year</label>
+          <input type="number" id="talk-year" placeholder="2025" min="2000" max="2099" />
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select id="talk-type">
+            <option value="regular">Regular</option>
+            <option value="invited">Invited</option>
+            <option value="keynote">Keynote / Opening</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Upcoming?</label>
+          <select id="talk-upcoming">
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-actions" style="margin-top:1rem">
+        <button class="btn primary" onclick="saveTalk()">Add talk →</button>
+      </div>
+    </div>
+
+    <p class="section-title">All talks</p>
+    <div id="talkAdminList" class="pub-admin-list"></div>
+  </div>
+
+  <!-- ═══ PHOTOS PANEL ═══ -->
+  <div class="admin-panel" id="panel-photos">
+
+    <!-- CONTENTFUL STATUS -->
+    <div class="cf-status" id="cfStatus">
+      <span id="cfStatusText">Checking Contentful…</span>
+      <button id="cfSetupBtn" onclick="openSetup()">Configure Contentful</button>
+    </div>
+
+    <!-- BANNER -->
+    <p class="section-title">Homepage banner</p>
+
+    <div class="banner-manager">
+      <div class="banner-current">
+        <img id="bannerPreview" src="" alt="Current banner" />
+        <div class="banner-actions">
+          <p class="banner-label" id="bannerLabel">No banner set — using default</p>
+          <div style="display:flex; gap:0.6rem; flex-wrap:wrap; margin-top:0.7rem;">
+            <button class="btn primary" onclick="document.getElementById('bannerInput').click()">
+              Upload new banner →
+            </button>
+            <button class="btn ghost" id="pickFromPhotosBtn" onclick="openPhotoPicker()">
+              Pick from photos
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <input type="file" id="bannerInput" accept="image/*" style="display:none" />
+
+    <!-- PHOTO PICKER OVERLAY -->
+    <div class="modal-bg" id="pickerModal">
+      <div class="modal" style="max-width:700px">
+        <h2 id="pickerModalTitle">Pick a banner photo</h2>
+        <p class="modal-sub" id="pickerModalSub">Click any photo to set it as homepage banner</p>
+        <div class="photo-list" id="pickerGrid" style="margin-top:1rem"></div>
+        <div class="modal-actions">
+          <button class="btn ghost" onclick="document.getElementById('pickerModal').classList.remove('open')">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:1px; background:var(--rule); margin:1.8rem 0;"></div>
+
+    <!-- UPLOAD -->
+    <p class="section-title">Add photos</p>
+
+    <div class="upload-zone" id="uploadZone">
+      <strong>Drop photos here or click to select</strong>
+      <p>JPG, PNG, WEBP — multiple files supported</p>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" multiple />
+
+    <div class="uploading-indicator" id="uploadingIndicator">
+      <span>↑</span>
+      <span id="uploadingText">Uploading…</span>
+    </div>
+
+    <!-- METADATA FORM -->
+    <div class="meta-form" id="metaForm">
+      <div class="form-preview">
+        <img id="previewImg" src="" alt="" />
+        <div class="form-preview-info">
+          <p class="filename" id="previewFilename"></p>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="fTitle" placeholder="e.g. Via del Corso" />
+        </div>
+        <div class="form-group">
+          <label>Series / album</label>
+          <input type="text" id="fSeries" list="seriesList" placeholder="e.g. Rome" />
+          <datalist id="seriesList"></datalist>
+        </div>
+        <div class="form-group">
+          <label>Year</label>
+          <input type="number" id="fYear" placeholder="2024" min="1990" max="2099" />
+        </div>
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" id="fLocation" placeholder="e.g. Rome, Kyoto…" />
+        </div>
+        <div class="form-group full">
+          <label>Caption (optional)</label>
+          <textarea id="fCaption" placeholder="A short description shown in lightbox"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Featured on homepage</label>
+          <select id="fFeatured">
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn primary" onclick="savePhoto()">Save photo →</button>
+        <button class="btn ghost" onclick="cancelForm()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- PHOTO LIST -->
+    <p class="section-title" style="margin-top:2rem">Your photos</p>
+    <div id="photoList" class="photo-list"></div>
+    <div id="listEmpty" class="list-empty" style="display:none">
+      No photos yet. Upload your first one above.
+    </div>
+
+  
+    <!-- Layout S settings -->
+    <div id="layout-s-settings" style="display:none;margin-top:2rem">
+      <p class="section-title" style="margin-bottom:1rem">Layout S &mdash; banner panel settings</p>
+
+      <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1rem">
+        <p style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem">Pannello 1 &mdash; Philosophy</p>
+
+        <div style="margin-bottom:0.8rem">
+          <label style="display:block;margin-bottom:0.4rem">Immagine selezionata</label>
+          <div id="s1-crop-tool" style="position:relative;width:100%;aspect-ratio:4 / 1;background:#111;border:1px solid var(--rule);border-radius:3px;overflow:hidden;cursor:crosshair;margin-bottom:0.4rem;user-select:none">
+            <img id="s1-preview" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 38%;display:none;pointer-events:none" />
+            <div id="s1-crop-cross" style="position:absolute;transform:translate(-50%,-50%);pointer-events:none;left:50%;top:38%">
+              <div style="position:absolute;top:50%;left:-12px;width:24px;height:1px;background:rgba(255,255,255,0.9)"></div>
+              <div style="position:absolute;left:50%;top:-12px;width:1px;height:24px;background:rgba(255,255,255,0.9)"></div>
+              <div style="position:absolute;top:-5px;left:-5px;width:10px;height:10px;border:1.5px solid rgba(255,255,255,0.9);border-radius:50%"></div>
+            </div>
+          </div>
+          <p style="font-size:0.6rem;color:var(--ink3);margin-bottom:0.4rem">Scegli dalle foto caricate:</p>
+          <div id="s1-picker-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:4px;max-height:160px;overflow-y:auto;border:1px solid var(--rule);border-radius:3px;padding:4px"></div>
+          <input type="hidden" id="s1-url" value="" />
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem">
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s1-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s1-pos-x" oninput="updateLayoutSPreview('s1')" style="width:100%" /></div>
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s1-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s1-pos-y" oninput="updateLayoutSPreview('s1')" style="width:100%" /></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.1fr 0.9fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
+          <div><label>Font etichetta</label><select id="s1-font" style="width:100%;font-size:0.62rem"><option value="">Default</option><option>EB Garamond</option><option>Cormorant Garant</option><option>Playfair Display</option><option>Spectral</option><option>Libre Baskerville</option><option>Inter</option><option>Lato</option><option>DM Mono</option></select></div>
+          <div><label>Peso</label><select id="s1-weight" style="width:100%;font-size:0.62rem"><option value="">Default</option><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option></select></div>
+          <div><label>Colore etichetta</label><div style="display:flex;gap:4px"><input type="color" id="cp-s1" value="#ffffff" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule)" oninput="document.getElementById('hex-s1').value=this.value" /><input type="text" id="hex-s1" value="#ffffff" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value))document.getElementById('cp-s1').value=this.value" /></div></div>
+          <div><label>Dimensione <span id="v-s1-size">100</span>%</label><input type="range" min="60" max="200" value="100" id="s1-size" oninput="document.getElementById('v-s1-size').textContent=this.value" style="width:100%" /></div>
+        </div>
+        <div class="form-group"><label>Testo etichetta</label><input type="text" id="s1-text" value="Philosophy" /></div>
+      </div>
+
+      <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem">
+        <p style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem">Pannello 2 &mdash; Photography</p>
+
+        <div style="margin-bottom:0.8rem">
+          <label style="display:block;margin-bottom:0.4rem">Immagine selezionata</label>
+          <div id="s2-crop-tool" style="position:relative;width:100%;aspect-ratio:4 / 1;background:#111;border:1px solid var(--rule);border-radius:3px;overflow:hidden;cursor:crosshair;margin-bottom:0.4rem;user-select:none">
+            <img id="s2-preview" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 38%;display:none;pointer-events:none" />
+            <div id="s2-crop-cross" style="position:absolute;transform:translate(-50%,-50%);pointer-events:none;left:50%;top:38%">
+              <div style="position:absolute;top:50%;left:-12px;width:24px;height:1px;background:rgba(255,255,255,0.9)"></div>
+              <div style="position:absolute;left:50%;top:-12px;width:1px;height:24px;background:rgba(255,255,255,0.9)"></div>
+              <div style="position:absolute;top:-5px;left:-5px;width:10px;height:10px;border:1.5px solid rgba(255,255,255,0.9);border-radius:50%"></div>
+            </div>
+          </div>
+          <p style="font-size:0.6rem;color:var(--ink3);margin-bottom:0.4rem">Scegli dalle foto caricate:</p>
+          <div id="s2-picker-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:4px;max-height:160px;overflow-y:auto;border:1px solid var(--rule);border-radius:3px;padding:4px"></div>
+          <input type="hidden" id="s2-url" value="" />
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem">
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s2-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s2-pos-x" oninput="updateLayoutSPreview('s2')" style="width:100%" /></div>
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s2-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s2-pos-y" oninput="updateLayoutSPreview('s2')" style="width:100%" /></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.1fr 0.9fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
+          <div><label>Font etichetta</label><select id="s2-font" style="width:100%;font-size:0.62rem"><option value="">Default</option><option>EB Garamond</option><option>Cormorant Garant</option><option>Playfair Display</option><option>Spectral</option><option>Libre Baskerville</option><option>Inter</option><option>Lato</option><option>DM Mono</option></select></div>
+          <div><label>Peso</label><select id="s2-weight" style="width:100%;font-size:0.62rem"><option value="">Default</option><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option></select></div>
+          <div><label>Colore etichetta</label><div style="display:flex;gap:4px"><input type="color" id="cp-s2" value="#ffffff" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule)" oninput="document.getElementById('hex-s2').value=this.value" /><input type="text" id="hex-s2" value="#ffffff" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value))document.getElementById('cp-s2').value=this.value" /></div></div>
+          <div><label>Dimensione <span id="v-s2-size">100</span>%</label><input type="range" min="60" max="200" value="100" id="s2-size" oninput="document.getElementById('v-s2-size').textContent=this.value" style="width:100%" /></div>
+        </div>
+        <div class="form-group"><label>Testo etichetta</label><input type="text" id="s2-text" value="Photography" /></div>
+      </div>
+
+      <div style="margin-top:1rem">
+        <button class="btn primary" onclick="saveLayoutS()">Save layout S &rarr;</button>
+        <span id="s-save-msg" style="display:none;margin-left:1rem;font-size:0.62rem;color:#4a7c59">Saved &check;</span>
+      </div>
+    </div>
+  </div><!-- /panel-photos -->
+
+
+  <!-- ═══ ELSEWHERE PANEL ═══ -->
+  <div class="admin-panel" id="panel-elsewhere">
+    <!-- Banner 3 — Elsewhere -->
+    <p class="section-title" style="margin-bottom:1rem">Banner 3 &mdash; Elsewhere</p>
+    <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1.8rem">
+
+      <div style="margin-bottom:0.8rem">
+        <label style="display:block;margin-bottom:0.4rem">Immagine</label>
+        <img id="s3-preview" src="" alt="" style="width:100%;max-height:120px;object-fit:cover;border:1px solid var(--rule);border-radius:3px;display:none;margin-bottom:0.4rem" />
+        <p style="font-size:0.6rem;color:var(--ink3);margin-bottom:0.4rem">Scegli dalle foto caricate:</p>
+        <div id="s3-picker-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:4px;max-height:160px;overflow-y:auto;border:1px solid var(--rule);border-radius:3px;padding:4px"></div>
+        <input type="hidden" id="s3-url" value="" />
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem">
+        <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s3-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s3-pos-x" oninput="document.getElementById('v-s3-x').textContent=this.value" style="width:100%" /></div>
+        <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s3-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s3-pos-y" oninput="document.getElementById('v-s3-y').textContent=this.value" style="width:100%" /></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
+        <div><label>Font etichetta</label><select id="s3-font" style="width:100%;font-size:0.62rem"><option value="">Default</option><option>EB Garamond</option><option>Cormorant Garant</option><option>Playfair Display</option><option>Spectral</option><option>Libre Baskerville</option><option>Inter</option><option>Lato</option><option>DM Mono</option></select></div>
+        <div><label>Colore etichetta</label><div style="display:flex;gap:4px"><input type="color" id="cp-s3" value="#ffffff" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule)" oninput="document.getElementById('hex-s3').value=this.value" /><input type="text" id="hex-s3" value="#ffffff" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value))document.getElementById('cp-s3').value=this.value" /></div></div>
+        <div><label>Dimensione <span id="v-s3-size">100</span>%</label><input type="range" min="60" max="200" value="100" id="s3-size" oninput="document.getElementById('v-s3-size').textContent=this.value" style="width:100%" /></div>
+      </div>
+      <div class="form-group" style="margin-bottom:0.5rem"><label>Testo etichetta</label><input type="text" id="s3-text" value="Elsewhere" /></div>
+      <div class="form-actions" style="margin-top:1rem">
+        <button class="btn primary" onclick="saveBanner3()">Save banner 3 &rarr;</button>
+        <span id="banner3SaveMsg" style="display:none;margin-left:1rem;font-size:0.62rem;color:var(--green)">Saved &check;</span>
+      </div>
+    </div>
+
+    <hr style="border:none;border-top:0.5px solid var(--rule);margin:0 0 1.8rem">
+
+    <p class="section-title">Elsewhere, ORCID & contact colors</p>
+    <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1.8rem">
+      <div style="margin-bottom:0.9rem;font-size:0.56rem;line-height:1.7;color:var(--ink3)">
+        Order on the site: Academia, PhilPeople, ResearchGate, Google Scholar, ORCID, Instagram.
+        The contact form text color is separate from the Elsewhere links color.
+      </div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Academia URL</label>
+          <input type="text" id="else-academia" placeholder="https://…" />
+        </div>
+        <div class="form-group full">
+          <label>PhilPeople URL</label>
+          <input type="text" id="else-philpeople" placeholder="https://…" />
+        </div>
+        <div class="form-group full">
+          <label>ORCID URL</label>
+          <input type="text" id="else-orcid" placeholder="https://orcid.org/..." />
+        </div>
+        <div class="form-group full">
+          <label>Instagram URL</label>
+          <input type="text" id="else-instagram" placeholder="https://…" />
+        </div>
+        <div class="form-group full">
+          <label>ResearchGate URL</label>
+          <input type="text" id="else-researchgate" placeholder="https://…" />
+        </div>
+        <div class="form-group full">
+          <label>Google Scholar URL</label>
+          <input type="text" id="else-googlescholar" placeholder="https://…" />
+        </div>
+        <div class="form-group">
+          <label>Contact form text color</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="color" id="cp-contact-form-text" value="#1a1814" style="width:40px;height:32px;padding:2px;border:1px solid var(--rule);cursor:pointer" oninput="document.getElementById('hex-contact-form-text').value=this.value" />
+            <input type="text" id="hex-contact-form-text" placeholder="#1a1814" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:90px" oninput="var p=document.getElementById('cp-contact-form-text');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Elsewhere links color</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="color" id="cp-elsewhere-links" value="#1a1814" style="width:40px;height:32px;padding:2px;border:1px solid var(--rule);cursor:pointer" oninput="document.getElementById('hex-elsewhere-links').value=this.value" />
+            <input type="text" id="hex-elsewhere-links" placeholder="#1a1814" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:90px" oninput="var p=document.getElementById('cp-elsewhere-links');if(/^#[0-9a-fA-F]{6}$/.test(this.value))p.value=this.value" />
+          </div>
+        </div>
+      </div>
+
+        <div style="margin-top:1.2rem;padding-top:1.2rem;border-top:0.5px solid var(--rule)">
+          <p style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:0.8rem">Link aggiuntivi (fino a 10)</p>
+          <div id="extra-links-container"></div>
+          <button class="btn" onclick="addExtraLinkRow()" style="margin-top:0.6rem;font-size:0.5rem">+ Aggiungi link</button>
+        </div>
+      <div class="form-actions" style="margin-top:1rem">
+        <button class="btn primary" onclick="saveElsewhere()">Save elsewhere settings →</button>
+      </div>
+      <div id="elsewhereSaveMsg" style="font-size:0.58rem;color:var(--green);margin-top:0.6rem;display:none">✓ Saved</div>
+    </div>
+  </div>
+
+  <!-- ═══ SETTINGS PANEL ═══ -->
+  <div class="admin-panel" id="panel-settings">
+    <p class="section-title">Contentful connection & schema</p>
+    <div class="cf-status" id="cfStatus2" style="margin-bottom:1.8rem">
+      <span id="cfStatusText2">Checking…</span>
+      <button onclick="openSetup()">Configure</button>
+    </div>
+    <p style="font-size:0.6rem;color:var(--ink3);line-height:1.8">
+      Contentful stores all your content — photos, publications, talks, bio text —
+      so it persists across devices and sessions. Without it, changes are lost on refresh.<br><br>
+      Once connected, all sections of this admin panel save directly to Contentful
+      and appear live on the site immediately.<br><br>
+      If a new site setting does not appear yet in your space, run Setup once more: the schema updater now adds missing fields to existing content types too.
+    </p>
+  </div>
+
+  </div><!-- /admin-body -->
+
+  <!-- CONTENTFUL SETUP MODAL -->
+  <div class="modal-bg" id="setupModal">
+    <div class="modal">
+      <h2>Connect Contentful</h2>
+      <p class="modal-sub">One-time setup · Free tier is enough</p>
+
+      <div class="guide">
+        <ol>
+          <li>Go to <a href="https://contentful.com" target="_blank">contentful.com</a> and create a free account</li>
+          <li>Create a new Space (any name, e.g. "pignocchi-photo")</li>
+          <li>In Settings → API keys → "Add API key" — copy the <strong>Space ID</strong> and <strong>Content Delivery API token</strong></li>
+          <li>In Settings → API keys → "Content management tokens" — generate a <strong>Management token</strong></li>
+          <li>Paste all three below and click Setup</li>
+        </ol>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0.8rem">
+        <label>Space ID</label>
+        <input type="text" id="cfSpaceId" placeholder="xxxxxxxxxxxxxx" />
+      </div>
+      <div class="form-group" style="margin-bottom:0.8rem">
+        <label>Delivery Token (public read)</label>
+        <input type="text" id="cfDelivery" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+      </div>
+      <div class="form-group">
+        <label>Management Token (admin write)</label>
+        <input type="text" id="cfMgmt" placeholder="CFPAT-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn primary" onclick="runSetup()">Setup Contentful →</button>
+        <button class="btn ghost" onclick="closeSetup()">Cancel</button>
+        <button class="btn danger" onclick="disconnectCF()">Disconnect</button>
+      </div>
+
+      <div class="log" id="setupLog"></div>
+    </div>
+  </div>
+
+  <script>
+    /* ── Auth ── */
+    /* Auth handled by Cloudflare Zero Trust */
+    function logout() {
+      window.location.href = 'https://tomasopignocchi.com/cdn-cgi/access/logout';
+    }
+
+    /* ── State ── */
+    let pendingFile  = null;
+    let pendingUrl   = null; /* object URL for preview */
+    let photos       = [];   /* loaded from Contentful */
+    let seriesNames  = new Set();
+
+    /* ── Contentful status ── */
+    function updateCFStatus() {
+      const canRead = CF.hasReadAccess();
+      const canWrite = CF.hasWriteAccess();
+      const bar  = document.getElementById('cfStatus');
+      const text = document.getElementById('cfStatusText');
+      const btn  = document.getElementById('cfSetupBtn');
+      if (canWrite) {
+        bar.className = 'cf-status connected';
+        text.textContent = '✓ Connected to Contentful — read and write are enabled';
+        btn.textContent = 'Settings';
+      } else if (canRead) {
+        bar.className = 'cf-status connected';
+        text.textContent = '✓ Contentful read is enabled, but write is missing — homepage can load, admin cannot save';
+        btn.textContent = 'Settings';
+      } else {
+        bar.className = 'cf-status disconnected';
+        text.textContent = '⚠ Contentful not connected — homepage data will fall back and admin saves will fail.';
+        btn.textContent = 'Configure Contentful';
+      }
+    }
+
+    /* ── Setup modal ── */
+    function openSetup() {
+      const c = CF.cfg();
+      document.getElementById('cfSpaceId').value  = c.spaceId  || '';
+      document.getElementById('cfDelivery').value = c.deliveryToken || '';
+      document.getElementById('cfMgmt').value     = c.mgmtToken || '';
+      document.getElementById('setupLog').className = 'log';
+      document.getElementById('setupLog').textContent = '';
+      document.getElementById('setupModal').classList.add('open');
+    }
+    function closeSetup() { document.getElementById('setupModal').classList.remove('open'); }
+
+    function log(msg, color) {
+      const box = document.getElementById('setupLog');
+      box.className = 'log visible';
+      box.innerHTML += `<span style="color:${color||'#8f8'}">${msg}</span>\n`;
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function runSetup() {
+      const spaceId = document.getElementById('cfSpaceId').value.trim();
+      const delivery = document.getElementById('cfDelivery').value.trim();
+      const mgmt = document.getElementById('cfMgmt').value.trim();
+
+      if (!spaceId || !delivery || !mgmt) {
+        log('Please fill all three fields.', '#f88'); return;
+      }
+
+      CF.saveCfg({ spaceId, deliveryToken: delivery, mgmtToken: mgmt });
+      log('Credentials saved. Creating content types…');
+
+      try {
+        const results = await CF.createContentTypes();
+        results.forEach(r => {
+          log(`  ${r.id}: ${r.status}${r.message ? ' — ' + r.message : ''}`,
+            r.status === 'error' ? '#f88' : '#8f8');
+        });
+        log('✓ Setup complete! Close this panel and start uploading photos.');
+        updateCFStatus();
+        loadPhotos();
+      } catch (e) {
+        log('Error: ' + e.message, '#f88');
+      }
+    }
+
+    function disconnectCF() {
+      if (confirm('Remove Contentful connection? Uploaded photos stay on Contentful.')) {
+        localStorage.removeItem('pignocchi_cf');
+        updateCFStatus();
+        closeSetup();
+      }
+    }
+
+    /* ── Upload zone ── */
+    const zone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+
+    zone.addEventListener('click', () => fileInput.click());
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault(); zone.classList.remove('drag');
+      handleFiles(e.dataTransfer.files);
+    });
+    fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+    function handleFiles(files) {
+      if (!files.length) return;
+      /* show form for first file; queue rest for later */
+      showMetaForm(files[0]);
+    }
+
+    function showMetaForm(file) {
+      if (pendingUrl) URL.revokeObjectURL(pendingUrl);
+      pendingFile = file;
+      pendingUrl = URL.createObjectURL(file);
+
+      document.getElementById('previewImg').src = pendingUrl;
+      document.getElementById('previewFilename').textContent = file.name;
+      document.getElementById('fTitle').value    = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+      document.getElementById('fYear').value     = new Date().getFullYear();
+      document.getElementById('fLocation').value = '';
+      document.getElementById('fSeries').value   = '';
+      document.getElementById('fCaption').value  = '';
+      document.getElementById('fFeatured').value = 'false';
+
+      /* populate series datalist */
+      const dl = document.getElementById('seriesList');
+      dl.innerHTML = '';
+      seriesNames.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        dl.appendChild(opt);
+      });
+
+      document.getElementById('metaForm').classList.add('visible');
+      document.getElementById('fTitle').focus();
+    }
+
+    function cancelForm() {
+      document.getElementById('metaForm').classList.remove('visible');
+      pendingFile = null;
+      fileInput.value = '';
+    }
+
+    async function savePhoto() {
+      if (!pendingFile) return;
+
+      const title    = document.getElementById('fTitle').value.trim() || pendingFile.name;
+      const series   = document.getElementById('fSeries').value.trim();
+      const year     = parseInt(document.getElementById('fYear').value) || null;
+      const location = document.getElementById('fLocation').value.trim();
+      const caption  = document.getElementById('fCaption').value.trim();
+      const featured = document.getElementById('fFeatured').value === 'true';
+
+      const ind = document.getElementById('uploadingIndicator');
+      const indText = document.getElementById('uploadingText');
+      ind.classList.add('visible');
+
+      try {
+        if (CF.hasWriteAccess()) {
+          /* upload image to Contentful assets */
+          indText.textContent = 'Uploading image to Contentful…';
+          const assetId = await CF.uploadAsset(pendingFile);
+
+          /* create photo entry */
+          indText.textContent = 'Saving metadata…';
+          const fields = {
+            title,
+            image: { sys: { type: 'Link', linkType: 'Asset', id: assetId } },
+            ...(series   && { series }),
+            ...(year     && { year }),
+            ...(location && { location }),
+            ...(caption  && { caption }),
+            featured
+          };
+
+          /* POST with content type header */
+          const c = CF.cfg();
+          const r = await fetch(
+            `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries`,
+            {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${c.mgmtToken}`,
+                'Content-Type': 'application/vnd.contentful.management.v1+json',
+                'X-Contentful-Content-Type': 'photo'
+              },
+              body: JSON.stringify({
+                fields: Object.fromEntries(
+                  Object.entries(fields).map(([k, v]) => [k, { 'en-US': v }])
+                )
+              })
+            }
+          );
+          const entry = await r.json();
+          if (!r.ok) throw new Error(entry.message || 'Failed to create entry');
+
+          /* publish */
+          await fetch(
+            `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entry.sys.id}/published`,
+            {
+              method: 'PUT',
+              headers: {
+                Authorization: `Bearer ${c.mgmtToken}`,
+                'Content-Type': 'application/vnd.contentful.management.v1+json',
+                'X-Contentful-Version': entry.sys.version
+              }
+            }
+          );
+
+          if (series) seriesNames.add(series);
+          await loadPhotos();
+
+        } else {
+          /* local fallback — store as data URL (session only) */
+          const reader = new FileReader();
+          reader.onload = e => {
+            const local = JSON.parse(sessionStorage.getItem('tp_local_photos') || '[]');
+            local.unshift({ _id: Date.now().toString(), title, image: e.target.result,
+              series, year, location, caption, featured });
+            sessionStorage.setItem('tp_local_photos', JSON.stringify(local));
+            if (series) seriesNames.add(series);
+            renderPhotoList(local);
+          };
+          reader.readAsDataURL(pendingFile);
+        }
+
+        cancelForm();
+
+      } catch (e) {
+        alert('Error saving photo: ' + e.message);
+        console.error(e);
+      } finally {
+        ind.classList.remove('visible');
+        indText.textContent = 'Uploading…';
+      }
+    }
+
+    /* ── Load & render photos ── */
+    async function loadPhotos() {
+      let list = [];
+      if (CF.hasReadAccess()) {
+        try { list = await CF.get('photo') || []; } catch {}
+      } else {
+        list = JSON.parse(sessionStorage.getItem('tp_local_photos') || '[]');
+      }
+      photos = list;
+      list.forEach(p => { if (p.series) seriesNames.add(p.series); });
+      renderPhotoList(list);
+    }
+
+    function renderPhotoList(list) {
+      const grid  = document.getElementById('photoList');
+      const empty = document.getElementById('listEmpty');
+      grid.innerHTML = '';
+
+      if (!list.length) {
+        empty.style.display = 'block'; return;
+      }
+      empty.style.display = 'none';
+
+      list.forEach(photo => {
+        const card = document.createElement('div');
+        card.className = 'photo-card';
+        const sub = [photo.series, photo.year].filter(Boolean).join(' · ');
+        card.innerHTML = `
+          <img src="${photo.image}" alt="${photo.title || ''}" loading="lazy" />
+          <div class="card-info">
+            <p>${photo.title || ''}</p>
+            <p>${sub}</p>
+          </div>
+          <button class="card-del" title="Delete" onclick="deletePhoto('${photo._id}', event)">×</button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    async function deletePhoto(id, e) {
+      e.stopPropagation();
+      if (!confirm('Delete this photo? This cannot be undone.')) return;
+      try {
+        if (CF.hasWriteAccess()) {
+          await CF.deleteEntry(id);
+          await loadPhotos();
+        } else {
+          const local = JSON.parse(sessionStorage.getItem('tp_local_photos') || '[]')
+            .filter(p => p._id !== id);
+          sessionStorage.setItem('tp_local_photos', JSON.stringify(local));
+          renderPhotoList(local);
+        }
+      } catch (e) {
+        alert('Could not delete: ' + e.message);
+      }
+    }
+
+    /* ── Banner management ── */
+    async function loadBanner() {
+      let url = localStorage.getItem('tp_banner_url') || '';
+
+      if (!url && CF.hasReadAccess()) {
+        try {
+          const s = await getMainEntry('siteSettings');
+          if (s && s.heroBanner) url = s.heroBanner;
+        } catch {}
+      }
+
+      const preview = document.getElementById('bannerPreview');
+      const label   = document.getElementById('bannerLabel');
+      if (url) {
+        preview.src = url;
+        label.textContent = 'Current banner (click photo or upload to change)';
+      } else {
+        preview.src = 'https://www.tomasopignocchi.com/wp-content/uploads/2021/12/banner_bike_r_L.jpg';
+        label.textContent = 'Using default banner — upload or pick a photo to customise';
+      }
+    }
+
+    async function setBanner(url) {
+      localStorage.setItem('tp_banner_url', url);
+      document.getElementById('bannerPreview').src = url;
+      document.getElementById('bannerLabel').textContent = 'Banner updated ✓';
+      /* update crop preview too */
+      const cropImg = document.getElementById('cropPreview');
+      if (cropImg) cropImg.src = url;
+
+      /* save to Contentful if connected */
+      if (CF.hasWriteAccess()) {
+        try {
+          await upsertMainEntry('siteSettings', { key: 'main', heroBanner: url });
+        } catch (e) {
+          console.warn('Could not save banner to Contentful:', e);
+        }
+      }
+    }
+
+    /* Upload a new banner image */
+    document.getElementById('bannerInput').addEventListener('change', async function () {
+      const file = this.files[0];
+      if (!file) return;
+
+      const ind = document.getElementById('uploadingIndicator');
+      const indText = document.getElementById('uploadingText');
+      ind.classList.add('visible');
+      indText.textContent = 'Uploading banner…';
+
+      try {
+        if (CF.hasWriteAccess()) {
+          const assetId = await CF.uploadAsset(file);
+          /* fetch resolved URL */
+          const asset = await CF.mgmt('GET', `/assets/${assetId}`);
+          const url = 'https:' + asset.fields.file['en-US'].url;
+          await setBanner(url);
+        } else {
+          /* fallback: object URL (session only) */
+          const url = URL.createObjectURL(file);
+          await setBanner(url);
+        }
+      } catch (e) {
+        alert('Could not upload banner: ' + e.message);
+      } finally {
+        ind.classList.remove('visible');
+        this.value = '';
+      }
+    });
+
+    /* Photo picker */
+    function openGenericPhotoPicker(options) {
+      const grid = document.getElementById('pickerGrid');
+      const title = document.getElementById('pickerModalTitle');
+      const sub = document.getElementById('pickerModalSub');
+      if (title) title.textContent = options?.title || 'Pick a photo';
+      if (sub) sub.textContent = options?.subtitle || 'Click any photo to select it';
+      grid.innerHTML = '';
+
+      if (!photos.length) {
+        grid.innerHTML = '<p style="font-size:0.6rem;color:var(--ink3);padding:1rem">No photos uploaded yet.</p>';
+      } else {
+        photos.forEach(photo => {
+          const card = document.createElement('div');
+          card.className = 'photo-card';
+          card.style.cursor = 'pointer';
+          card.innerHTML = `<img src="${photo.image}" alt="${photo.title||''}" loading="lazy" />
+            <div class="card-info"><p>${photo.title||''}</p></div>`;
+          card.addEventListener('click', async () => {
+            if (options && typeof options.onSelect === 'function') await options.onSelect(photo);
+            document.getElementById('pickerModal').classList.remove('open');
+          });
+          grid.appendChild(card);
+        });
+      }
+
+      document.getElementById('pickerModal').classList.add('open');
+    }
+
+    function openPhotoPicker() {
+      openGenericPhotoPicker({
+        title: 'Pick a banner photo',
+        subtitle: 'Click any photo to set it as homepage banner',
+        onSelect: async (photo) => { await setBanner(photo.image); }
+      });
+    }
+
+    function setPhilosophyPortrait(url, syncInput = true) {
+      const clean = (url || '').trim();
+      const preview = document.getElementById('sc-philo-preview');
+      const empty = document.getElementById('sc-philo-empty');
+      const input = document.getElementById('sc-philo-url');
+      const cropPreview = document.getElementById('cropPreview');
+      if (syncInput && input) input.value = clean;
+      if (preview) {
+        preview.src = clean;
+        preview.style.display = clean ? 'block' : 'none';
+        preview.style.objectPosition = `${cropX}% ${cropY}%`;
+      }
+      if (cropPreview) {
+        cropPreview.src = clean;
+        cropPreview.style.display = clean ? 'block' : 'none';
+        cropPreview.style.objectPosition = `${cropX}% ${cropY}%`;
+      }
+      if (empty) empty.style.display = clean ? 'none' : 'flex';
+    }
+
+    function clearPhilosophyPortrait() {
+      setPhilosophyPortrait('', true);
+    }
+
+    function openPhiloPortraitPicker() {
+      openGenericPhotoPicker({
+        title: 'Pick a philosophy portrait',
+        subtitle: 'Click any uploaded photo to use it next to the bio on philosophy.html',
+        onSelect: async (photo) => { setPhilosophyPortrait(photo.image, true); }
+      });
+    }
+
+    document.getElementById('philoPortraitInput')?.addEventListener('change', async function () {
+      const file = this.files && this.files[0];
+      if (!file) return;
+      const ind = document.getElementById('uploadingIndicator');
+      const indText = document.getElementById('uploadingText');
+      ind.classList.add('visible');
+      indText.textContent = 'Uploading portrait…';
+      try {
+        if (CF.hasWriteAccess()) {
+          const assetId = await CF.uploadAsset(file);
+          const asset = await CF.mgmt('GET', `/assets/${assetId}`);
+          const url = 'https:' + asset.fields.file['en-US'].url;
+          setPhilosophyPortrait(url, true);
+        } else {
+          setPhilosophyPortrait(URL.createObjectURL(file), true);
+        }
+      } catch (e) {
+        alert('Could not upload portrait: ' + e.message);
+      } finally {
+        ind.classList.remove('visible');
+        this.value = '';
+      }
+    });
+
+    async function getContentTypeFieldIds(contentTypeId) {
+      const ct = await CF.mgmt('GET', `/content_types/${contentTypeId}`);
+      return new Set((ct.fields || []).map(f => f.id));
+    }
+
+    async function ensureContentTypeFields(contentTypeId, fieldIds = []) {
+      let allowedFieldIds = await getContentTypeFieldIds(contentTypeId);
+      const missing = fieldIds.filter(id => !allowedFieldIds.has(id));
+      if (!missing.length) return allowedFieldIds;
+      await CF.createContentTypes();
+      allowedFieldIds = await getContentTypeFieldIds(contentTypeId);
+      const stillMissing = fieldIds.filter(id => !allowedFieldIds.has(id));
+      if (stillMissing.length) throw new Error(`${contentTypeId} is still missing field(s): ${stillMissing.join(', ')}`);
+      return allowedFieldIds;
+    }
+
+    function pickExistingFieldId(fieldIds, candidates) {
+      for (const id of candidates) if (fieldIds.has(id)) return id;
+      return null;
+    }
+
+    async function getMainEntry(contentTypeId) {
+      const items = await CF.get(contentTypeId);
+      if (!items || !items.length) return null;
+      return items.find(item => item && item.key === 'main') || items[0];
+    }
+
+    async function upsertMainEntry(contentTypeId, fieldMap) {
+      const allowedFieldIds = await getContentTypeFieldIds(contentTypeId);
+      const filtered = Object.fromEntries(Object.entries(fieldMap).filter(([k]) => allowedFieldIds.has(k)));
+      if (!Object.keys(filtered).length) return null;
+      const c = CF.cfg();
+      const existing = await getMainEntry(contentTypeId);
+      if (existing) {
+        const id = existing._id;
+        const e = await CF.mgmt('GET', `/entries/${id}`);
+        const mergedFields = { ...(e.fields || {}) };
+        Object.entries(filtered).forEach(([k, v]) => { mergedFields[k] = { 'en-US': v }; });
+        const updR = await fetch(
+          `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${id}`,
+          { method: 'PUT',
+            headers: { Authorization: `Bearer ${c.mgmtToken}`,
+              'Content-Type': 'application/vnd.contentful.management.v1+json',
+              'X-Contentful-Version': e.sys.version },
+            body: JSON.stringify({ fields: mergedFields })
+          }
+        );
+        const upd = await updR.json();
+        if (!updR.ok) throw new Error(upd.message || `Could not update ${contentTypeId}`);
+        await CF.publishEntry(id, upd.sys.version);
+        return upd;
+      }
+
+      const createFields = { ...(filtered.key === undefined && allowedFieldIds.has('key') ? { key: 'main' } : {}), ...filtered };
+      const r = await fetch(
+        `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries`,
+        { method: 'POST',
+          headers: { Authorization: `Bearer ${c.mgmtToken}`,
+            'Content-Type': 'application/vnd.contentful.management.v1+json',
+            'X-Contentful-Content-Type': contentTypeId },
+          body: JSON.stringify({ fields: Object.fromEntries(Object.entries(createFields).map(([k, v]) => [k, { 'en-US': v }])) })
+        }
+      );
+      const entry = await r.json();
+      if (!r.ok) throw new Error(entry.message || `Could not create ${contentTypeId}`);
+      await fetch(`https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entry.sys.id}/published`,
+        { method: 'PUT', headers: { Authorization: `Bearer ${c.mgmtToken}`,
+          'Content-Type': 'application/vnd.contentful.management.v1+json',
+          'X-Contentful-Version': entry.sys.version }});
+      return entry;
+    }
+
+
+    async function savePhilosophyPortraitToSiteSettings(url) {
+      await ensureContentTypeFields('siteSettings', ['philosophyPortraitUrl']);
+      await upsertMainEntry('siteSettings', {
+        key: 'main',
+        philosophyPortraitUrl: (url || '').trim()
+      });
+    }
+
+    async function saveTitleAndLogoToSiteSettings(title, logoSize, secondaryTitleSize) {
+      await ensureContentTypeFields('siteSettings', ['siteTitle', 'logoSize', 'secondaryTitleSize']);
+      const payload = {
+        key: 'main',
+        siteTitle: (title || 'Tomaso Pignocchi').trim(),
+        logoSize: parseInt(logoSize || 100, 10) || 100,
+        secondaryTitleSize: parseInt(secondaryTitleSize || 100, 10) || 100,
+      };
+      await upsertMainEntry('siteSettings', payload);
+    }
+
+    /* ── Portrait crop tool (reusing heroPosX / heroPosY) ── */
+    let cropX = 50, cropY = 38;
+
+    function updateCrop(x, y) {
+      if (x !== undefined) cropX = Math.round(x);
+      if (y !== undefined) cropY = Math.round(y);
+      const sliderX = document.getElementById('posX');
+      const sliderY = document.getElementById('posY');
+      if (sliderX) sliderX.value = cropX;
+      if (sliderY) sliderY.value = cropY;
+      const valX = document.getElementById('posXVal');
+      const valY = document.getElementById('posYVal');
+      if (valX) valX.textContent = cropX;
+      if (valY) valY.textContent = cropY;
+      const preview = document.getElementById('cropPreview');
+      const staticPreview = document.getElementById('sc-philo-preview');
+      const cross = document.getElementById('cropCross');
+      if (preview) preview.style.objectPosition = `${cropX}% ${cropY}%`;
+      if (staticPreview) staticPreview.style.objectPosition = `${cropX}% ${cropY}%`;
+      if (cross) { cross.style.left = cropX + '%'; cross.style.top = cropY + '%'; }
+      localStorage.setItem('tp_philosophy_portrait_pos', `${cropX}% ${cropY}%`);
+    }
+
+    function getCropPointForTool(tool, e) {
+      const rect = tool.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const x = Math.max(0, Math.min(100, Math.round((clientX - rect.left) / rect.width * 100)));
+      const y = Math.max(0, Math.min(100, Math.round((clientY - rect.top) / rect.height * 100)));
+      return { x, y };
+    }
+
+    document.getElementById('posX') && document.getElementById('posX').addEventListener('input', function() {
+      cropX = parseInt(this.value);
+      updateCrop();
+    });
+    document.getElementById('posY') && document.getElementById('posY').addEventListener('input', function() {
+      cropY = parseInt(this.value);
+      updateCrop();
+    });
+
+    const cropTool = document.getElementById('cropTool');
+    if (cropTool) {
+      let dragging = false;
+      cropTool.addEventListener('mousedown', e => { dragging = true; const p = getCropPointForTool(cropTool, e); updateCrop(p.x, p.y); });
+      cropTool.addEventListener('mousemove', e => { if (dragging) { const p = getCropPointForTool(cropTool, e); updateCrop(p.x, p.y); } });
+      cropTool.addEventListener('mouseup', () => dragging = false);
+      cropTool.addEventListener('mouseleave', () => dragging = false);
+      window.addEventListener('mouseup', () => dragging = false);
+      cropTool.addEventListener('touchstart', e => { e.preventDefault(); const p = getCropPointForTool(cropTool, e); updateCrop(p.x, p.y); }, { passive: false });
+      cropTool.addEventListener('touchmove', e => { e.preventDefault(); const p = getCropPointForTool(cropTool, e); updateCrop(p.x, p.y); }, { passive: false });
+    }
+
+    function initCropPreview() {
+      const portrait = document.getElementById('sc-philo-url')?.value?.trim() || document.getElementById('sc-philo-preview')?.getAttribute('src') || '';
+      const preview = document.getElementById('cropPreview');
+      if (preview) {
+        preview.src = portrait;
+        preview.style.display = portrait ? 'block' : 'none';
+      }
+      const saved = localStorage.getItem('tp_philosophy_portrait_pos');
+      if (saved && (cropX === undefined || cropY === undefined)) {
+        const parts = saved.match(/(\d+)%\s+(\d+)%/);
+        if (parts) { cropX = parseInt(parts[1]); cropY = parseInt(parts[2]); }
+      }
+      updateCrop();
+    }
+
+
+    /* ── Font definitions ── */
+    const FONT_DATA = {
+      'EB Garamond':        { css: "'EB Garamond', serif",           weights: [400,500,600,700,800] },
+      'New Computer Modern':{ css: "'New Computer Modern', serif",   weights: [400] },
+      'Libre Baskerville':  { css: "'Libre Baskerville', serif",     weights: [400,700] },
+      'Playfair Display':   { css: "'Playfair Display', serif",      weights: [400,500,600,700,800,900] },
+      'Cormorant Garant':   { css: "'Cormorant Garant', serif",      weights: [300,400,500,600,700] },
+      'Spectral':           { css: "'Spectral', serif",              weights: [200,300,400,500,600,700,800] },
+      'Lato':               { css: "'Lato', sans-serif",             weights: [100,300,400,700,900] },
+      'Inter':              { css: "'Inter', sans-serif",            weights: [100,200,300,400,500,600,700,800,900] },
+      'Source Sans Pro':    { css: "'Source Sans 3', sans-serif",    weights: [200,300,400,500,600,700,900] },
+      'DM Mono':            { css: "'DM Mono', monospace",           weights: [300,400,500] },
+    };
+    const WEIGHT_NAMES = {100:'Thin',200:'ExtraLight',300:'Light',400:'Regular',500:'Medium',600:'SemiBold',700:'Bold',800:'ExtraBold',900:'Black'};
+
+    let currentHeroStyle = 'e';
+
+    let currentLayout = 'a';
+    function setLayout(s) {
+      currentLayout = s;
+      const sSettings = document.getElementById('layout-s-settings');
+      if (sSettings) sSettings.style.display = s === 's' ? 'block' : 'none';
+      document.querySelectorAll('.layout-opt').forEach(b => {
+        const active = b.dataset.layout === s;
+        b.style.borderColor = active ? 'var(--ink)' : 'var(--rule)';
+        b.style.background  = active ? 'white' : 'var(--paper)';
+        b.style.fontWeight  = active ? '500' : '300';
+      });
+    }
+    setLayout('a');
+
+
+
+    function updateTypoPreview() { /* replaced by per-section controls */ }
+
+    function syncSize(key) {
+      const slider = document.getElementById('sz-' + key);
+      const label  = document.getElementById('v-' + key) || document.getElementById('v-sz-' + key);
+      if (slider && label) label.textContent = slider.value;
+      const prev = document.getElementById('tp-bio-preview');
+      if (!prev || !slider) return;
+      const val = parseInt(slider.value) / 100;
+      if (key === 'lh-bio') prev.style.lineHeight = val;
+      if (key === 'bio')    prev.style.fontSize = (0.95 * val) + 'rem';
+    }
+
+    function loadTypographyToAdmin(sc) {
+      if (!sc) return;
+      /* Load sizes into sliders */
+      const sizeMap = {
+        'banner-title': sc.sizeBannerTitle,
+        'banner-sub':   sc.sizeBannerSubtitle,
+        'bio':          sc.sizeBio,
+        'pubs':         sc.sizePubs,
+        'photo':        sc.sizePhotoIntro,
+        'labels':       sc.sizeLabels,
+        'sublabels':    sc.sizeSublabels,
+        'seemore':      sc.sizeSeemore,
+        'venue':        sc.sizeVenue,
+        'footer':       sc.sizeFooter,
+        'logo':         sc.logoSize,
+        'secondary-title': sc.secondaryTitleSize,
+      };
+      Object.entries(sizeMap).forEach(([k, v]) => {
+        if (!v) return;
+        const slider = document.getElementById('sz-' + k);
+        const label  = document.getElementById('v-sz-' + k) || document.getElementById('v-' + k);
+        if (slider) slider.value = v;
+        if (label)  label.textContent = v;
+      });
+      if (sc.bioLineHeight) {
+        const s = document.getElementById('sz-lh-bio');
+        const l = document.getElementById('v-sz-lh-bio') || document.getElementById('v-lh-bio');
+        if (s) s.value = sc.bioLineHeight;
+        if (l) l.textContent = sc.bioLineHeight;
+      }
+
+      /* Load per-section font/weight/color */
+      const sections = ['name','sub','bio','pubs','venue','labels','sublabels','seemore','photo','footer'];
+      sections.forEach(sec => {
+        const fontSel  = document.getElementById('font-' + sec);
+        const wtSel    = document.getElementById('wt-' + sec);
+        const colorHex = document.getElementById('hex-color-' + sec);
+        const colorPick= document.getElementById('cp-color-' + sec);
+        if (fontSel  && sc[sec + 'Font'])        fontSel.value  = sc[sec + 'Font'];
+        if (wtSel    && sc[sec + 'FontWeight'])   wtSel.value   = sc[sec + 'FontWeight'];
+        if (colorHex && sc[sec + 'Color'])        colorHex.value = sc[sec + 'Color'];
+        if (colorPick && sc[sec + 'Color'] && /^#[0-9a-fA-F]{6}$/.test(sc[sec + 'Color']))
+          colorPick.value = sc[sec + 'Color'];
+      });
+
+      /* Legacy venue color */
+      if (sc.venueColor) {
+        const vh = document.getElementById('cp-venue'); if(vh) vh.value = sc.venueColor;
+        const vp = document.getElementById('cp-venue-picker'); if(vp) vp.value = sc.venueColor;
+      }
+    }
+
+    /* ── Color pickers ── */
+    let currentLogoVariant = 'light';
+
+    function updateSwatch(which) {
+      const input = document.getElementById('cp-' + (which === 'bg' ? 'bg' : 'ink'));
+      const val = input.value.trim();
+      /* swatch removed — picker is the visual indicator */
+    }
+
+    function setLogoVariant(v) {
+      currentLogoVariant = v;
+      document.querySelectorAll('.logo-opt').forEach(b => {
+        const isDark = b.dataset.variant === v;
+        b.style.background  = isDark ? 'var(--ink)' : 'var(--paper)';
+        b.style.color       = isDark ? 'var(--paper)' : 'var(--ink)';
+        b.style.borderColor = isDark ? 'var(--ink)' : 'var(--rule)';
+      });
+    }
+
+    function loadColorsToAdmin(sc) {
+      if (!sc) return;
+      if (sc.bgColor)   { document.getElementById('cp-bg').value  = sc.bgColor;  updateSwatch('bg');  var bp=document.getElementById('cp-bg-picker');  if(bp) bp.value=sc.bgColor; }
+      if (sc.textColor) { document.getElementById('cp-ink').value = sc.textColor; updateSwatch('ink'); var ip=document.getElementById('cp-ink-picker'); if(ip) ip.value=sc.textColor; }
+      if (sc.logoVariant) setLogoVariant(sc.logoVariant);
+    }
+
+    /* ── Admin tab switching ── */
+    function switchPanel(panelName) {
+      document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+      var tab = document.querySelector('.admin-tab[data-panel="' + panelName + '"]');
+      var panel = document.getElementById('panel-' + panelName);
+      if (tab) tab.classList.add('active');
+      if (panel) panel.classList.add('active');
+    }
+    document.querySelectorAll('.admin-tab').forEach(function(btn) {
+      btn.onclick = function() { switchPanel(btn.dataset.panel); };
+    });
+
+    /* ── Contentful status (second instance in settings tab) ── */
+    function updateCFStatus2() {
+      const canRead = CF.hasReadAccess();
+      const canWrite = CF.hasWriteAccess();
+      const bar  = document.getElementById('cfStatus2');
+      const text = document.getElementById('cfStatusText2');
+      if (!bar) return;
+      if (canWrite) {
+        bar.className = 'cf-status connected';
+        text.textContent = '✓ Connected to Contentful — write enabled';
+      } else if (canRead) {
+        bar.className = 'cf-status connected';
+        text.textContent = '✓ Read-only connection — add Management Token to save';
+      } else {
+        bar.className = 'cf-status disconnected';
+        text.textContent = '⚠ Not connected';
+      }
+    }
+
+    /* ── Site Content ── */
+    async function loadContent() {
+      if (!CF.hasReadAccess()) return;
+      try {
+        const items = await CF.get('siteContent');
+        const sc = (items && items.find(item => item && item.key === 'main')) || (items && items.length ? items[0] : null);
+
+        const settings = await CF.get('siteSettings');
+        const ss = (settings && settings.find(item => item && item.key === 'main')) || (settings && settings.length ? settings[0] : null);
+        const contentUi = { ...(sc || {}), ...(ss || {}) };
+
+        document.getElementById('sc-title').value = contentUi.siteTitle || 'Tomaso Pignocchi';
+        if (sc.nameplateSubtitle) document.getElementById('sc-subtitle').value = sc.nameplateSubtitle;
+        if (sc.bioText)           document.getElementById('sc-bio').value = sc.bioText;
+        if (sc.photoIntro)        document.getElementById('sc-photo-intro').value = sc.photoIntro;
+        if (sc.contactInfo)       document.getElementById('sc-contact').value = sc.contactInfo;
+        if (sc.heroPosX !== undefined) { cropX = sc.heroPosX; cropY = sc.heroPosY || 38; updateCrop(); }
+        if (sc.heroStyle) setLayout(String(sc.heroStyle).toLowerCase());
+        loadTypographyToAdmin({ ...(contentUi || {}), secondaryTitleSize: (ss && ss.secondaryTitleSize) || undefined, logoSize: (ss && ss.logoSize) || (contentUi && contentUi.logoSize) });
+        loadColorsToAdmin(contentUi);
+        setPhilosophyPortrait((ss && ss.philosophyPortraitUrl) || '', false);
+      } catch(e) { console.warn('loadContent error', e); }
+      initCropPreview();
+    }
+
+    async function saveContent() {
+      if (!CF.hasWriteAccess()) { alert('Connect Contentful first and add the Management Token (Settings tab)'); return; }
+      const fields = {
+        key: 'main',
+        nameplateSubtitle: document.getElementById('sc-subtitle').value.trim(),
+        bioText:           document.getElementById('sc-bio').value.trim(),
+        photoIntro:        document.getElementById('sc-photo-intro').value.trim(),
+        contactInfo:       document.getElementById('sc-contact').value.trim(),
+        heroPosX:          cropX,
+        heroPosY:          cropY,
+        heroStyle:         currentLayout,
+        sizeBannerTitle:   parseInt(document.getElementById('sz-banner-title')?.value || 100),
+        sizeBannerSubtitle:parseInt(document.getElementById('sz-banner-sub')?.value || 100),
+        sizeBio:           parseInt(document.getElementById('sz-bio')?.value || 100),
+        sizePubs:          parseInt(document.getElementById('sz-pubs')?.value || 100),
+        sizeVenue:         parseInt(document.getElementById('sz-venue')?.value || 100),
+        venueColor:        document.getElementById('cp-venue')?.value?.trim() || '#8a8480',
+        sizeLabels:        parseInt(document.getElementById('sz-labels')?.value || 100),
+        sizeSublabels:     parseInt(document.getElementById('sz-sublabels')?.value || 100),
+        sizeSeemore:       parseInt(document.getElementById('sz-seemore')?.value || 100),
+        /* Per-section font/weight/color */
+        nameFont: document.getElementById('font-name')?.value || '',
+        nameFontWeight: parseInt(document.getElementById('wt-name')?.value) || 0,
+        nameColor: document.getElementById('hex-color-name')?.value || '',
+        subFont: document.getElementById('font-sub')?.value || '',
+        subFontWeight: parseInt(document.getElementById('wt-sub')?.value) || 0,
+        subColor: document.getElementById('hex-color-sub')?.value || '',
+        bioFont: document.getElementById('font-bio')?.value || '',
+        bioFontWeight: parseInt(document.getElementById('wt-bio')?.value) || 0,
+        bioColor: document.getElementById('hex-color-bio')?.value || '',
+        pubsFont: document.getElementById('font-pubs')?.value || '',
+        pubsFontWeight: parseInt(document.getElementById('wt-pubs')?.value) || 0,
+        pubsColor: document.getElementById('hex-color-pubs')?.value || '',
+        venueFont: document.getElementById('font-venue')?.value || '',
+        venueFontWeight: parseInt(document.getElementById('wt-venue')?.value) || 0,
+        labelsFont: document.getElementById('font-labels')?.value || '',
+        labelsFontWeight: parseInt(document.getElementById('wt-labels')?.value) || 0,
+        labelsColor: document.getElementById('hex-color-labels')?.value || '',
+        sublabelsFont: document.getElementById('font-sublabels')?.value || '',
+        sublabelsFontWeight: parseInt(document.getElementById('wt-sublabels')?.value) || 0,
+        sublabelsColor: document.getElementById('hex-color-sublabels')?.value || '',
+        seemoreFont: document.getElementById('font-seemore')?.value || '',
+        seemoreColor: document.getElementById('hex-color-seemore')?.value || '',
+        photoFont: document.getElementById('font-photo')?.value || '',
+        photoFontWeight: parseInt(document.getElementById('wt-photo')?.value) || 0,
+        photoColor: document.getElementById('hex-color-photo')?.value || '',
+        footerFont: document.getElementById('font-footer')?.value || '',
+        footerColor: document.getElementById('hex-color-footer')?.value || '',
+        sizeFooter:        parseInt(document.getElementById('sz-footer')?.value || 100),
+        sizePhotoIntro:    parseInt(document.getElementById('sz-photo')?.value || 100),
+        bioLineHeight:     parseInt(document.getElementById('sz-lh-bio')?.value || 188),
+        bgColor:           document.getElementById('cp-bg')?.value?.trim() || '#f5f2ec',
+        textColor:         document.getElementById('cp-ink')?.value?.trim() || '#1a1814',
+        logoVariant:       currentLogoVariant,
+      };
+      const siteTitleValue = document.getElementById('sc-title')?.value?.trim() || 'Tomaso Pignocchi';
+      const logoSizeValue = parseInt(document.getElementById('sz-logo')?.value || 100, 10) || 100;
+      const secondaryTitleSizeValue = parseInt(document.getElementById('sz-secondary-title')?.value || 100, 10) || 100;
+      try {
+        await upsertMainEntry('siteContent', fields);
+        await saveTitleAndLogoToSiteSettings(siteTitleValue, logoSizeValue, secondaryTitleSizeValue);
+        await savePhilosophyPortraitToSiteSettings(document.getElementById('sc-philo-url')?.value?.trim() || '');
+        const msg = document.getElementById('contentSaveMsg');
+        msg.style.display = 'block';
+        setTimeout(() => msg.style.display = 'none', 2500);
+      } catch(e) { alert('Save error: ' + e.message); }
+    }
+
+    /* ── Publications ── */
+    const STATIC_PUBLICATIONS_SEED = [
+      { title: '«No Room for Play»: Anatomy of a Defensive Fantasy', venue: 'Pòlemos. Materiali di filosofia e critica sociale, 2/25', year: 2026, pubType: 'article', link: '', forthcoming: true, order: 1 },
+      { title: 'Question de perspectives. Images, raisons et méthodes philosophiques entre Wittgenstein et Nietzsche', venue: 'Transversalités, 179', year: 2026, pubType: 'article', link: '', forthcoming: true, order: 2 },
+      { title: 'When Rivers are Just Rivers: A Buddhist-Wittgensteinian Framework for a Non-Foundational Epistemology', venue: 'Topoi, 45/2', year: 2026, pubType: 'article', link: 'https://link.springer.com/article/10.1007/s11245-026-10398-2', forthcoming: false, order: 3 },
+      { title: '«Il serpentesco inganno»: Linguaggio, illusione e conoscenza in Hamann e Wittgenstein', venue: 'Annuario filosofico, 40, pp. 78–107', year: 2025, pubType: 'article', link: '', forthcoming: false, order: 4 },
+      { title: "Beyond Belief: Deep Disagreement and Conversion in Wittgenstein's Philosophy", venue: 'Synthese, 205, art. 39, pp. 1–25', year: 2025, pubType: 'article', link: 'https://link.springer.com/epdf/10.1007/s11229-024-04857-9?sharing_token=eWPcmhCATbF0bETTNvtLqfe4RwlQNchNByi7wbcMAY4u8QU-fGvgMQcyub6FGk_b71uQTswrL5BDaND01PIlWsqX2l1bdDHN7kGH1Wi1gxerC7FchvXAb-sIqROEfatNg7ZEZWv6GKek6RnxZ_rqDGzgd1fivCEPFaZCH9B-d0Q%3D', forthcoming: false, order: 5 },
+      { title: 'The Buddhist Quest for Valid Experience from Dignāga to Candrakīrti', venue: 'Synthesis — Journal for Philosophy, 4, pp. 115–148', year: 2024, pubType: 'article', link: 'https://synthesisonline.net/wp-content/uploads/2024/12/5.-tomaso-pignocchi-2.pdf', forthcoming: false, order: 6 },
+      { title: 'La profondità del quotidiano. Etica e senso nella poesia haiku', venue: 'Munera. Rivista europea di cultura, 1, pp. 115–123', year: 2024, pubType: 'article', link: 'https://www.cittadellaeditrice.com/munera/tutti-gli-articoli/munera-1-2024-tomaso-pignocchi-la-profondita-del-quotidiano-etica-e-senso-nella-poesia-haiku/', forthcoming: false, order: 7 },
+      { title: "Sull'uso della similitudine e del paradosso nel Tractatus di Wittgenstein e nel buddhismo", venue: 'Rivista Italiana di Filosofia del Linguaggio, 17/1, pp. 96–108', year: 2023, pubType: 'article', link: 'http://www.rifl.unical.it/index.php/rifl/article/view/747/725', forthcoming: false, order: 8 },
+      { title: 'Ordinary Aesthetics and Ethics in the Haiku Poetry of Matsuo Bashō: A Wittgensteinian Perspective', venue: 'Open Philosophy, 6/1, pp. 1–16', year: 2023, pubType: 'article', link: 'https://philpapers.org/archive/PIGOAA.pdf', forthcoming: false, order: 9 },
+      { title: 'Language and Emptiness. Toward a Non-Foundational Soteriological Epistemology', venue: 'Studium — Contemporary Humanism Open Access Annals 2025, pp. 149–156', year: 2026, pubType: 'chapter', link: '', forthcoming: false, order: 10 },
+      { title: "Language and Soteriology: Desire, Illusion and Liberation in Wittgenstein's and Buddhist Philosophies", venue: 'Studium — Contemporary Humanism Open Access Annals 2024, pp. 260–267', year: 2025, pubType: 'chapter', link: '', forthcoming: false, order: 11 }
+    ];
+
+    function normalizePubKey(pub) {
+      return `${(pub.title || '').trim().toLowerCase()}::${String(pub.year || '').trim()}`;
+    }
+
+    function updatePubImportNotice() {
+      const box = document.getElementById('pubImportNotice');
+      if (!box) return;
+      box.style.display = pubsCache.length ? 'none' : 'block';
+    }
+
+    let pubsCache = [];
+
+    async function loadPubs() {
+      if (!CF.hasReadAccess()) return;
+      try {
+        pubsCache = await CF.get('publication', { order: 'fields.order,-fields.year' }) || [];
+        sortPubsCache();
+        renderPubAdminList();
+      } catch(e) { console.warn('loadPubs error', e); }
+    }
+
+    function renderPubAdminList() {
+      const el = document.getElementById('pubList');
+      updatePubImportNotice();
+      if (!pubsCache.length) { el.innerHTML = '<p class="pub-admin-empty">No Contentful publications yet.</p>'; return; }
+      el.innerHTML = '';
+      pubsCache.forEach((p, idx) => {
+        const div = document.createElement('div');
+        div.className = 'pub-admin-item';
+        div.setAttribute('data-pub-id', p._id);
+        div.innerHTML = `
+          <div class="pub-edit-grid">
+            <div class="form-group"><label>Title</label><input type="text" data-field="title" value="${(p.title || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}" /></div>
+            <div class="form-group"><label>Venue</label><input type="text" data-field="venue" value="${(p.venue || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}" /></div>
+            <div class="form-group"><label>Year</label><input type="number" min="1900" max="2099" data-field="year" value="${p.year || ''}" /></div>
+            <div class="form-group"><label>Type</label><select data-field="pubType">
+              <option value="article" ${p.pubType==='article'?'selected':''}>Article</option>
+              <option value="chapter" ${p.pubType==='chapter'?'selected':''}>Chapter</option>
+              <option value="review" ${p.pubType==='review'?'selected':''}>Review</option>
+              <option value="other" ${p.pubType==='other'?'selected':''}>Other</option>
+            </select></div>
+            <div class="form-group"><label>Link</label><input type="text" data-field="link" value="${(p.link || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}" /></div>
+            <div class="form-group"><label>Forthcoming</label><select data-field="forthcoming"><option value="false" ${p.forthcoming ? '' : 'selected'}>No</option><option value="true" ${p.forthcoming ? 'selected' : ''}>Yes</option></select></div>
+            <div class="form-group"><label>Order</label><input type="number" data-field="order" value="${p.order ?? (idx+1)}" /></div>
+            <div class="pub-edit-actions">
+              <button class="pub-mini" onclick="movePub('${p._id}', -1)">↑</button>
+              <button class="pub-mini" onclick="movePub('${p._id}', 1)">↓</button>
+              <button class="pub-mini" onclick="saveExistingPub('${p._id}')">Save</button>
+              <button class="pub-mini danger" onclick="deletePub('${p._id}')">Delete</button>
+            </div>
+          </div>`;
+        el.appendChild(div);
+      });
+    }
+
+    async function importSeedPublications() {
+      if (!CF.hasWriteAccess()) { alert('Connect Contentful first and add the Management Token (Settings tab)'); return; }
+      try {
+        const msg = document.getElementById('pubImportMsg');
+        const c = CF.cfg();
+        const existing = await CF.get('publication', { order: 'fields.order,-fields.year' }) || [];
+        const existingKeys = new Set(existing.map(normalizePubKey));
+        const missing = STATIC_PUBLICATIONS_SEED.filter(pub => !existingKeys.has(normalizePubKey(pub)));
+        if (!missing.length) {
+          if (msg) {
+            msg.textContent = '✓ All current philosophy publications are already in Contentful.';
+            msg.style.display = 'block';
+          }
+          pubsCache = existing;
+          sortPubsCache();
+          renderPubAdminList();
+          return;
+        }
+        for (const pub of missing) {
+          const fields = Object.fromEntries(
+            Object.entries(pub).filter(([,v]) => v !== '' && v !== null && v !== undefined).map(([k,v]) => [k, { 'en-US': v }])
+          );
+          const r = await fetch(
+            `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries`,
+            {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${c.mgmtToken}`,
+                'Content-Type': 'application/vnd.contentful.management.v1+json',
+                'X-Contentful-Content-Type': 'publication'
+              },
+              body: JSON.stringify({ fields })
+            }
+          );
+          const entry = await r.json();
+          if (!r.ok) throw new Error(entry.message || 'Could not import publication');
+          await fetch(
+            `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entry.sys.id}/published`,
+            {
+              method: 'PUT',
+              headers: {
+                Authorization: `Bearer ${c.mgmtToken}`,
+                'Content-Type': 'application/vnd.contentful.management.v1+json',
+                'X-Contentful-Version': entry.sys.version
+              }
+            }
+          );
+        }
+        await loadPubs();
+        if (msg) {
+          msg.textContent = `✓ Imported ${missing.length} publication${missing.length === 1 ? '' : 's'} into Contentful.`;
+          msg.style.display = 'block';
+        }
+      } catch (e) {
+        alert('Import error: ' + e.message);
+      }
+    }
+
+    async function savePub() {
+      if (!CF.hasWriteAccess()) { alert('Connect Contentful first and add the Management Token (Settings tab)'); return; }
+      const title = document.getElementById('pub-title').value.trim();
+      if (!title) { alert('Title is required'); return; }
+      const nextOrder = (pubsCache.reduce((m,p)=>Math.max(m, Number.isFinite(+p.order)?+p.order:0), 0) || 0) + 1;
+      const fields = {
+        title,
+        venue:       document.getElementById('pub-venue').value.trim(),
+        year:        parseInt(document.getElementById('pub-year').value, 10) || new Date().getFullYear(),
+        pubType:     document.getElementById('pub-type').value,
+        link:        document.getElementById('pub-link').value.trim(),
+        forthcoming: document.getElementById('pub-forthcoming').value === 'true',
+        order:       nextOrder,
+      };
+      try {
+        const c = CF.cfg();
+        const r = await fetch(
+          `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries`,
+          { method: 'POST',
+            headers: { Authorization: `Bearer ${c.mgmtToken}`,
+              'Content-Type': 'application/vnd.contentful.management.v1+json',
+              'X-Contentful-Content-Type': 'publication' },
+            body: JSON.stringify({ fields: Object.fromEntries(Object.entries(fields).filter(([,v]) => v !== '' && v !== null).map(([k,v]) => [k, {'en-US': v}])) })
+          }
+        );
+        const entry = await r.json();
+        if (!r.ok) throw new Error(entry.message);
+        await fetch(`https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entry.sys.id}/published`,
+          { method: 'PUT', headers: { Authorization: `Bearer ${c.mgmtToken}`,
+            'Content-Type': 'application/vnd.contentful.management.v1+json',
+            'X-Contentful-Version': entry.sys.version }});
+        ['pub-title','pub-venue','pub-year','pub-link'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('pub-forthcoming').value = 'false';
+        document.getElementById('pub-type').value = 'article';
+        await loadPubs();
+      } catch(e) { alert('Save error: ' + e.message); }
+    }
+
+    async function deletePub(id) {
+      if (!confirm('Delete this publication?')) return;
+      try { await CF.deleteEntry(id); await loadPubs(); }
+      catch(e) { alert('Delete error: ' + e.message); }
+    }
+
+    /* ── Talks ── */
+    let talksCache = [];
+
+    async function loadTalks() {
+      if (!CF.hasReadAccess()) return;
+      try {
+        talksCache = await CF.get('talk', { order: '-fields.year' }) || [];
+        renderTalkAdminList();
+      } catch(e) { console.warn('loadTalks error', e); }
+    }
+
+    function renderTalkAdminList() {
+      const el = document.getElementById('talkAdminList');
+      if (!talksCache.length) { el.innerHTML = '<p class="pub-admin-empty">No talks yet.</p>'; return; }
+      el.innerHTML = '';
+      talksCache.forEach(t => {
+        const div = document.createElement('div');
+        div.className = 'pub-admin-item';
+        div.innerHTML = `
+          <span class="pai-year">${t.year || '—'}</span>
+          <span class="pai-text">${t.title}${t.upcoming ? ' <em style="color:var(--ink3)">(upcoming)</em>' : ''}<br>
+            <span style="font-size:0.75rem;color:var(--ink3)">${t.venue || ''}</span>
+          </span>
+          <button class="pai-del" onclick="deleteTalk('${t._id}')">Delete</button>`;
+        el.appendChild(div);
+      });
+    }
+
+    async function saveTalk() {
+      if (!CF.hasWriteAccess()) { alert('Connect Contentful first and add the Management Token (Settings tab)'); return; }
+      const title = document.getElementById('talk-title').value.trim();
+      if (!title) { alert('Title is required'); return; }
+      const fields = {
+        title,
+        venue:    document.getElementById('talk-venue').value.trim(),
+        year:     parseInt(document.getElementById('talk-year').value) || new Date().getFullYear(),
+        talkType: document.getElementById('talk-type').value,
+        upcoming: document.getElementById('talk-upcoming').value === 'true',
+      };
+      try {
+        const c = CF.cfg();
+        const r = await fetch(
+          `https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries`,
+          { method: 'POST',
+            headers: { Authorization: `Bearer ${c.mgmtToken}`,
+              'Content-Type': 'application/vnd.contentful.management.v1+json',
+              'X-Contentful-Content-Type': 'talk' },
+            body: JSON.stringify({ fields: Object.fromEntries(Object.entries(fields).filter(([,v]) => v !== '').map(([k,v]) => [k, {'en-US': v}])) })
+          }
+        );
+        const entry = await r.json();
+        if (!r.ok) throw new Error(entry.message);
+        await fetch(`https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${entry.sys.id}/published`,
+          { method: 'PUT', headers: { Authorization: `Bearer ${c.mgmtToken}`,
+            'Content-Type': 'application/vnd.contentful.management.v1+json',
+            'X-Contentful-Version': entry.sys.version }});
+        ['talk-title','talk-venue','talk-year'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('talk-upcoming').value = 'false';
+        await loadTalks();
+      } catch(e) { alert('Save error: ' + e.message); }
+    }
+
+    async function deleteTalk(id) {
+      if (!confirm('Delete this talk?')) return;
+      try { await CF.deleteEntry(id); await loadTalks(); }
+      catch(e) { alert('Delete error: ' + e.message); }
+    }
+
+    /* ── Elsewhere ── */
+    async function loadElsewhere() {
+      const _photoList = await CF.get('photo').catch(() => []);
+      if (!CF.hasReadAccess()) return;
+      try {
+        const settings = await CF.get('siteSettings');
+        const s = (settings && settings.find(item => item && item.key === 'main')) || (settings && settings.length ? settings[0] : null);
+        if (!s) return;
+        const map = {
+          'else-academia': 'academiaUrl',
+          'else-philpeople': 'philpeopleUrl',
+          'else-orcid': 'orcidUrl',
+          'else-instagram': 'instagramUrl',
+          'else-researchgate': 'researchGateUrl',
+          'else-googlescholar': 'googleScholarUrl'
+        };
+        Object.entries(map).forEach(([id, key]) => {
+          const el = document.getElementById(id);
+          if (el) el.value = s[key] || '';
+        });
+        const contactColor = s.contactFormTextColor || '';
+        const elsewhereColor = s.elsewhereLinkColor || '';
+        const contactHex = document.getElementById('hex-contact-form-text');
+        const contactPick = document.getElementById('cp-contact-form-text');
+        const elsewhereHex = document.getElementById('hex-elsewhere-links');
+        const elsewherePick = document.getElementById('cp-elsewhere-links');
+        if (contactHex) contactHex.value = contactColor;
+        if (contactPick && /^#[0-9a-fA-F]{6}$/.test(contactColor)) contactPick.value = contactColor;
+        if (elsewhereHex) elsewhereHex.value = elsewhereColor;
+        if (elsewherePick && /^#[0-9a-fA-F]{6}$/.test(elsewhereColor)) elsewherePick.value = elsewhereColor;
+      } catch (e) { console.warn('loadElsewhere', e); }
+    }
+
+    async function saveElsewhere() {
+      if (!CF.hasWriteAccess()) { alert('Connect Contentful first and add the Management Token (Settings tab)'); return; }
+      try {
+        const allowedFieldIds = await ensureContentTypeFields('siteSettings', ['academiaUrl','philpeopleUrl','researchGateUrl','googleScholarUrl','orcidUrl','instagramUrl','contactFormTextColor','elsewhereLinkColor']);
+        const payload = {
+          key: 'main',
+          academiaUrl: document.getElementById('else-academia').value.trim(),
+          philpeopleUrl: document.getElementById('else-philpeople').value.trim(),
+          researchGateUrl: document.getElementById('else-researchgate').value.trim(),
+          googleScholarUrl: document.getElementById('else-googlescholar').value.trim(),
+          orcidUrl: document.getElementById('else-orcid').value.trim(),
+          instagramUrl: document.getElementById('else-instagram').value.trim(),
+          contactFormTextColor: document.getElementById('hex-contact-form-text').value.trim(),
+          elsewhereLinkColor: document.getElementById('hex-elsewhere-links').value.trim(),
+        };
+        await upsertMainEntry('siteSettings', payload);
+        const msg = document.getElementById('elsewhereSaveMsg');
+        if (msg) { msg.style.display = 'block'; setTimeout(() => msg.style.display = 'none', 2500); }
+      } catch(e) { alert('Save error: ' + e.message); }
+    }
+
+    function sortPubsCache() {
+      pubsCache.sort((a,b) => {
+        const ao = Number.isFinite(+a.order) ? +a.order : Number.MAX_SAFE_INTEGER;
+        const bo = Number.isFinite(+b.order) ? +b.order : Number.MAX_SAFE_INTEGER;
+        if (ao !== bo) return ao - bo;
+        return (+b.year || 0) - (+a.year || 0);
+      });
+    }
+
+    function pubTypeLabel(v) {
+      return ({article:'Article', chapter:'Chapter', review:'Review', other:'Other'})[v] || 'Other';
+    }
+
+    async function updatePublication(id, fields) {
+      const c = CF.cfg();
+      const existing = await CF.mgmt('GET', `/entries/${id}`);
+      const mergedFields = { ...(existing.fields || {}) };
+      Object.entries(fields).forEach(([k,v]) => { mergedFields[k] = { 'en-US': v }; });
+      const updR = await fetch(`https://api.contentful.com/spaces/${c.spaceId}/environments/master/entries/${id}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${c.mgmtToken}`, 'Content-Type': 'application/vnd.contentful.management.v1+json', 'X-Contentful-Version': existing.sys.version },
+        body: JSON.stringify({ fields: mergedFields })
+      });
+      const upd = await updR.json();
+      if (!updR.ok) throw new Error(upd.message || 'Could not update publication');
+      await CF.publishEntry(id, upd.sys.version);
+      return upd;
+    }
+
+    async function saveExistingPub(id) {
+      try {
+        const row = document.querySelector(`[data-pub-id="${id}"]`);
+        if (!row) return;
+        const fields = {
+          title: row.querySelector('[data-field="title"]').value.trim(),
+          venue: row.querySelector('[data-field="venue"]').value.trim(),
+          year: parseInt(row.querySelector('[data-field="year"]').value, 10) || '',
+          link: row.querySelector('[data-field="link"]').value.trim(),
+          pubType: row.querySelector('[data-field="pubType"]').value,
+          forthcoming: row.querySelector('[data-field="forthcoming"]').value === 'true',
+          order: parseInt(row.querySelector('[data-field="order"]').value, 10) || 0,
+        };
+        if (!fields.title) throw new Error('Title is required');
+        await updatePublication(id, fields);
+        await loadPubs();
+        alert('Publication updated');
+      } catch(e) { alert('Save error: ' + e.message); }
+    }
+
+    async function movePub(id, delta) {
+      sortPubsCache();
+      pubsCache.forEach((p, idx) => { if (!Number.isFinite(+p.order)) p.order = idx + 1; });
+      const idx = pubsCache.findIndex(p => p._id === id);
+      const swapIdx = idx + delta;
+      if (idx < 0 || swapIdx < 0 || swapIdx >= pubsCache.length) return;
+      const a = pubsCache[idx], b = pubsCache[swapIdx];
+      const temp = +a.order; a.order = +b.order; b.order = temp;
+      try {
+        await updatePublication(a._id, { order: a.order });
+        await updatePublication(b._id, { order: b.order });
+        await loadPubs();
+      } catch(e) { alert('Reorder error: ' + e.message); }
+    }
+
+    /* ── Init ── */
+    updateCFStatus();
+    updateCFStatus2();
+    loadPhotos();
+    loadBanner();
+    loadContent();
+    loadPubs();
+    loadTalks();
+    loadLayoutS();
+    loadElsewhere();
+    initCropPreview();
+    loadLayoutS();
+
+    /* ── Layout S ── */
+    function encodePackedLabelFont(font, weight) {
+      const f = (font || '').trim();
+      const w = parseInt(weight) || 0;
+      if (!f && !w) return '';
+      return `${f}||${w || ''}`;
+    }
+
+    function decodePackedLabelFont(rawFont, fallbackWeight) {
+      let font = typeof rawFont === 'string' ? rawFont : '';
+      let weight = parseInt(fallbackWeight) || 0;
+      if (typeof font === 'string' && font.includes('||')) {
+        const [packedFont, packedWeight] = font.split('||');
+        font = packedFont || '';
+        if (!weight && /^\d+$/.test((packedWeight || '').trim())) weight = parseInt(packedWeight, 10) || 0;
+      }
+      return { font, weight };
+    }
+
+    async function saveLayoutS() {
+      if (!CF.hasWriteAccess()) { alert('Connect Contentful first and add the Management Token'); return; }
+      const c = CF.cfg();
+      setLayout('s');
+      try {
+        const label1FontValue = document.getElementById('s1-font')?.value || '';
+        const label1WeightValue = parseInt(document.getElementById('s1-weight')?.value) || 0;
+        const label2FontValue = document.getElementById('s2-font')?.value || '';
+        const label2WeightValue = parseInt(document.getElementById('s2-weight')?.value) || 0;
+        const fields = {
+          banner1PosX: parseInt(document.getElementById('s1-pos-x')?.value)||50,
+          banner1PosY: parseInt(document.getElementById('s1-pos-y')?.value)||38,
+          banner1Url:  document.getElementById('s1-url')?.value?.trim()||'',
+          banner2Url:  document.getElementById('s2-url')?.value?.trim()||'',
+          banner2PosX: parseInt(document.getElementById('s2-pos-x')?.value)||50,
+          banner2PosY: parseInt(document.getElementById('s2-pos-y')?.value)||38,
+          label1Text:  document.getElementById('s1-text')?.value?.trim()||'Philosophy',
+          label1Font:  label1FontValue,
+          label1Color: document.getElementById('hex-s1')?.value?.trim()||'#ffffff',
+          label1Size:  parseInt(document.getElementById('s1-size')?.value)||100,
+          label1Weight: label1WeightValue,
+          label2Text:  document.getElementById('s2-text')?.value?.trim()||'Photography',
+          label2Font:  label2FontValue,
+          label2Color: document.getElementById('hex-s2')?.value?.trim()||'#ffffff',
+          label2Size:  parseInt(document.getElementById('s2-size')?.value)||100,
+          label2Weight: label2WeightValue,
+        };
+        await upsertMainEntry('siteSettings', { key: 'main', ...fields });
+
+        /* Make Layout S go live immediately on the homepage */
+        await upsertMainEntry('siteContent', { key: 'main', heroStyle: 's' });
+
+        const msg = document.getElementById('s-save-msg');
+        if (msg) { msg.style.display='inline'; setTimeout(()=>msg.style.display='none',3000); }
+      } catch(e) { alert('Save error: '+e.message); }
+    }
+
+    function updateLayoutSPreview(prefix, nextX, nextY) {
+      const preview = document.getElementById(prefix + '-preview');
+      const posX = document.getElementById(prefix + '-pos-x');
+      const posY = document.getElementById(prefix + '-pos-y');
+      const cross = document.getElementById(prefix + '-crop-cross');
+      const valX = document.getElementById('v-' + prefix + '-x');
+      const valY = document.getElementById('v-' + prefix + '-y');
+      if (posX && nextX !== undefined) posX.value = Math.round(nextX);
+      if (posY && nextY !== undefined) posY.value = Math.round(nextY);
+      const x = parseInt(posX?.value ?? 50);
+      const y = parseInt(posY?.value ?? 38);
+      if (valX) valX.textContent = x;
+      if (valY) valY.textContent = y;
+      if (preview) {
+        preview.style.display = preview.src ? 'block' : 'none';
+        preview.style.objectPosition = `${x}% ${y}%`;
+      }
+      if (cross) {
+        cross.style.left = x + '%';
+        cross.style.top = y + '%';
+      }
+    }
+
+    function bindLayoutSCropDrag(prefix) {
+      const tool = document.getElementById(prefix + '-crop-tool');
+      if (!tool || tool.dataset.bound === '1') return;
+      tool.dataset.bound = '1';
+      let dragging = false;
+      const apply = (e) => {
+        const p = getCropPointForTool(tool, e);
+        updateLayoutSPreview(prefix, p.x, p.y);
+      };
+      tool.addEventListener('mousedown', e => { dragging = true; apply(e); });
+      tool.addEventListener('mousemove', e => { if (dragging) apply(e); });
+      tool.addEventListener('mouseup', () => dragging = false);
+      tool.addEventListener('mouseleave', () => dragging = false);
+      window.addEventListener('mouseup', () => dragging = false);
+      tool.addEventListener('touchstart', e => { e.preventDefault(); apply(e); }, { passive: false });
+      tool.addEventListener('touchmove', e => { e.preventDefault(); apply(e); }, { passive: false });
+    }
+
+    async function uploadS1(file) {
+      if (!file||!CF.hasWriteAccess()) return;
+      try { const assetId=await CF.uploadAsset(file); const asset=await CF.mgmt('GET','/assets/'+assetId); document.getElementById('s1-url').value='https:'+asset.fields.file['en-US'].url; const p=document.getElementById('s1-preview'); if(p){ p.src='https:'+asset.fields.file['en-US'].url; p.style.display='block'; updateLayoutSPreview('s1'); } } catch(e) { alert('Upload error: '+e.message); }
+    }
+    async function uploadS2(file) {
+      if (!file||!CF.hasWriteAccess()) return;
+      try { const assetId=await CF.uploadAsset(file); const asset=await CF.mgmt('GET','/assets/'+assetId); document.getElementById('s2-url').value='https:'+asset.fields.file['en-US'].url; const p=document.getElementById('s2-preview'); if(p){ p.src='https:'+asset.fields.file['en-US'].url; p.style.display='block'; updateLayoutSPreview('s2'); } } catch(e) { alert('Upload error: '+e.message); }
+    }
+    bindLayoutSCropDrag('s1');
+    bindLayoutSCropDrag('s2');
+    async function loadLayoutS() {
+      if (!CF.hasReadAccess()) return;
+      try {
+        const [ss, photoList] = await Promise.all([CF.get('siteSettings'), CF.get('photo')]);
+        /* Populate photo picker grids */
+        ['s1','s2'].forEach(p => {
+          const grid = document.getElementById(p+'-picker-grid');
+          if (!grid || !photoList) return;
+          grid.innerHTML = '';
+          photoList.forEach(ph => {
+            if (!ph.image) return;
+            const img = document.createElement('img');
+            img.src = ph.image; img.alt = ph.title||'';
+            img.style.cssText = 'width:100%;aspect-ratio:3/2;object-fit:cover;cursor:pointer;border-radius:2px;border:2px solid transparent;transition:border-color 0.15s';
+            img.onclick = () => {
+              document.getElementById(p+'-url').value = ph.image;
+              const prev = document.getElementById(p+'-preview');
+              if (prev) { prev.src = ph.image; prev.style.display='block'; updateLayoutSPreview(p); }
+              grid.querySelectorAll('img').forEach(i => i.style.borderColor='transparent');
+              img.style.borderColor = 'var(--ink)';
+            };
+            grid.appendChild(img);
+          });
+        });
+        bindLayoutSCropDrag('s1');
+        bindLayoutSCropDrag('s2');
+        if (!ss||!ss.length) return;
+        const s = ss.find(item => item && item.key === 'main') || ss[0];
+        const set=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null)el.value=v;};
+        const setN=(id,vid,v)=>{set(id,v);const l=document.getElementById(vid);if(l&&v!=null)l.textContent=v;};
+        const banner1Url = s.banner1Url || s.banner1url;
+        const banner2Url = s.banner2Url || s.banner2url;
+        const banner1PosX = s.banner1PosX ?? s.banner1posX;
+        const banner1PosY = s.banner1PosY ?? s.banner1posY;
+        const banner2PosX = s.banner2PosX ?? s.banner2posX;
+        const banner2PosY = s.banner2PosY ?? s.banner2posY;
+        const label1Text = s.label1Text || s.label1text;
+        const label1Font = s.label1Font || s.label1font;
+        const label1Weight = s.label1Weight ?? s.label1weight;
+        const label1Color = s.label1Color || s.label1color;
+        const label1Size = s.label1Size ?? s.label1size;
+        const label2Text = s.label2Text || s.label2text;
+        const label2Font = s.label2Font || s.label2font;
+        const label2Weight = s.label2Weight ?? s.label2weight;
+        const label2Color = s.label2Color || s.label2color;
+        const label2Size = s.label2Size ?? s.label2size;
+        if (banner1Url) { set('s1-url',banner1Url); const p=document.getElementById('s1-preview'); if(p){p.src=banner1Url;p.style.display='block';} }
+        if (banner2Url) { set('s2-url',banner2Url); const p=document.getElementById('s2-preview'); if(p){p.src=banner2Url;p.style.display='block';} }
+        setN('s1-pos-x','v-s1-x',banner1PosX); setN('s1-pos-y','v-s1-y',banner1PosY);
+        setN('s2-pos-x','v-s2-x',banner2PosX); setN('s2-pos-y','v-s2-y',banner2PosY);
+        set('s1-text',label1Text); set('s1-font',label1Font); set('s1-weight', label1Weight || '');
+        set('s2-text',label2Text); set('s2-font',label2Font); set('s2-weight', label2Weight || '');
+        setN('s1-size','v-s1-size',label1Size); setN('s2-size','v-s2-size',label2Size);
+        if(label1Color){set('hex-s1',label1Color);set('cp-s1',label1Color);}
+        if(label2Color){set('hex-s2',label2Color);set('cp-s2',label2Color);}
+        updateLayoutSPreview('s1');
+        updateLayoutSPreview('s2');
+      } catch(e) { console.warn('loadLayoutS',e); }
+    }
+
+
+    /* ── Banner 3 (Elsewhere) ── */
+    async function saveBanner3() {
+      if (!CF.hasWriteAccess()) { alert('Connect Contentful first'); return; }
+      try {
+        const fields = {
+          banner3Url:  document.getElementById('s3-url')?.value?.trim() || '',
+          banner3PosX: parseInt(document.getElementById('s3-pos-x')?.value) || 50,
+          banner3PosY: parseInt(document.getElementById('s3-pos-y')?.value) || 38,
+          label3Text:  document.getElementById('s3-text')?.value?.trim() || 'Elsewhere',
+          label3Font:  document.getElementById('s3-font')?.value || '',
+          label3Color: document.getElementById('hex-s3')?.value?.trim() || '#ffffff',
+          label3Size:  parseInt(document.getElementById('s3-size')?.value) || 100,
+        };
+        const existing = await CF.get('siteSettings');
+        if (!existing || !existing.length) { alert('No siteSettings entry found'); return; }
+        const id = existing[0]._id;
+        const e = await CF.mgmt('GET', '/entries/' + id);
+        const merged = { ...e.fields };
+        Object.entries(fields).forEach(([k,v]) => { merged[k] = { 'en-US': v }; });
+        const r = await fetch(
+          'https://api.contentful.com/spaces/' + CF.cfg().spaceId + '/environments/master/entries/' + id,
+          { method: 'PUT', headers: { Authorization: 'Bearer ' + CF.cfg().mgmtToken,
+            'Content-Type': 'application/vnd.contentful.management.v1+json',
+            'X-Contentful-Version': e.sys.version },
+            body: JSON.stringify({ fields: merged }) }
+        );
+        const updated = await r.json();
+        if (!r.ok) throw new Error(updated.message || 'Update failed');
+        await CF.publishEntry(id, updated.sys.version);
+        const msg = document.getElementById('banner3SaveMsg');
+        if (msg) { msg.style.display = 'inline'; setTimeout(() => msg.style.display = 'none', 3000); }
+      } catch(e) { alert('Save error: ' + e.message); }
+    }
+
+    function loadBanner3(ss, photoList) {
+      const grid = document.getElementById('s3-picker-grid');
+      if (grid && photoList) {
+        grid.innerHTML = '';
+        photoList.forEach(ph => {
+          if (!ph.image) return;
+          const img = document.createElement('img');
+          img.src = ph.image;
+          img.style.cssText = 'width:100%;aspect-ratio:3/2;object-fit:cover;cursor:pointer;border-radius:2px;border:2px solid transparent;transition:border-color 0.15s';
+          img.onclick = () => {
+            document.getElementById('s3-url').value = ph.image;
+            const prev = document.getElementById('s3-preview');
+            if (prev) { prev.src = ph.image; prev.style.display = 'block'; }
+            grid.querySelectorAll('img').forEach(i => i.style.borderColor = 'transparent');
+            img.style.borderColor = 'var(--ink)';
+          };
+          grid.appendChild(img);
+        });
+      }
+      if (!ss) return;
+      const set = (id, v) => { const el = document.getElementById(id); if (el && v != null) el.value = v; };
+      const setN = (id, vid, v) => { set(id, v); const l = document.getElementById(vid); if (l && v != null) l.textContent = v; };
+      if (ss.banner3Url) { set('s3-url', ss.banner3Url); const p = document.getElementById('s3-preview'); if (p) { p.src = ss.banner3Url; p.style.display = 'block'; } }
+      setN('s3-pos-x', 'v-s3-x', ss.banner3PosX);
+      setN('s3-pos-y', 'v-s3-y', ss.banner3PosY);
+      set('s3-text', ss.label3Text);
+      set('s3-font', ss.label3Font);
+      setN('s3-size', 'v-s3-size', ss.label3Size);
+      if (ss.label3Color) { set('hex-s3', ss.label3Color); set('cp-s3', ss.label3Color); }
+    }
+
+    /* ── Extra links (link1..link10) ── */
+    let extraLinkCount = 0;
+
+    function addExtraLinkRow(label, url) {
+      const container = document.getElementById('extra-links-container');
+      if (!container || extraLinkCount >= 10) return;
+      extraLinkCount++;
+      const n = extraLinkCount;
+      const row = document.createElement('div');
+      row.id = 'extra-link-row-' + n;
+      row.style.cssText = 'display:grid;grid-template-columns:1fr 1fr auto;gap:0.5rem;margin-bottom:0.5rem;align-items:end';
+      row.innerHTML =
+        '<div><label style="font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3)">Label</label>' +
+        '<input type="text" id="link' + n + 'Label" placeholder="es. ResearchGate" value="' + (label||'') + '" /></div>' +
+        '<div><label style="font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3)">URL</label>' +
+        '<input type="text" id="link' + n + 'Url" placeholder="https://..." value="' + (url||'') + '" /></div>' +
+        '<button class="btn" onclick="removeExtraLink(' + n + ')" style="height:36px;align-self:end">&times;</button>';
+      container.appendChild(row);
+    }
+
+    function removeExtraLink(n) {
+      const row = document.getElementById('extra-link-row-' + n);
+      if (row) row.remove();
+    }
+
+    function loadExtraLinks(ss) {
+      const container = document.getElementById('extra-links-container');
+      if (!container) return;
+      container.innerHTML = '';
+      extraLinkCount = 0;
+      for (let i = 1; i <= 10; i++) {
+        if (ss['link' + i + 'Label'] && ss['link' + i + 'Url']) {
+          addExtraLinkRow(ss['link' + i + 'Label'], ss['link' + i + 'Url']);
+        }
+      }
+    }
+
+    function getExtraLinksFields() {
+      const fields = {};
+      for (let i = 1; i <= 10; i++) {
+        const lbl = document.getElementById('link' + i + 'Label');
+        const url = document.getElementById('link' + i + 'Url');
+        fields['link' + i + 'Label'] = lbl ? lbl.value.trim() : '';
+        fields['link' + i + 'Url']   = url ? url.value.trim() : '';
+      }
+      return fields;
+    }
+
+  </script>
+</body>
+</html>
