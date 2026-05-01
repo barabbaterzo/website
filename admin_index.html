@@ -1184,36 +1184,45 @@
 
   <!-- ═══ ELSEWHERE PANEL ═══ -->
   <div class="admin-panel" id="panel-elsewhere">
-    <!-- Banner 3 — Elsewhere -->
-    <p class="section-title" style="margin-bottom:1rem">Banner 3 &mdash; Elsewhere</p>
-    <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1.8rem">
 
-      <div style="margin-bottom:0.8rem">
-        <label style="display:block;margin-bottom:0.4rem">Immagine</label>
-        <img id="s3-preview" src="" alt="" style="width:100%;max-height:120px;object-fit:cover;border:1px solid var(--rule);border-radius:3px;display:none;margin-bottom:0.4rem" />
-        <p style="font-size:0.6rem;color:var(--ink3);margin-bottom:0.4rem">Scegli dalle foto caricate:</p>
-        <div id="s3-picker-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:4px;max-height:160px;overflow-y:auto;border:1px solid var(--rule);border-radius:3px;padding:4px"></div>
-        <input type="hidden" id="s3-url" value="" />
+      <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1rem">
+        <p style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem">Pannello 3 &mdash; Elsewhere (banner homepage)</p>
+
+        <div style="margin-bottom:0.8rem">
+          <label style="display:block;margin-bottom:0.4rem">Immagine selezionata</label>
+          <div id="s3-crop-tool" style="position:relative;width:100%;aspect-ratio:4 / 1;background:#111;border:1px solid var(--rule);border-radius:3px;overflow:hidden;cursor:crosshair;margin-bottom:0.4rem;user-select:none">
+            <img id="s3-preview" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 38%;display:none;pointer-events:none" />
+            <div id="s3-crop-cross" style="position:absolute;transform:translate(-50%,-50%);pointer-events:none;left:50%;top:38%">
+              <div style="position:absolute;top:50%;left:-12px;width:24px;height:1px;background:rgba(255,255,255,0.9)"></div>
+              <div style="position:absolute;left:50%;top:-12px;width:1px;height:24px;background:rgba(255,255,255,0.9)"></div>
+              <div style="position:absolute;top:-5px;left:-5px;width:10px;height:10px;border:1.5px solid rgba(255,255,255,0.9);border-radius:50%"></div>
+            </div>
+          </div>
+          <p style="font-size:0.6rem;color:var(--ink3);margin-bottom:0.4rem">Scegli dalle foto caricate:</p>
+          <div id="s3-picker-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:4px;max-height:160px;overflow-y:auto;border:1px solid var(--rule);border-radius:3px;padding:4px"></div>
+          <input type="hidden" id="s3-url" value="" />
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem">
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s3-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s3-pos-x" oninput="updateLayoutSPreview('s3')" style="width:100%" /></div>
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s3-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s3-pos-y" oninput="updateLayoutSPreview('s3')" style="width:100%" /></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.1fr 0.9fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
+          <div><label>Font etichetta</label><select id="s3-font" style="width:100%;font-size:0.62rem"><option value="">Default</option><option>EB Garamond</option><option>Cormorant Garant</option><option>Playfair Display</option><option>Spectral</option><option>Libre Baskerville</option><option>Inter</option><option>Lato</option><option>DM Mono</option></select></div>
+          <div><label>Peso</label><select id="s3-weight" style="width:100%;font-size:0.62rem"><option value="">Default</option><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option></select></div>
+          <div><label>Colore etichetta</label><div style="display:flex;gap:4px"><input type="color" id="cp-s3" value="#ffffff" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule)" oninput="document.getElementById('hex-s3').value=this.value" /><input type="text" id="hex-s3" value="#ffffff" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value))document.getElementById('cp-s3').value=this.value" /></div></div>
+          <div><label>Dimensione <span id="v-s3-size">100</span>%</label><input type="range" min="60" max="200" value="100" id="s3-size" oninput="document.getElementById('v-s3-size').textContent=this.value" style="width:100%" /></div>
+        </div>
+        <div class="form-group"><label>Testo etichetta</label><input type="text" id="s3-text" value="Elsewhere" /></div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem">
-        <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s3-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s3-pos-x" oninput="document.getElementById('v-s3-x').textContent=this.value" style="width:100%" /></div>
-        <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s3-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s3-pos-y" oninput="document.getElementById('v-s3-y').textContent=this.value" style="width:100%" /></div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
-        <div><label>Font etichetta</label><select id="s3-font" style="width:100%;font-size:0.62rem"><option value="">Default</option><option>EB Garamond</option><option>Cormorant Garant</option><option>Playfair Display</option><option>Spectral</option><option>Libre Baskerville</option><option>Inter</option><option>Lato</option><option>DM Mono</option></select></div>
-        <div><label>Colore etichetta</label><div style="display:flex;gap:4px"><input type="color" id="cp-s3" value="#ffffff" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule)" oninput="document.getElementById('hex-s3').value=this.value" /><input type="text" id="hex-s3" value="#ffffff" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value))document.getElementById('cp-s3').value=this.value" /></div></div>
-        <div><label>Dimensione <span id="v-s3-size">100</span>%</label><input type="range" min="60" max="200" value="100" id="s3-size" oninput="document.getElementById('v-s3-size').textContent=this.value" style="width:100%" /></div>
-      </div>
-      <div class="form-group" style="margin-bottom:0.5rem"><label>Testo etichetta</label><input type="text" id="s3-text" value="Elsewhere" /></div>
-      <div class="form-actions" style="margin-top:1rem">
+      <div style="margin-top:1rem;margin-bottom:2rem">
         <button class="btn primary" onclick="saveBanner3()">Save banner 3 &rarr;</button>
-        <span id="banner3SaveMsg" style="display:none;margin-left:1rem;font-size:0.62rem;color:var(--green)">Saved &check;</span>
+        <span id="s3-save-msg" style="display:none;margin-left:1rem;font-size:0.6rem;color:var(--green)">Saved ✓</span>
       </div>
-    </div>
 
-    <hr style="border:none;border-top:0.5px solid var(--rule);margin:0 0 1.8rem">
+      <hr style="border:none;border-top:0.5px solid var(--rule);margin-bottom:1.8rem">
 
     <p class="section-title">Elsewhere, ORCID & contact colors</p>
     <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-bottom:1.8rem">
@@ -2437,7 +2446,6 @@
 
     /* ── Elsewhere ── */
     async function loadElsewhere() {
-      const _photoList = await CF.get('photo').catch(() => []);
       if (!CF.hasReadAccess()) return;
       try {
         const settings = await CF.get('siteSettings');
@@ -2465,6 +2473,45 @@
         if (contactPick && /^#[0-9a-fA-F]{6}$/.test(contactColor)) contactPick.value = contactColor;
         if (elsewhereHex) elsewhereHex.value = elsewhereColor;
         if (elsewherePick && /^#[0-9a-fA-F]{6}$/.test(elsewhereColor)) elsewherePick.value = elsewhereColor;
+        /* Banner 3 */
+        const photoList3 = await CF.get('photo').catch(()=>[]);
+        const grid3 = document.getElementById('s3-picker-grid');
+        if (grid3 && photoList3) {
+          grid3.innerHTML = '';
+          photoList3.forEach(ph => {
+            if (!ph.image) return;
+            const img = document.createElement('img');
+            img.src = ph.image; img.alt = ph.title||'';
+            img.style.cssText = 'width:100%;aspect-ratio:3/2;object-fit:cover;cursor:pointer;border-radius:2px;border:2px solid transparent;transition:border-color 0.15s';
+            img.onclick = () => {
+              document.getElementById('s3-url').value = ph.image;
+              const prev = document.getElementById('s3-preview');
+              if (prev) { prev.src = ph.image; prev.style.display='block'; updateLayoutSPreview('s3'); }
+              grid3.querySelectorAll('img').forEach(i => i.style.borderColor='transparent');
+              img.style.borderColor = 'var(--ink)';
+            };
+            grid3.appendChild(img);
+          });
+        }
+        bindLayoutSCropDrag('s3');
+        const b3u = s.banner3Url || s.banner3url || '';
+        const b3x = s.banner3PosX ?? s.banner3posX ?? 50;
+        const b3y = s.banner3PosY ?? s.banner3posY ?? 38;
+        const l3t = s.label3Text || s.label3text || '';
+        const l3f = s.label3Font || s.label3font || '';
+        const l3w = s.label3Weight ?? s.label3weight ?? '';
+        const l3c = s.label3Color || s.label3color || '';
+        const l3s = s.label3Size ?? s.label3size ?? 100;
+        if (b3u) { const el=document.getElementById('s3-url'); if(el) el.value=b3u; const p=document.getElementById('s3-preview'); if(p){p.src=b3u;p.style.display='block';} }
+        const _setN3=(id,vid,v)=>{const el=document.getElementById(id);if(el&&v!=null)el.value=v;const l=document.getElementById(vid);if(l&&v!=null)l.textContent=v;};
+        _setN3('s3-pos-x','v-s3-x',b3x); _setN3('s3-pos-y','v-s3-y',b3y);
+        _setN3('s3-size','v-s3-size',l3s);
+        const _set3=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null)el.value=v;};
+        _set3('s3-text',l3t); _set3('s3-font',l3f); _set3('s3-weight',l3w);
+        if(l3c){_set3('hex-s3',l3c);_set3('cp-s3',l3c);}
+        updateLayoutSPreview('s3');
+        /* Extra links */
+        loadExtraLinks(s);
       } catch (e) { console.warn('loadElsewhere', e); }
     }
 
@@ -2482,6 +2529,7 @@
           instagramUrl: document.getElementById('else-instagram').value.trim(),
           contactFormTextColor: document.getElementById('hex-contact-form-text').value.trim(),
           elsewhereLinkColor: document.getElementById('hex-elsewhere-links').value.trim(),
+          ...getExtraLinksFields(),
         };
         await upsertMainEntry('siteSettings', payload);
         const msg = document.getElementById('elsewhereSaveMsg');
@@ -2736,67 +2784,24 @@
 
     /* ── Banner 3 (Elsewhere) ── */
     async function saveBanner3() {
-      if (!CF.hasWriteAccess()) { alert('Connect Contentful first'); return; }
+      if (!CF.hasWriteAccess()) { alert('Connect Contentful first and add the Management Token'); return; }
       try {
+        const label3FontValue = document.getElementById('s3-font')?.value || '';
+        const label3WeightValue = parseInt(document.getElementById('s3-weight')?.value) || 0;
         const fields = {
-          banner3Url:  document.getElementById('s3-url')?.value?.trim() || '',
-          banner3PosX: parseInt(document.getElementById('s3-pos-x')?.value) || 50,
-          banner3PosY: parseInt(document.getElementById('s3-pos-y')?.value) || 38,
-          label3Text:  document.getElementById('s3-text')?.value?.trim() || 'Elsewhere',
-          label3Font:  document.getElementById('s3-font')?.value || '',
-          label3Color: document.getElementById('hex-s3')?.value?.trim() || '#ffffff',
-          label3Size:  parseInt(document.getElementById('s3-size')?.value) || 100,
+          banner3Url:   document.getElementById('s3-url')?.value?.trim() || '',
+          banner3PosX:  parseInt(document.getElementById('s3-pos-x')?.value) || 50,
+          banner3PosY:  parseInt(document.getElementById('s3-pos-y')?.value) || 38,
+          label3Text:   document.getElementById('s3-text')?.value?.trim() || 'Elsewhere',
+          label3Font:   label3FontValue,
+          label3Color:  document.getElementById('hex-s3')?.value?.trim() || '#ffffff',
+          label3Size:   parseInt(document.getElementById('s3-size')?.value) || 100,
+          label3Weight: label3WeightValue,
         };
-        const existing = await CF.get('siteSettings');
-        if (!existing || !existing.length) { alert('No siteSettings entry found'); return; }
-        const id = existing[0]._id;
-        const e = await CF.mgmt('GET', '/entries/' + id);
-        const merged = { ...e.fields };
-        Object.entries(fields).forEach(([k,v]) => { merged[k] = { 'en-US': v }; });
-        const r = await fetch(
-          'https://api.contentful.com/spaces/' + CF.cfg().spaceId + '/environments/master/entries/' + id,
-          { method: 'PUT', headers: { Authorization: 'Bearer ' + CF.cfg().mgmtToken,
-            'Content-Type': 'application/vnd.contentful.management.v1+json',
-            'X-Contentful-Version': e.sys.version },
-            body: JSON.stringify({ fields: merged }) }
-        );
-        const updated = await r.json();
-        if (!r.ok) throw new Error(updated.message || 'Update failed');
-        await CF.publishEntry(id, updated.sys.version);
-        const msg = document.getElementById('banner3SaveMsg');
-        if (msg) { msg.style.display = 'inline'; setTimeout(() => msg.style.display = 'none', 3000); }
-      } catch(e) { alert('Save error: ' + e.message); }
-    }
-
-    function loadBanner3(ss, photoList) {
-      const grid = document.getElementById('s3-picker-grid');
-      if (grid && photoList) {
-        grid.innerHTML = '';
-        photoList.forEach(ph => {
-          if (!ph.image) return;
-          const img = document.createElement('img');
-          img.src = ph.image;
-          img.style.cssText = 'width:100%;aspect-ratio:3/2;object-fit:cover;cursor:pointer;border-radius:2px;border:2px solid transparent;transition:border-color 0.15s';
-          img.onclick = () => {
-            document.getElementById('s3-url').value = ph.image;
-            const prev = document.getElementById('s3-preview');
-            if (prev) { prev.src = ph.image; prev.style.display = 'block'; }
-            grid.querySelectorAll('img').forEach(i => i.style.borderColor = 'transparent');
-            img.style.borderColor = 'var(--ink)';
-          };
-          grid.appendChild(img);
-        });
-      }
-      if (!ss) return;
-      const set = (id, v) => { const el = document.getElementById(id); if (el && v != null) el.value = v; };
-      const setN = (id, vid, v) => { set(id, v); const l = document.getElementById(vid); if (l && v != null) l.textContent = v; };
-      if (ss.banner3Url) { set('s3-url', ss.banner3Url); const p = document.getElementById('s3-preview'); if (p) { p.src = ss.banner3Url; p.style.display = 'block'; } }
-      setN('s3-pos-x', 'v-s3-x', ss.banner3PosX);
-      setN('s3-pos-y', 'v-s3-y', ss.banner3PosY);
-      set('s3-text', ss.label3Text);
-      set('s3-font', ss.label3Font);
-      setN('s3-size', 'v-s3-size', ss.label3Size);
-      if (ss.label3Color) { set('hex-s3', ss.label3Color); set('cp-s3', ss.label3Color); }
+        await upsertMainEntry('siteSettings', { key: 'main', ...fields });
+        const msg = document.getElementById('s3-save-msg');
+        if (msg) { msg.style.display='inline'; setTimeout(()=>msg.style.display='none',3000); }
+      } catch(e) { alert('Save error: '+e.message); }
     }
 
     /* ── Extra links (link1..link10) ── */
@@ -2824,25 +2829,23 @@
       if (row) row.remove();
     }
 
-    function loadExtraLinks(ss) {
+    function loadExtraLinks(s) {
       const container = document.getElementById('extra-links-container');
       if (!container) return;
-      container.innerHTML = '';
-      extraLinkCount = 0;
+      container.innerHTML = ''; extraLinkCount = 0;
       for (let i = 1; i <= 10; i++) {
-        if (ss['link' + i + 'Label'] && ss['link' + i + 'Url']) {
-          addExtraLinkRow(ss['link' + i + 'Label'], ss['link' + i + 'Url']);
-        }
+        if (s['link'+i+'Label'] && s['link'+i+'Url'])
+          addExtraLinkRow(s['link'+i+'Label'], s['link'+i+'Url']);
       }
     }
 
     function getExtraLinksFields() {
       const fields = {};
       for (let i = 1; i <= 10; i++) {
-        const lbl = document.getElementById('link' + i + 'Label');
-        const url = document.getElementById('link' + i + 'Url');
-        fields['link' + i + 'Label'] = lbl ? lbl.value.trim() : '';
-        fields['link' + i + 'Url']   = url ? url.value.trim() : '';
+        const lbl = document.getElementById('link'+i+'Label');
+        const url = document.getElementById('link'+i+'Url');
+        fields['link'+i+'Label'] = lbl ? lbl.value.trim() : '';
+        fields['link'+i+'Url']   = url ? url.value.trim() : '';
       }
       return fields;
     }
