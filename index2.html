@@ -998,14 +998,24 @@
           if (label2Size)  root.style.setProperty('--sz-label-s2', label2Size / 100);
           if (label1Text) { const el = document.getElementById('labelS1'); if (el) el.textContent = label1Text; }
           if (label2Text) { const el = document.getElementById('labelS2'); if (el) el.textContent = label2Text; }
-          const elsewhereLinks = [
-            ['Academia', ss.academiaUrl],
-            ['PhilPeople', ss.philpeopleUrl],
-            ['ResearchGate', ss.researchGateUrl],
-            ['Google Scholar', ss.googleScholarUrl],
-            ['ORCID', ss.orcidUrl],
-            ['Instagram', ss.instagramUrl],
-          ].filter(([,url]) => !!url);
+          const elsewhereLinks = [];
+          const elsewhereCfg = Array.isArray(ss.elsewhereLinks)
+            ? { items: ss.elsewhereLinks }
+            : (ss.elsewhereLinks && typeof ss.elsewhereLinks === 'object' ? ss.elsewhereLinks : {});
+          const objectLinks = Array.isArray(elsewhereCfg.items) ? elsewhereCfg.items : [];
+          if (objectLinks.length) {
+            objectLinks.forEach(item => { if (item && item.label && item.url) elsewhereLinks.push([item.label, item.url]); });
+          }
+          if (!elsewhereLinks.length) {
+            elsewhereLinks.push(...[
+              ['Academia', ss.academiaUrl],
+              ['PhilPeople', ss.philpeopleUrl],
+              ['ResearchGate', ss.researchGateUrl],
+              ['Google Scholar', ss.googleScholarUrl],
+              ['ORCID', ss.orcidUrl],
+              ['Instagram', ss.instagramUrl],
+            ].filter(([,url]) => !!url));
+          }
           const elsewhereWrap = document.getElementById('contactElsewhere');
           const elsewhereBox = document.getElementById('contactElsewhereLinks');
           if (elsewhereWrap && elsewhereBox) {

@@ -2437,6 +2437,13 @@
     /* ── Elsewhere ── */
     let elsewhereLinksState = [];
 
+
+    function getElsewhereConfig(raw) {
+      if (Array.isArray(raw)) return { items: raw };
+      if (raw && typeof raw === 'object') return raw;
+      return {};
+    }
+
     function normalizeElsewhereLinks(list) {
       return (list || []).map(item => ({
         label: (item && item.label ? String(item.label) : '').trim(),
@@ -2480,7 +2487,7 @@
     }
 
     function addElsewhereLink() {
-      if (elsewhereLinksState.length >= 20) { alert('Maximum 20 links'); return; }
+      if (elsewhereLinksState.length >= 50) { alert('Maximum 50 links'); return; }
       elsewhereLinksState.push({ label: '', url: '', meta: '' });
       renderElsewhereLinksEditor();
     }
@@ -2526,24 +2533,30 @@
           if (label) label.textContent = finalValue;
         };
 
-        setVal('elsewhere-intro-text', s.elsewhereIntroText || '');
-        setVal('elsewhere-intro-font', s.elsewhereIntroFont || '');
-        setVal('elsewhere-intro-weight', s.elsewhereIntroWeight || '');
-        setColor('hex-elsewhere-intro-color', 'cp-elsewhere-intro-color', s.elsewhereIntroColor || '');
-        setRange('elsewhere-intro-size', 'v-elsewhere-intro-size', s.elsewhereIntroSize, 100);
+        const elsewhereCfg = getElsewhereConfig(s.elsewhereLinks);
+        const introStyle = elsewhereCfg.introStyle || {};
+        const linkStyle = elsewhereCfg.linkStyle || {};
+        const metaStyle = elsewhereCfg.metaStyle || {};
 
-        setVal('elsewhere-link-font', s.elsewhereLinkFont || '');
-        setVal('elsewhere-link-weight', s.elsewhereLinkWeight || '');
-        setColor('hex-elsewhere-links', 'cp-elsewhere-links', s.elsewhereLinkColor || '');
-        setRange('elsewhere-link-size', 'v-elsewhere-link-size', s.elsewhereLinkSize, 100);
+        setVal('elsewhere-intro-text', elsewhereCfg.introText || s.elsewhereIntroText || '');
+        setVal('elsewhere-intro-font', introStyle.font || s.elsewhereIntroFont || '');
+        setVal('elsewhere-intro-weight', introStyle.weight || s.elsewhereIntroWeight || '');
+        setColor('hex-elsewhere-intro-color', 'cp-elsewhere-intro-color', introStyle.color || s.elsewhereIntroColor || '');
+        setRange('elsewhere-intro-size', 'v-elsewhere-intro-size', introStyle.size || s.elsewhereIntroSize, 100);
 
-        setVal('elsewhere-meta-font', s.elsewhereMetaFont || '');
-        setVal('elsewhere-meta-weight', s.elsewhereMetaWeight || '');
-        setColor('hex-elsewhere-meta-color', 'cp-elsewhere-meta-color', s.elsewhereMetaColor || '');
-        setRange('elsewhere-meta-size', 'v-elsewhere-meta-size', s.elsewhereMetaSize, 100);
+        setVal('elsewhere-link-font', linkStyle.font || s.elsewhereLinkFont || '');
+        setVal('elsewhere-link-weight', linkStyle.weight || s.elsewhereLinkWeight || '');
+        setColor('hex-elsewhere-links', 'cp-elsewhere-links', linkStyle.color || s.elsewhereLinkColor || '');
+        setRange('elsewhere-link-size', 'v-elsewhere-link-size', linkStyle.size || s.elsewhereLinkSize, 100);
+
+        setVal('elsewhere-meta-font', metaStyle.font || s.elsewhereMetaFont || '');
+        setVal('elsewhere-meta-weight', metaStyle.weight || s.elsewhereMetaWeight || '');
+        setColor('hex-elsewhere-meta-color', 'cp-elsewhere-meta-color', metaStyle.color || s.elsewhereMetaColor || '');
+        setRange('elsewhere-meta-size', 'v-elsewhere-meta-size', metaStyle.size || s.elsewhereMetaSize, 100);
 
         setColor('hex-contact-form-text', 'cp-contact-form-text', s.contactFormTextColor || '');
 
+        const objectLinks = Array.isArray(elsewhereCfg.items) ? elsewhereCfg.items : [];
         const dynamic = [];
         for (let i = 1; i <= 20; i++) {
           const label = s['link' + i + 'Label'];
@@ -2551,7 +2564,9 @@
           const meta = s['link' + i + 'Meta'];
           if (label || url || meta) dynamic.push({ label: label || '', url: url || '', meta: meta || '' });
         }
-        if (dynamic.length) {
+        if (objectLinks.length) {
+          elsewhereLinksState = normalizeElsewhereLinks(objectLinks);
+        } else if (dynamic.length) {
           elsewhereLinksState = normalizeElsewhereLinks(dynamic);
         } else {
           elsewhereLinksState = normalizeElsewhereLinks([
@@ -2570,43 +2585,35 @@
     async function saveElsewhere() {
       if (!CF.hasWriteAccess()) { alert('Connect Contentful first and add the Management Token (Settings tab)'); return; }
       try {
-        const fieldIds = ['academiaUrl','philpeopleUrl','researchGateUrl','googleScholarUrl','orcidUrl','instagramUrl','contactFormTextColor','elsewhereIntroText','elsewhereIntroFont','elsewhereIntroWeight','elsewhereIntroColor','elsewhereIntroSize','elsewhereLinkFont','elsewhereLinkWeight','elsewhereLinkColor','elsewhereLinkSize','elsewhereMetaFont','elsewhereMetaWeight','elsewhereMetaColor','elsewhereMetaSize'];
-        for (let i = 1; i <= 20; i++) fieldIds.push(`link${i}Label`, `link${i}Url`, `link${i}Meta`);
-        await ensureContentTypeFields('siteSettings', fieldIds);
+        await ensureContentTypeFields('siteSettings', ['contactFormTextColor','elsewhereLinks']);
 
-        const links = normalizeElsewhereLinks(elsewhereLinksState).filter(item => item.label && item.url).slice(0, 20);
+        const links = normalizeElsewhereLinks(elsewhereLinksState).filter(item => item.label && item.url).slice(0, 50);
         const payload = {
           key: 'main',
-          academiaUrl: '', philpeopleUrl: '', researchGateUrl: '', googleScholarUrl: '', orcidUrl: '', instagramUrl: '',
           contactFormTextColor: document.getElementById('hex-contact-form-text').value.trim(),
-          elsewhereIntroText: document.getElementById('elsewhere-intro-text').value.trim(),
-          elsewhereIntroFont: document.getElementById('elsewhere-intro-font').value,
-          elsewhereIntroWeight: parseInt(document.getElementById('elsewhere-intro-weight').value) || null,
-          elsewhereIntroColor: document.getElementById('hex-elsewhere-intro-color').value.trim(),
-          elsewhereIntroSize: parseInt(document.getElementById('elsewhere-intro-size').value) || 100,
-          elsewhereLinkFont: document.getElementById('elsewhere-link-font').value,
-          elsewhereLinkWeight: parseInt(document.getElementById('elsewhere-link-weight').value) || null,
-          elsewhereLinkColor: document.getElementById('hex-elsewhere-links').value.trim(),
-          elsewhereLinkSize: parseInt(document.getElementById('elsewhere-link-size').value) || 100,
-          elsewhereMetaFont: document.getElementById('elsewhere-meta-font').value,
-          elsewhereMetaWeight: parseInt(document.getElementById('elsewhere-meta-weight').value) || null,
-          elsewhereMetaColor: document.getElementById('hex-elsewhere-meta-color').value.trim(),
-          elsewhereMetaSize: parseInt(document.getElementById('elsewhere-meta-size').value) || 100,
+          elsewhereLinks: {
+            introText: document.getElementById('elsewhere-intro-text').value.trim(),
+            introStyle: {
+              font: document.getElementById('elsewhere-intro-font').value,
+              weight: parseInt(document.getElementById('elsewhere-intro-weight').value) || null,
+              color: document.getElementById('hex-elsewhere-intro-color').value.trim(),
+              size: parseInt(document.getElementById('elsewhere-intro-size').value) || 100,
+            },
+            linkStyle: {
+              font: document.getElementById('elsewhere-link-font').value,
+              weight: parseInt(document.getElementById('elsewhere-link-weight').value) || null,
+              color: document.getElementById('hex-elsewhere-links').value.trim(),
+              size: parseInt(document.getElementById('elsewhere-link-size').value) || 100,
+            },
+            metaStyle: {
+              font: document.getElementById('elsewhere-meta-font').value,
+              weight: parseInt(document.getElementById('elsewhere-meta-weight').value) || null,
+              color: document.getElementById('hex-elsewhere-meta-color').value.trim(),
+              size: parseInt(document.getElementById('elsewhere-meta-size').value) || 100,
+            },
+            items: links,
+          },
         };
-        for (let i = 1; i <= 20; i++) {
-          const item = links[i - 1] || { label: '', url: '', meta: '' };
-          payload[`link${i}Label`] = item.label;
-          payload[`link${i}Url`] = item.url;
-          payload[`link${i}Meta`] = item.meta;
-        }
-        if (!links.length) {
-          payload.academiaUrl = '';
-          payload.philpeopleUrl = '';
-          payload.researchGateUrl = '';
-          payload.googleScholarUrl = '';
-          payload.orcidUrl = '';
-          payload.instagramUrl = '';
-        }
         await upsertMainEntry('siteSettings', payload);
         elsewhereLinksState = links;
         renderElsewhereLinksEditor();

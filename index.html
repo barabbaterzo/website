@@ -1043,10 +1043,19 @@
           if (label3Size != null) root.style.setProperty('--sz-label-s3', label3Size / 100);
           if (label3Text)   { const el3 = document.getElementById('labelS3'); if (el3) el3.textContent = label3Text; }
           const elsewhereLinks = [];
-          for (let i = 1; i <= 20; i++) {
-            const label = ss['link' + i + 'Label'];
-            const url = ss['link' + i + 'Url'];
-            if (label && url) elsewhereLinks.push([label, url]);
+          const elsewhereCfg = Array.isArray(ss.elsewhereLinks)
+            ? { items: ss.elsewhereLinks }
+            : (ss.elsewhereLinks && typeof ss.elsewhereLinks === 'object' ? ss.elsewhereLinks : {});
+          const objectLinks = Array.isArray(elsewhereCfg.items) ? elsewhereCfg.items : [];
+          if (objectLinks.length) {
+            objectLinks.forEach(item => { if (item && item.label && item.url) elsewhereLinks.push([item.label, item.url]); });
+          }
+          if (!elsewhereLinks.length) {
+            for (let i = 1; i <= 20; i++) {
+              const label = ss['link' + i + 'Label'];
+              const url = ss['link' + i + 'Url'];
+              if (label && url) elsewhereLinks.push([label, url]);
+            }
           }
           if (!elsewhereLinks.length) {
             elsewhereLinks.push(...[

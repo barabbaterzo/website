@@ -266,6 +266,13 @@
       catch { return url; }
     }
 
+
+    function getElsewhereConfig(raw) {
+      if (Array.isArray(raw)) return { items: raw };
+      if (raw && typeof raw === 'object') return raw;
+      return {};
+    }
+
     function setSiteTitle(name) {
       const clean = (name || 'Tomaso Pignocchi').trim();
       const nav = document.getElementById('navName');
@@ -305,32 +312,58 @@
           }
         }
 
+        const elsewhereCfg = ss ? getElsewhereConfig(ss.elsewhereLinks) : {};
+        const introStyle = elsewhereCfg.introStyle || {};
+        const linkStyle = elsewhereCfg.linkStyle || {};
+        const metaStyle = elsewhereCfg.metaStyle || {};
+
         if (ss) {
-          if (ss.elsewhereIntroText) {
+          const introText = elsewhereCfg.introText || ss.elsewhereIntroText || '';
+          if (introText) {
             const intro = document.getElementById('elsewhereIntroText');
-            if (intro) intro.textContent = ss.elsewhereIntroText;
+            if (intro) intro.textContent = introText;
           }
-          if (ss.elsewhereIntroFont) root.style.setProperty('--elsewhere-intro-font', FONT_CSS[ss.elsewhereIntroFont] || ss.elsewhereIntroFont);
-          if (ss.elsewhereIntroWeight) root.style.setProperty('--elsewhere-intro-weight', ss.elsewhereIntroWeight);
-          if (ss.elsewhereIntroColor) root.style.setProperty('--elsewhere-intro-color', ss.elsewhereIntroColor);
-          if (ss.elsewhereIntroSize != null) root.style.setProperty('--elsewhere-intro-size', ss.elsewhereIntroSize / 100);
-          if (ss.elsewhereLinkFont) root.style.setProperty('--elsewhere-link-font', FONT_CSS[ss.elsewhereLinkFont] || ss.elsewhereLinkFont);
-          if (ss.elsewhereLinkWeight) root.style.setProperty('--elsewhere-link-weight', ss.elsewhereLinkWeight);
-          if (ss.elsewhereLinkColor) root.style.setProperty('--elsewhere-link-color', ss.elsewhereLinkColor);
-          if (ss.elsewhereLinkSize != null) root.style.setProperty('--elsewhere-link-size', ss.elsewhereLinkSize / 100);
-          if (ss.elsewhereMetaFont) root.style.setProperty('--elsewhere-meta-font', FONT_CSS[ss.elsewhereMetaFont] || ss.elsewhereMetaFont);
-          if (ss.elsewhereMetaWeight) root.style.setProperty('--elsewhere-meta-weight', ss.elsewhereMetaWeight);
-          if (ss.elsewhereMetaColor) root.style.setProperty('--elsewhere-meta-color', ss.elsewhereMetaColor);
-          if (ss.elsewhereMetaSize != null) root.style.setProperty('--elsewhere-meta-size', ss.elsewhereMetaSize / 100);
+          const introFont = introStyle.font || ss.elsewhereIntroFont;
+          const introWeight = introStyle.weight || ss.elsewhereIntroWeight;
+          const introColor = introStyle.color || ss.elsewhereIntroColor;
+          const introSize = introStyle.size || ss.elsewhereIntroSize;
+          const eLinkFont = linkStyle.font || ss.elsewhereLinkFont;
+          const eLinkWeight = linkStyle.weight || ss.elsewhereLinkWeight;
+          const eLinkColor = linkStyle.color || ss.elsewhereLinkColor;
+          const eLinkSize = linkStyle.size || ss.elsewhereLinkSize;
+          const eMetaFont = metaStyle.font || ss.elsewhereMetaFont;
+          const eMetaWeight = metaStyle.weight || ss.elsewhereMetaWeight;
+          const eMetaColor = metaStyle.color || ss.elsewhereMetaColor;
+          const eMetaSize = metaStyle.size || ss.elsewhereMetaSize;
+          if (introFont) root.style.setProperty('--elsewhere-intro-font', FONT_CSS[introFont] || introFont);
+          if (introWeight) root.style.setProperty('--elsewhere-intro-weight', introWeight);
+          if (introColor) root.style.setProperty('--elsewhere-intro-color', introColor);
+          if (introSize != null) root.style.setProperty('--elsewhere-intro-size', introSize / 100);
+          if (eLinkFont) root.style.setProperty('--elsewhere-link-font', FONT_CSS[eLinkFont] || eLinkFont);
+          if (eLinkWeight) root.style.setProperty('--elsewhere-link-weight', eLinkWeight);
+          if (eLinkColor) root.style.setProperty('--elsewhere-link-color', eLinkColor);
+          if (eLinkSize != null) root.style.setProperty('--elsewhere-link-size', eLinkSize / 100);
+          if (eMetaFont) root.style.setProperty('--elsewhere-meta-font', FONT_CSS[eMetaFont] || eMetaFont);
+          if (eMetaWeight) root.style.setProperty('--elsewhere-meta-weight', eMetaWeight);
+          if (eMetaColor) root.style.setProperty('--elsewhere-meta-color', eMetaColor);
+          if (eMetaSize != null) root.style.setProperty('--elsewhere-meta-size', eMetaSize / 100);
         }
 
         const links = [];
         if (ss) {
-          for (let i = 1; i <= 20; i++) {
-            const lbl = ss['link' + i + 'Label'];
-            const url = ss['link' + i + 'Url'];
-            const sub = ss['link' + i + 'Meta'];
-            if (lbl && url) links.push({ label: lbl, url: url, meta: sub || '' });
+          const objectLinks = Array.isArray(elsewhereCfg.items) ? elsewhereCfg.items : [];
+          if (objectLinks.length) {
+            objectLinks.forEach(item => {
+              if (item && item.label && item.url) links.push({ label: item.label, url: item.url, meta: item.meta || '' });
+            });
+          }
+          if (!links.length) {
+            for (let i = 1; i <= 20; i++) {
+              const lbl = ss['link' + i + 'Label'];
+              const url = ss['link' + i + 'Url'];
+              const sub = ss['link' + i + 'Meta'];
+              if (lbl && url) links.push({ label: lbl, url: url, meta: sub || '' });
+            }
           }
           if (!links.length) {
             ['academiaUrl','philpeopleUrl','researchGateUrl','googleScholarUrl','orcidUrl','instagramUrl']
