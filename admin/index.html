@@ -1174,6 +1174,38 @@
         <div class="form-group"><label>Testo etichetta</label><input type="text" id="s2-text" value="Photography" /></div>
       </div>
 
+      <div style="background:white;border:1px solid var(--rule);border-radius:4px;padding:1.4rem;margin-top:1rem">
+        <p style="font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem">Pannello 3 &mdash; Elsewhere</p>
+
+        <div style="margin-bottom:0.8rem">
+          <label style="display:block;margin-bottom:0.4rem">Immagine selezionata</label>
+          <div id="s3-crop-tool" style="position:relative;width:100%;aspect-ratio:4 / 1;background:#111;border:1px solid var(--rule);border-radius:3px;overflow:hidden;cursor:crosshair;margin-bottom:0.4rem;user-select:none">
+            <img id="s3-preview" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 38%;display:none;pointer-events:none" />
+            <div id="s3-crop-cross" style="position:absolute;transform:translate(-50%,-50%);pointer-events:none;left:50%;top:38%">
+              <div style="position:absolute;top:50%;left:-12px;width:24px;height:1px;background:rgba(255,255,255,0.9)"></div>
+              <div style="position:absolute;left:50%;top:-12px;width:1px;height:24px;background:rgba(255,255,255,0.9)"></div>
+              <div style="position:absolute;top:-5px;left:-5px;width:10px;height:10px;border:1.5px solid rgba(255,255,255,0.9);border-radius:50%"></div>
+            </div>
+          </div>
+          <p style="font-size:0.6rem;color:var(--ink3);margin-bottom:0.4rem">Scegli dalle foto caricate:</p>
+          <div id="s3-picker-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:4px;max-height:160px;overflow-y:auto;border:1px solid var(--rule);border-radius:3px;padding:4px"></div>
+          <input type="hidden" id="s3-url" value="" />
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:0.8rem">
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop X <span id="v-s3-x">50</span>%</label><input type="range" min="0" max="100" value="50" id="s3-pos-x" oninput="updateLayoutSPreview('s3')" style="width:100%" /></div>
+          <div><label style="display:flex;justify-content:space-between;margin-bottom:3px">Crop Y <span id="v-s3-y">38</span>%</label><input type="range" min="0" max="100" value="38" id="s3-pos-y" oninput="updateLayoutSPreview('s3')" style="width:100%" /></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.1fr 0.9fr 1fr 1fr;gap:0.8rem;margin-bottom:0.5rem">
+          <div><label>Font etichetta</label><select id="s3-font" style="width:100%;font-size:0.62rem"><option value="">Default</option><option>EB Garamond</option><option>Cormorant Garant</option><option>Playfair Display</option><option>Spectral</option><option>Libre Baskerville</option><option>Inter</option><option>Lato</option><option>DM Mono</option></select></div>
+          <div><label>Peso</label><select id="s3-weight" style="width:100%;font-size:0.62rem"><option value="">Default</option><option value="100">100</option><option value="200">200</option><option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700">700</option><option value="800">800</option><option value="900">900</option></select></div>
+          <div><label>Colore etichetta</label><div style="display:flex;gap:4px"><input type="color" id="cp-s3" value="#ffffff" style="width:32px;height:28px;padding:2px;border:1px solid var(--rule)" oninput="document.getElementById('hex-s3').value=this.value" /><input type="text" id="hex-s3" value="#ffffff" maxlength="7" style="font-family:'DM Mono',monospace;font-size:0.62rem;width:72px" oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value))document.getElementById('cp-s3').value=this.value" /></div></div>
+          <div><label>Dimensione <span id="v-s3-size">100</span>%</label><input type="range" min="60" max="200" value="100" id="s3-size" oninput="document.getElementById('v-s3-size').textContent=this.value" style="width:100%" /></div>
+        </div>
+        <div class="form-group"><label>Testo etichetta</label><input type="text" id="s3-text" value="Elsewhere" /></div>
+      </div>
+
       <div style="margin-top:1rem">
         <button class="btn primary" onclick="saveLayoutS()">Save layout S &rarr;</button>
         <span id="s-save-msg" style="display:none;margin-left:1rem;font-size:0.62rem;color:#4a7c59">Saved &check;</span>
@@ -2552,10 +2584,13 @@
       const c = CF.cfg();
       setLayout('s');
       try {
+        await ensureContentTypeFields('siteSettings', ['banner3Url','banner3PosX','banner3PosY','label3Text','label3Font','label3Weight','label3Color','label3Size']);
         const label1FontValue = document.getElementById('s1-font')?.value || '';
         const label1WeightValue = parseInt(document.getElementById('s1-weight')?.value) || 0;
         const label2FontValue = document.getElementById('s2-font')?.value || '';
         const label2WeightValue = parseInt(document.getElementById('s2-weight')?.value) || 0;
+        const label3FontValue = document.getElementById('s3-font')?.value || '';
+        const label3WeightValue = parseInt(document.getElementById('s3-weight')?.value) || 0;
         const fields = {
           banner1PosX: parseInt(document.getElementById('s1-pos-x')?.value)||50,
           banner1PosY: parseInt(document.getElementById('s1-pos-y')?.value)||38,
@@ -2563,6 +2598,9 @@
           banner2Url:  document.getElementById('s2-url')?.value?.trim()||'',
           banner2PosX: parseInt(document.getElementById('s2-pos-x')?.value)||50,
           banner2PosY: parseInt(document.getElementById('s2-pos-y')?.value)||38,
+          banner3Url:  document.getElementById('s3-url')?.value?.trim()||'',
+          banner3PosX: parseInt(document.getElementById('s3-pos-x')?.value)||50,
+          banner3PosY: parseInt(document.getElementById('s3-pos-y')?.value)||38,
           label1Text:  document.getElementById('s1-text')?.value?.trim()||'Philosophy',
           label1Font:  label1FontValue,
           label1Color: document.getElementById('hex-s1')?.value?.trim()||'#ffffff',
@@ -2573,6 +2611,11 @@
           label2Color: document.getElementById('hex-s2')?.value?.trim()||'#ffffff',
           label2Size:  parseInt(document.getElementById('s2-size')?.value)||100,
           label2Weight: label2WeightValue,
+          label3Text:  document.getElementById('s3-text')?.value?.trim()||'Elsewhere',
+          label3Font:  label3FontValue,
+          label3Color: document.getElementById('hex-s3')?.value?.trim()||'#ffffff',
+          label3Size:  parseInt(document.getElementById('s3-size')?.value)||100,
+          label3Weight: label3WeightValue,
         };
         await upsertMainEntry('siteSettings', { key: 'main', ...fields });
 
@@ -2635,12 +2678,13 @@
     }
     bindLayoutSCropDrag('s1');
     bindLayoutSCropDrag('s2');
+    bindLayoutSCropDrag('s3');
     async function loadLayoutS() {
       if (!CF.hasReadAccess()) return;
       try {
         const [ss, photoList] = await Promise.all([CF.get('siteSettings'), CF.get('photo')]);
         /* Populate photo picker grids */
-        ['s1','s2'].forEach(p => {
+        ['s1','s2','s3'].forEach(p => {
           const grid = document.getElementById(p+'-picker-grid');
           if (!grid || !photoList) return;
           grid.innerHTML = '';
@@ -2661,16 +2705,20 @@
         });
         bindLayoutSCropDrag('s1');
         bindLayoutSCropDrag('s2');
+        bindLayoutSCropDrag('s3');
         if (!ss||!ss.length) return;
         const s = ss.find(item => item && item.key === 'main') || ss[0];
         const set=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null)el.value=v;};
         const setN=(id,vid,v)=>{set(id,v);const l=document.getElementById(vid);if(l&&v!=null)l.textContent=v;};
         const banner1Url = s.banner1Url || s.banner1url;
         const banner2Url = s.banner2Url || s.banner2url;
+        const banner3Url = s.banner3Url || s.banner3url;
         const banner1PosX = s.banner1PosX ?? s.banner1posX;
         const banner1PosY = s.banner1PosY ?? s.banner1posY;
         const banner2PosX = s.banner2PosX ?? s.banner2posX;
         const banner2PosY = s.banner2PosY ?? s.banner2posY;
+        const banner3PosX = s.banner3PosX ?? s.banner3posX;
+        const banner3PosY = s.banner3PosY ?? s.banner3posY;
         const label1Text = s.label1Text || s.label1text;
         const label1Font = s.label1Font || s.label1font;
         const label1Weight = s.label1Weight ?? s.label1weight;
@@ -2681,17 +2729,27 @@
         const label2Weight = s.label2Weight ?? s.label2weight;
         const label2Color = s.label2Color || s.label2color;
         const label2Size = s.label2Size ?? s.label2size;
+        const label3Text = s.label3Text || s.label3text;
+        const label3Font = s.label3Font || s.label3font;
+        const label3Weight = s.label3Weight ?? s.label3weight;
+        const label3Color = s.label3Color || s.label3color;
+        const label3Size = s.label3Size ?? s.label3size;
         if (banner1Url) { set('s1-url',banner1Url); const p=document.getElementById('s1-preview'); if(p){p.src=banner1Url;p.style.display='block';} }
         if (banner2Url) { set('s2-url',banner2Url); const p=document.getElementById('s2-preview'); if(p){p.src=banner2Url;p.style.display='block';} }
+        if (banner3Url) { set('s3-url',banner3Url); const p=document.getElementById('s3-preview'); if(p){p.src=banner3Url;p.style.display='block';} }
         setN('s1-pos-x','v-s1-x',banner1PosX); setN('s1-pos-y','v-s1-y',banner1PosY);
         setN('s2-pos-x','v-s2-x',banner2PosX); setN('s2-pos-y','v-s2-y',banner2PosY);
+        setN('s3-pos-x','v-s3-x',banner3PosX); setN('s3-pos-y','v-s3-y',banner3PosY);
         set('s1-text',label1Text); set('s1-font',label1Font); set('s1-weight', label1Weight || '');
         set('s2-text',label2Text); set('s2-font',label2Font); set('s2-weight', label2Weight || '');
-        setN('s1-size','v-s1-size',label1Size); setN('s2-size','v-s2-size',label2Size);
+        set('s3-text',label3Text); set('s3-font',label3Font); set('s3-weight', label3Weight || '');
+        setN('s1-size','v-s1-size',label1Size); setN('s2-size','v-s2-size',label2Size); setN('s3-size','v-s3-size',label3Size);
         if(label1Color){set('hex-s1',label1Color);set('cp-s1',label1Color);}
         if(label2Color){set('hex-s2',label2Color);set('cp-s2',label2Color);}
+        if(label3Color){set('hex-s3',label3Color);set('cp-s3',label3Color);}
         updateLayoutSPreview('s1');
         updateLayoutSPreview('s2');
+        updateLayoutSPreview('s3');
       } catch(e) { console.warn('loadLayoutS',e); }
     }
 

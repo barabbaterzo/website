@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any" />
+  <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
+  <link rel="shortcut icon" href="/favicon-48.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
   <title>Tomaso Pignocchi &mdash; Elsewhere</title>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=New+Computer+Modern:ital,wght@0,400;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Cormorant+Garant:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Source+Sans+3:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet" />
   <style>
@@ -25,6 +29,8 @@
       --lh-bio:1.78; --lh-pubs:1.45;
       --gutter:clamp(1.5rem,4vw,3.2rem);
       --max-w:1200px;
+      --elsewhere-link-color:var(--page-ink);
+      --elsewhere-meta-color:var(--page-ink3);
     }
     html{scroll-behavior:smooth}
     body{background:var(--page-bg);color:var(--page-ink);font-family:var(--font-primary)}
@@ -39,18 +45,18 @@
       background:var(--page-bg);border-bottom:none;
       height:54px;
     }
-    .site-nav .wrap{height:100%;display:flex;align-items:center;justify-content:space-between}
+    .site-nav .wrap{min-height:54px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;padding-top:0.5rem;padding-bottom:0.5rem}
     .nav-logo{display:flex;align-items:center;text-decoration:none;gap:0.8rem}
-    .logo-mark{height:20px;width:auto;display:block}
-    .nav-site-name{
+    .logo-mark{height:20px;width:auto;display:block;object-fit:contain;flex-shrink:0}
+    .nav-site-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40vw;
       font-family:var(--font-name,var(--font-primary));font-weight:var(--wt-name,var(--wt-primary));
       font-size:calc(1rem * var(--sz-secondary-title,1));color:var(--color-name,var(--page-ink));letter-spacing:-0.01em;
     }
-    .nav-right{display:flex;gap:2rem}
+    .nav-right{display:flex;gap:clamp(0.8rem,2.5vw,2rem);flex-wrap:wrap;align-items:center}
     .nav-right a{
-      font-family:var(--font-secondary);font-weight:300;font-size:0.6rem;
-      letter-spacing:0.22em;text-transform:uppercase;color:var(--page-ink3);
-      text-decoration:none;transition:color 0.2s;
+      font-family:var(--font-secondary);font-weight:300;font-size:clamp(0.48rem,1.2vw,0.6rem);
+      letter-spacing:0.18em;text-transform:uppercase;color:var(--page-ink3);
+      text-decoration:none;transition:color 0.2s;white-space:nowrap;
     }
     .nav-right a:hover{color:var(--page-ink)}
     .nav-right a.active{color:var(--page-ink);border-bottom:0.5px solid var(--page-ink)}
@@ -72,6 +78,8 @@
       .bio-grid{grid-template-columns:1fr}
       .bio-copy p{max-width:none}
       .bio-portrait{justify-self:start;max-width:180px}
+      .nav-right{gap:0.8rem}
+      .nav-right a{font-size:0.5rem;letter-spacing:0.14em}
     }
 
     /* PUBLICATIONS */
@@ -131,11 +139,11 @@
     .link-label {
       font-family: var(--font-primary); font-weight: var(--wt-primary);
       font-size: clamp(1.1rem, 2vw, 1.6rem);
-      color: var(--page-ink); letter-spacing: -0.01em;
+      color: var(--elsewhere-link-color); letter-spacing: -0.01em;
     }
     .link-meta { display: flex; align-items: center; gap: 0.5rem; }
-    .link-url { font-family: var(--font-secondary); font-weight: 300; font-size: 0.58rem; letter-spacing: 0.08em; color: var(--page-ink3); }
-    .link-arrow { color: var(--page-ink3); font-size: 0.75rem; }
+    .link-url { font-family: var(--font-secondary); font-weight: 300; font-size: 0.58rem; letter-spacing: 0.08em; color: var(--elsewhere-meta-color); }
+    .link-arrow { color: var(--elsewhere-meta-color); font-size: 0.75rem; }
     .empty-msg { font-family: var(--font-secondary); font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--page-ink3); padding: 2rem 0; display: block; }
   </style>
 </head>
@@ -147,10 +155,10 @@
         <span class="nav-site-name" id="navName">Tomaso Pignocchi</span>
       </a>
       <nav class="nav-right">
-        <a href="philosophy.html" >Philosophy</a>
+        <a href="philosophy.html">Philosophy</a>
         <a href="photography.html">Photography</a>
+        <a href="elsewhere.html" class="active">Elsewhere</a>
         <a href="index.html#contact">Contact</a>
-              <a href="elsewhere.html" class="active">Elsewhere</a>
       </nav>
     </div>
   </header>
@@ -168,6 +176,19 @@
   <script>
     const CF_SPACE    = 'fejt7dmbrv9e';
     const CF_DELIVERY = 'tOHgPb2AaW4raBzCEnxzs5QhFMnNdyOGJDF3sTKGAgc';
+
+    const FONT_CSS = {
+      'EB Garamond': "'EB Garamond', serif",
+      'Cormorant Garant': "'Cormorant Garant', serif",
+      'Playfair Display': "'Playfair Display', serif",
+      'Spectral': "'Spectral', serif",
+      'Libre Baskerville': "'Libre Baskerville', serif",
+      'Inter': "'Inter', sans-serif",
+      'Lato': "'Lato', sans-serif",
+      'DM Mono': "'DM Mono', monospace",
+      'Source Sans 3': "'Source Sans 3', sans-serif",
+      'New Computer Modern': "'New Computer Modern', serif"
+    };
 
     async function cfGet(contentType, params) {
       const qs = new URLSearchParams({ content_type: contentType, limit: 200, ...(params||{}) });
@@ -194,22 +215,58 @@
       catch { return url; }
     }
 
+    function setSiteTitle(name) {
+      const clean = (name || 'Tomaso Pignocchi').trim();
+      const nav = document.getElementById('navName');
+      if (nav) nav.textContent = clean;
+      const footer = document.getElementById('footerName');
+      if (footer) footer.textContent = '© 2026 ' + clean;
+      document.title = clean + ' — Elsewhere';
+    }
+
     (async function() {
       const ul = document.getElementById('linksList');
       try {
-        const settings = await cfGet('siteSettings');
-        const ss = settings && settings.length ? settings[0] : null;
-        const links = [];
+        setSiteTitle('Tomaso Pignocchi');
+        const [items, settings] = await Promise.all([
+          cfGet('siteContent'),
+          cfGet('siteSettings')
+        ]);
+        const sc = (items && items.find(item => item && item.key === 'main')) || (items && items.length ? items[0] : null);
+        const ss = (settings && settings.find(item => item && item.key === 'main')) || (settings && settings.length ? settings[0] : null);
+        const root = document.documentElement;
 
+        if (ss && ss.siteTitle) setSiteTitle(ss.siteTitle);
+        if (ss && ss.secondaryTitleSize != null) root.style.setProperty('--sz-secondary-title', ss.secondaryTitleSize / 100);
+
+        if (sc) {
+          if (sc.bgColor) {
+            root.style.setProperty('--page-bg', sc.bgColor);
+            document.body.style.background = sc.bgColor;
+          }
+          if (sc.textColor) root.style.setProperty('--page-ink', sc.textColor);
+          if (sc.nameFont) root.style.setProperty('--font-name', FONT_CSS[sc.nameFont] || sc.nameFont);
+          if (sc.nameFontWeight) root.style.setProperty('--wt-name', sc.nameFontWeight);
+          if (sc.nameColor) root.style.setProperty('--color-name', sc.nameColor);
+          if (sc.logoVariant) {
+            const logo = document.querySelector('.logo-mark');
+            if (logo) logo.src = sc.logoVariant === 'light' ? 'assets/asterisco-white.svg' : 'assets/asterisco-black.svg';
+          }
+        }
+
+        if (ss && ss.elsewhereLinkColor) {
+          root.style.setProperty('--elsewhere-link-color', ss.elsewhereLinkColor);
+        }
+
+        const links = [];
         if (ss) {
-          /* Fixed fields */
           ['academiaUrl','philpeopleUrl','researchGateUrl','googleScholarUrl','orcidUrl','instagramUrl']
             .forEach(f => { if (ss[f]) links.push({ label: FIELD_LABELS[f], url: ss[f] }); });
-          /* Extra custom fields link1..link10 */
-          for (let i = 1; i <= 10; i++) {
+          for (let i = 1; i <= 20; i++) {
             const lbl = ss['link' + i + 'Label'];
             const url = ss['link' + i + 'Url'];
-            if (lbl && url) links.push({ label: lbl, url: url });
+            const sub = ss['link' + i + 'Meta'];
+            if (lbl && url) links.push({ label: lbl, url: url, meta: sub || '' });
           }
         }
 
@@ -221,10 +278,9 @@
         ul.innerHTML = links.map(l =>
           '<li><a class="link-item" href="' + l.url + '" target="_blank" rel="noopener noreferrer">' +
           '<span class="link-label">' + l.label + '</span>' +
-          '<span class="link-meta"><span class="link-url">' + urlDisplay(l.url) + '</span>' +
+          '<span class="link-meta"><span class="link-url">' + (l.meta || urlDisplay(l.url)) + '</span>' +
           '<span class="link-arrow">&rarr;</span></span></a></li>'
         ).join('');
-
       } catch(e) {
         ul.innerHTML = '<li><span class="empty-msg">Could not load links.</span></li>';
         console.warn(e);
