@@ -743,7 +743,11 @@
             method="POST"
             id="contactForm"
           >
-            <!-- honeypot anti-spam nascosto -->
+            <!-- honeypot anti-spam: nascosto agli utenti reali, compilato dai bot -->
+            <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden" tabindex="-1">
+              <label for="cf-hp">Leave this field empty</label>
+              <input type="text" id="cf-hp" name="hp" autocomplete="off" tabindex="-1" />
+            </div>
 
             <div class="form-group">
               <label for="cf-name">Name</label>
@@ -1118,12 +1122,15 @@
     if (window.location.hash === '#contact') showTab('contact');
 
     var cf_form = document.getElementById('contactForm');
+    var cf_loadedAt = Date.now();
     if (cf_form) {
       cf_form.addEventListener('submit', function(e) {
         e.preventDefault();
         var btn=document.getElementById('cfSubmit');
         btn.disabled=true; btn.textContent='Sending…';
-        fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(new FormData(cf_form)).toString()})
+        var cf_fd = new FormData(cf_form);
+        cf_fd.set('el', String(Date.now() - cf_loadedAt)); /* anti-spam: ms trascorsi sulla pagina */
+        fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(cf_fd).toString()})
         .then(async function(res){ const data = await res.json().catch(function(){ return {}; }); if(!res.ok || !data.ok) throw new Error(data.error || 'Something went wrong.'); cf_form.style.display='none';document.getElementById('formSuccess').style.display='block'; })
         .catch(function(err){btn.disabled=false;btn.textContent='Send →';alert(err && err.message ? err.message : 'Something went wrong.');});
       });
