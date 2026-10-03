@@ -8,6 +8,12 @@
     "not_found_handling": "none"
   },
   "workers_dev": true,
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "1643f7c4f6ab4d689c8d1ef9ec2dec32"
+    }
+  ],
   "send_email": [
     {
       "name": "CONTACT_EMAIL",

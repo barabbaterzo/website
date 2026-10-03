@@ -32,6 +32,20 @@ const CF = (() => {
     return hasReadAccess();
   }
 
+  /* Image dimensions by asset URL, filled by get() */
+  const assetDims = {};
+  function dims(url) { return assetDims[url] || null; }
+
+  /* Resized image URL via the Contentful Images API (only for Contentful-hosted images) */
+  function img(url, width, quality) {
+    if (!url || !/^https?:\/\/images\.ctfassets\.net\//.test(url)) return url;
+    const u = new URL(url);
+    u.searchParams.set('w', String(width));
+    u.searchParams.set('fm', 'webp');
+    u.searchParams.set('q', String(quality || 80));
+    return u.toString();
+  }
+
   /* ── Delivery API (public read) ── */
   async function get(contentType, params = {}) {
     const c = cfg();
@@ -51,6 +65,9 @@ const CF = (() => {
     const assets = {};
     (data.includes?.Asset || []).forEach(a => {
       assets[a.sys.id] = 'https:' + a.fields.file.url;
+      /* remember image dimensions so pages can lay out photos before they load */
+      const img = a.fields.file.details && a.fields.file.details.image;
+      if (img && img.width && img.height) assetDims[assets[a.sys.id]] = { w: img.width, h: img.height };
     });
     return (data.items || []).map(item => {
       const f = { ...item.fields, _id: item.sys.id };
@@ -360,6 +377,10 @@ const CF = (() => {
           { id: 'contactFormTextColor',  name: 'contactFormTextColor',  type: 'Symbol' },
           { id: 'elsewhereLinkColor',    name: 'elsewhereLinkColor',    type: 'Symbol' },
           { id: 'elsewhereLinks',    name: 'elsewhereLinks',    type: 'Object' },
+          { id: 'pubsLineHeight',    name: 'pubsLineHeight',    type: 'Integer' },
+          { id: 'photoLineHeight',   name: 'photoLineHeight',   type: 'Integer' },
+          { id: 'seemoreFontWeight', name: 'seemoreFontWeight', type: 'Integer' },
+          { id: 'footerFontWeight',  name: 'footerFontWeight',  type: 'Integer' },
         ],
         displayField: 'key'
       },
@@ -474,5 +495,5 @@ const CF = (() => {
     return results;
   }
 
-  return { cfg, saveCfg, hasReadAccess, hasWriteAccess, isConnected, get, mgmt, publishEntry, uploadAsset, createEntry, updateEntry, deleteEntry, createContentTypes };
+  return { cfg, saveCfg, hasReadAccess, hasWriteAccess, isConnected, get, dims, img, mgmt, publishEntry, uploadAsset, createEntry, updateEntry, deleteEntry, createContentTypes };
 })();

@@ -673,8 +673,8 @@
               <input type="range" min="60" max="200" value="100" step="1" id="sz-pubs" oninput="syncSize('pubs')" style="width:100%" />
             </div>
             <div class="ty-field" style="flex:1">
-              <label>Interlinea <span id="v-lh-pubs">178</span>%</label>
-              <input type="range" min="100" max="300" value="178" step="1" id="lh-pubs" oninput="syncSize('pubs-lh')" style="width:100%" />
+              <label>Interlinea <span id="v-lh-pubs">145</span>%</label>
+              <input type="range" min="100" max="300" value="145" step="1" id="lh-pubs" oninput="document.getElementById('v-lh-pubs').textContent=this.value" style="width:100%" />
             </div>
           </div>
         </div>
@@ -848,7 +848,7 @@
             </div>
             <div class="ty-field" style="flex:1">
               <label>Interlinea <span id="v-lh-photo">178</span>%</label>
-              <input type="range" min="100" max="300" value="178" step="1" id="lh-photo" oninput="syncSize('photo-lh')" style="width:100%" />
+              <input type="range" min="100" max="300" value="178" step="1" id="lh-photo" oninput="document.getElementById('v-lh-photo').textContent=this.value" style="width:100%" />
             </div>
           </div>
         </div>
@@ -1592,7 +1592,7 @@
         card.className = 'photo-card';
         const sub = [photo.series, photo.year].filter(Boolean).join(' · ');
         card.innerHTML = `
-          <img src="${photo.image}" alt="${photo.title || ''}" loading="lazy" />
+          <img src="${CF.img(photo.image, 500)}" alt="${photo.title || ''}" loading="lazy" />
           <div class="card-info">
             <p>${photo.title || ''}</p>
             <p>${sub}</p>
@@ -1638,7 +1638,7 @@
         preview.src = url;
         label.textContent = 'Current banner (click photo or upload to change)';
       } else {
-        preview.src = 'https://www.tomasopignocchi.com/wp-content/uploads/2021/12/banner_bike_r_L.jpg';
+        preview.removeAttribute('src');
         label.textContent = 'Using default banner — upload or pick a photo to customise';
       }
     }
@@ -1707,7 +1707,7 @@
           const card = document.createElement('div');
           card.className = 'photo-card';
           card.style.cursor = 'pointer';
-          card.innerHTML = `<img src="${photo.image}" alt="${photo.title||''}" loading="lazy" />
+          card.innerHTML = `<img src="${CF.img(photo.image, 500)}" alt="${photo.title||''}" loading="lazy" />
             <div class="card-info"><p>${photo.title||''}</p></div>`;
           card.addEventListener('click', async () => {
             if (options && typeof options.onSelect === 'function') await options.onSelect(photo);
@@ -1991,6 +1991,35 @@
       if (key === 'bio')    prev.style.fontSize = (0.95 * val) + 'rem';
     }
 
+    /* Line height (pubs, photo intro) and weight (see more, footer) are stored in
+       siteSettings because siteContent is at Contentful's 50-field limit. */
+    const EXTRA_TYPO = [
+      { field: 'pubsLineHeight',    el: 'lh-pubs',    label: 'v-lh-pubs' },
+      { field: 'photoLineHeight',   el: 'lh-photo',   label: 'v-lh-photo' },
+      { field: 'seemoreFontWeight', el: 'wt-seemore' },
+      { field: 'footerFontWeight',  el: 'wt-footer' },
+    ];
+    function loadExtraTypographyToAdmin(ss) {
+      if (!ss) return;
+      EXTRA_TYPO.forEach(({ field, el, label }) => {
+        const v = ss[field];
+        const input = document.getElementById(el);
+        if (!input || !v) return;
+        input.value = String(v);
+        if (label) { const l = document.getElementById(label); if (l) l.textContent = v; }
+      });
+    }
+    async function saveExtraTypographyToSiteSettings() {
+      const ids = EXTRA_TYPO.map(x => x.field);
+      await ensureContentTypeFields('siteSettings', ids);
+      const payload = { key: 'main' };
+      EXTRA_TYPO.forEach(({ field, el }) => {
+        const v = parseInt(document.getElementById(el)?.value, 10);
+        payload[field] = Number.isFinite(v) ? v : 0;
+      });
+      await upsertMainEntry('siteSettings', payload);
+    }
+
     function loadTypographyToAdmin(sc) {
       if (!sc) return;
       /* Load sizes into sliders */
@@ -2120,6 +2149,7 @@
         if (sc.heroPosX !== undefined) { cropX = sc.heroPosX; cropY = sc.heroPosY || 38; updateCrop(); }
         if (sc.heroStyle) setLayout(String(sc.heroStyle).toLowerCase());
         loadTypographyToAdmin({ ...(contentUi || {}), secondaryTitleSize: (ss && ss.secondaryTitleSize) || undefined, logoSize: (ss && ss.logoSize) || (contentUi && contentUi.logoSize) });
+        loadExtraTypographyToAdmin(ss);
         loadColorsToAdmin(contentUi);
         setPhilosophyPortrait((ss && ss.philosophyPortraitUrl) || '', false);
       } catch(e) { console.warn('loadContent error', e); }
@@ -2188,6 +2218,7 @@
         await upsertMainEntry('siteContent', fields);
         await saveTitleAndLogoToSiteSettings(siteTitleValue, logoSizeValue, secondaryTitleSizeValue);
         await savePhilosophyPortraitToSiteSettings(document.getElementById('sc-philo-url')?.value?.trim() || '');
+        await saveExtraTypographyToSiteSettings();
         const msg = document.getElementById('contentSaveMsg');
         msg.style.display = 'block';
         setTimeout(() => msg.style.display = 'none', 2500);
@@ -2830,12 +2861,12 @@
           photoList.forEach(ph => {
             if (!ph.image) return;
             const img = document.createElement('img');
-            img.src = ph.image; img.alt = ph.title||'';
+            img.src = CF.img(ph.image, 400); img.alt = ph.title||''; img.loading = 'lazy';
             img.style.cssText = 'width:100%;aspect-ratio:3/2;object-fit:cover;cursor:pointer;border-radius:2px;border:2px solid transparent;transition:border-color 0.15s';
             img.onclick = () => {
               document.getElementById(p+'-url').value = ph.image;
               const prev = document.getElementById(p+'-preview');
-              if (prev) { prev.src = ph.image; prev.style.display='block'; updateLayoutSPreview(p); }
+              if (prev) { prev.src = CF.img(ph.image, 1400); prev.style.display='block'; updateLayoutSPreview(p); }
               grid.querySelectorAll('img').forEach(i => i.style.borderColor='transparent');
               img.style.borderColor = 'var(--ink)';
             };

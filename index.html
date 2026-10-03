@@ -9,7 +9,16 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
   <meta name="description" content="Tomaso Pignocchi is a philosopher and photographer. Explore publications, philosophy, photography, and contact information." />
   <meta name="robots" content="max-snippet:160" />
-
+  <link rel="canonical" href="https://tomasopignocchi.com/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Tomaso Pignocchi" />
+  <meta property="og:title" content="Tomaso Pignocchi — Philosophy, Photography, Publications" />
+  <meta property="og:description" content="Tomaso Pignocchi is a philosopher and photographer. Explore publications, philosophy, photography, and contact information." />
+  <meta property="og:url" content="https://tomasopignocchi.com/" />
+  <meta property="og:image" content="https://images.ctfassets.net/fejt7dmbrv9e/bKeES2F76vQkYBUkbzndz/c14dd4527fee4287de3301ff643c1797/DSC04046.webp?w=1200&amp;h=630&amp;fit=fill&amp;fm=jpg&amp;q=80" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
   <title>Tomaso Pignocchi — Philosophy, Photography, Publications</title>
   <script>
     /* ── Apply saved layout instantly + hide body to prevent flash ── */
@@ -378,7 +387,7 @@
       text-transform:uppercase;color:var(--color-labels,var(--page-ink3));
     }
     .see-more{
-      font-family:var(--font-seemore,var(--font-secondary));font-size:calc(.52rem*var(--sz-seemore,1));letter-spacing:.14em;
+      font-family:var(--font-seemore,var(--font-secondary));font-weight:var(--wt-seemore,inherit);font-size:calc(.52rem*var(--sz-seemore,1));letter-spacing:.14em;
       text-transform:uppercase;color:var(--color-seemore,var(--page-ink3));text-decoration:none;
       border-bottom:.5px solid var(--page-rule);transition:color .2s,border-color .2s;
     }
@@ -445,7 +454,7 @@
     /* FOOTER */
     footer{border-top:none}
     footer .wrap{padding-top:1.4rem;padding-bottom:1.4rem;display:flex;justify-content:space-between;align-items:center}
-    footer p{font-family:var(--font-footer,var(--font-secondary));font-weight:300;font-size:calc(.5rem*var(--sz-footer,1));letter-spacing:.14em;text-transform:uppercase;color:var(--color-footer,var(--page-ink3))}
+    footer p{font-family:var(--font-footer,var(--font-secondary));font-weight:var(--wt-footer,300);font-size:calc(.5rem*var(--sz-footer,1));letter-spacing:.14em;text-transform:uppercase;color:var(--color-footer,var(--page-ink3))}
 
 
     /* ─── P: nome nella nav + sottotitolo grande + foto|bio ─── */
@@ -671,7 +680,7 @@
         </div>
       </div>
       <div class="i-bio" data-nosnippet>
-        <p id="bioText">I am a Ph.D. candidate in philosophy at the Institut Catholique de Paris and Universit&agrave; degli Studi La Sapienza, Roma. My research investigates the intersection of Wittgenstein&rsquo;s later philosophy and Madhyamaka Buddhism.</p>
+        <p id="bioText">I am a Ph.D. candidate in philosophy at the Catholic University of Paris and the University of Rome LUMSA, where I also serve as a teaching assistant. I hold the same position at Sapienza University of Rome, working in Ethics and Philosophy of Psychology. I am currently an International Guest Research Associate at Kyoto University.<br>My research explores the relation between the foundationalist impulse at work in a significant strand of the philosophical tradition and the deeper needs that may underlie it. More specifically, I explore Wittgenstein’s later philosophy in dialogue with Buddhist thought, especially the Madhyamaka school of Buddhism, with particular attention to language and to philosophy as a practice of clarification and transformation rather than system-building. I also draw on psychoanalytic thought and on thinkers such as Nietzsche, Schopenhauer, Hamann, and Kierkegaard.<br>Outside philosophy, I take photographs, especially while travelling; you can find some of my work in the photography section of this site. <br>I also love wine and run a wine bar in Rome with some of my closest friends.</p>
       </div>
     </div>
   </section>
@@ -784,6 +793,18 @@
     const CF_SPACE    = 'fejt7dmbrv9e';
     const CF_DELIVERY = 'tOHgPb2AaW4raBzCEnxzs5QhFMnNdyOGJDF3sTKGAgc';
 
+    /* Banners: ask Contentful for a resized webp instead of the original file */
+    function setBannerImg(img, url) {
+      if (!url) return;
+      if (typeof CF !== 'undefined' && CF.img && /images\.ctfassets\.net/.test(url)) {
+        img.srcset = [800, 1400, 2200].map(w => CF.img(url, w) + ' ' + w + 'w').join(', ');
+        img.sizes = '(max-width: 1240px) 100vw, 1200px';
+        img.src = CF.img(url, 1400);
+      } else {
+        img.src = url;
+      }
+    }
+
     async function cfGet(contentType, params) {
       const qs = new URLSearchParams({ content_type: contentType, limit: 200, include: 2, ...(params||{}) });
       const r = await fetch(
@@ -857,6 +878,9 @@
         if (sc[colorKey]) root.style.setProperty('--color-' + prefix, sc[colorKey]);
         if (sc[lhKey])    root.style.setProperty('--lh-' + prefix, sc[lhKey] / 100);
       }
+      /* These four live in siteSettings (siteContent is at Contentful's 50-field limit) */
+      sc = Object.assign({}, sc);
+      ['pubsLineHeight','photoLineHeight','seemoreFontWeight','footerFontWeight'].forEach(k => { if (ss && ss[k]) sc[k] = ss[k]; });
       ['name','sub','bio','pubs','venue','labels','sublabels','seemore','photo','footer'].forEach(p => applySection(p, sc));
       if (sc.bioColor || sc.textColor) root.style.setProperty('--color-contact', sc.bioColor || sc.textColor);
       if (sc.labelsColor || sc.textColor) root.style.setProperty('--color-contact-muted', sc.labelsColor || sc.textColor);
@@ -1012,17 +1036,17 @@
           /* Banner 1 (hero) */
           if (ss.heroBanner) {
             const img = document.getElementById('heroBannerImg');
-            if (img) img.src = ss.heroBanner;
+            if (img) setBannerImg(img, ss.heroBanner);
           }
           /* Layout S banners */
           const root = document.documentElement;
           if (banner2Url) {
             const img2 = document.getElementById('bannerS2Img');
-            if (img2) img2.src = banner2Url;
+            if (img2) setBannerImg(img2, banner2Url);
           }
           if (banner1Url) {
             const img1 = document.getElementById('bannerS1Img');
-            if (img1) img1.src = banner1Url;
+            if (img1) setBannerImg(img1, banner1Url);
           }
           if (banner1PosX != null && banner1PosY != null)
             root.style.setProperty('--pos-s1', banner1PosX + '% ' + banner1PosY + '%');
@@ -1039,7 +1063,7 @@
           if (label1Text) { const el = document.getElementById('labelS1'); if (el) el.textContent = label1Text; }
           if (label2Text) { const el = document.getElementById('labelS2'); if (el) el.textContent = label2Text; }
           /* Banner 3 */
-          if (banner3Url) { const img3 = document.getElementById('bannerS3Img'); if (img3) img3.src = banner3Url; }
+          if (banner3Url) { const img3 = document.getElementById('bannerS3Img'); if (img3) setBannerImg(img3, banner3Url); }
           if (banner3PosX != null && banner3PosY != null) root.style.setProperty('--pos-s3', banner3PosX + '% ' + banner3PosY + '%');
           if (label3Font)   root.style.setProperty('--font-label-s3', label3Font);
           if (label3Weight) root.style.setProperty('--wt-label-s3', label3Weight);

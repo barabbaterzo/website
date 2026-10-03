@@ -53,9 +53,11 @@ async function getLayout(env) {
     const data = await r.json();
     const layout = (data.items?.[0]?.fields?.heroStyle || 'a').toLowerCase();
 
-    /* Cache in KV for 60 seconds */
+    /* Cache in KV for 5 minutes (KV's minimum is 60s; 5 min keeps
+       daily writes well inside the free-plan limit). A layout change
+       made in the admin shows up for visitors within 5 minutes. */
     if (env.KV) {
-      env.KV.put('layout', layout, { expirationTtl: 5 }).catch(() => {});
+      env.KV.put('layout', layout, { expirationTtl: 300 }).catch(() => {});
     }
     return layout;
   } catch {
